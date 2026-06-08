@@ -1,0 +1,298 @@
+import type { FibelContext, FibelPage, FibelPlugin, NavSection, ThemeMode } from "../types";
+import { escapeHtml, joinUrl } from "../utils";
+import { clientScript } from "../client/script";
+
+export function layoutPlugin(): FibelPlugin {
+  return {
+    name: "layout",
+    setup(context) {
+      context.services.renderPage = (page, request) => renderDocument(page, request, context);
+    },
+    routes() {
+      return [
+        {
+          path: "/client.js",
+          handler: () => new Response(clientScript, { headers: { "Content-Type": "application/javascript; charset=utf-8" } }),
+        },
+      ];
+    },
+  };
+}
+
+function renderDocument(page: FibelPage, request: Request, context: FibelContext) {
+  const theme = context.services.getTheme(request, context);
+  const config = context.config;
+  const stylesheet = joinUrl(config.routing.basePath, config.routing.internalPath, "styles.css");
+  const client = joinUrl(config.routing.basePath, config.routing.internalPath, "client.js");
+  const favicon = joinUrl(config.routing.basePath, config.routing.internalPath, "favicon.svg");
+  const searchUrl = joinUrl(config.routing.basePath, config.routing.internalPath, "search");
+  const canonical = config.siteUrl ? `${config.siteUrl}${page.href}` : page.href;
+  const title = page.meta.title === config.title ? page.meta.title : `${page.meta.title} - ${config.title}`;
+
+  return `<!doctype html>
+<html lang="${page.locale.code}" dir="${page.locale.dir ?? "ltr"}" class="${theme}" data-theme="${theme}" style="color-scheme:${theme}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="view-transition" content="same-origin">
+    <meta name="theme-color" content="${theme === "dark" ? "#0b1020" : "#f8fafc"}">
+    <title>${escapeHtml(title)}</title>
+    <meta name="description" content="${escapeHtml(page.meta.description)}">
+    <link rel="canonical" href="${escapeHtml(canonical)}">
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="${escapeHtml(config.title)}">
+    <meta property="og:title" content="${escapeHtml(page.meta.title)}">
+    <meta property="og:description" content="${escapeHtml(page.meta.description)}">
+    <meta property="og:url" content="${escapeHtml(canonical)}">
+    <link rel="icon" type="image/svg+xml" href="${favicon}">
+    <link rel="stylesheet" href="${stylesheet}">
+  </head>
+  <body class="min-h-screen bg-white text-zinc-950 antialiased dark:bg-zinc-950 dark:text-zinc-100">
+    ${renderShell(page, context.nav.get(page.locale.code) ?? [], theme, searchUrl, context)}
+    <script>window.__FIBEL__=${JSON.stringify({
+      cookieName: config.theme.cookieName,
+      defaultTheme: config.theme.defaultMode,
+      searchUrl,
+      locale: page.locale.code,
+    })}</script>
+    <script type="module" src="${client}"></script>
+  </body>
+</html>`;
+}
+
+function renderShell(page: FibelPage, nav: NavSection[], theme: ThemeMode, searchUrl: string, context: FibelContext) {
+  return `<div class="fibel-app min-h-screen">
+    <header class="fibel-topbar sticky top-0 z-40 border-b border-zinc-200 bg-white/92 backdrop-blur-xl dark:border-white/10 dark:bg-zinc-950/90">
+      <div class="relative mx-auto grid h-16 max-w-[120rem] grid-cols-[auto_1fr_auto] items-center gap-3 px-4 md:flex md:gap-5 md:px-5 lg:px-8">
+        <button class="fibel-icon-button md:hidden" type="button" data-nav-toggle aria-label="Open navigation" aria-expanded="false">
+          <span class="sr-only">Open navigation</span>
+          ${menuIcon()}
+        </button>
+        <a class="absolute left-1/2 flex -translate-x-1/2 items-center text-[2rem] font-medium leading-none tracking-tight md:static md:translate-x-0" style="color:#d69e2e" href="${joinUrl(context.config.routing.basePath, page.locale.code)}">
+          <span class="truncate lowercase">${escapeHtml(context.config.title)}</span><span class="ml-0.5 opacity-80">|</span>
+        </a>
+        ${renderTopNav(page, context)}
+        <div class="ml-auto hidden items-center gap-3 md:flex">
+          <button class="fibel-search-button" type="button" data-search-open>
+            <span class="text-zinc-400">${searchIcon("h-4 w-4")}</span>
+            <span class="text-zinc-400">Search docs</span>
+            <span class="ml-auto flex items-center gap-1">
+              <kbd class="rounded-full border border-zinc-200 bg-zinc-50 px-1.5 py-0.5 text-[11px] text-zinc-500 dark:border-white/10 dark:bg-white/10 dark:text-zinc-400">⌘K</kbd>
+              <kbd class="rounded-full border border-zinc-200 bg-zinc-50 px-1.5 py-0.5 text-[11px] text-zinc-500 dark:border-white/10 dark:bg-white/10 dark:text-zinc-400">/</kbd>
+            </span>
+          </button>
+          ${renderLocaleMenu(page, context, "header")}
+          <button class="fibel-control-icon-button" type="button" data-theme-toggle aria-label="Toggle theme">
+            <span data-theme-icon>${themeIcon(theme)}</span>
+          </button>
+        </div>
+        <button class="fibel-icon-button ml-auto md:hidden" type="button" data-search-open aria-label="Search documentation">
+          ${searchIcon("h-5 w-5")}
+        </button>
+      </div>
+    </header>
+
+    <div class="mx-auto grid max-w-[120rem] grid-cols-1 lg:grid-cols-[19rem_minmax(0,1fr)]">
+      <div class="fixed inset-x-0 bottom-0 top-16 z-40 hidden bg-zinc-950/20 backdrop-blur-[1px] lg:hidden" data-sidebar-backdrop></div>
+      <aside class="fibel-sidebar fixed bottom-0 left-0 top-16 z-50 w-80 -translate-x-full overflow-y-auto border-r border-zinc-200 bg-white p-5 pt-6 transition-transform dark:border-white/10 dark:bg-zinc-950 lg:sticky lg:top-16 lg:z-20 lg:h-[calc(100vh-4rem)] lg:w-auto lg:translate-x-0 lg:pt-9" data-sidebar>
+        ${renderNav(nav, page)}
+      </aside>
+      <main class="min-w-0 px-5 py-10 sm:px-10 lg:px-20 lg:py-14">
+        <article class="mx-auto max-w-4xl">
+          <div class="mb-9">
+            <h1 class="text-[2.6rem] font-semibold leading-tight tracking-[-0.01em] text-zinc-900 dark:text-white md:text-5xl">${escapeHtml(page.meta.title)}</h1>
+            <p class="mt-5 max-w-3xl text-[1.15rem] leading-8 text-zinc-600 dark:text-zinc-300">${escapeHtml(page.meta.description)}</p>
+            ${renderPageActions(page)}
+          </div>
+          <div class="fibel-prose">${page.html}</div>
+          ${renderPager(page, context.pages.filter((candidate) => candidate.locale.code === page.locale.code && !candidate.meta.hidden))}
+        </article>
+      </main>
+    </div>
+    ${renderFooter(page, context, theme)}
+    ${renderSearchDialog(searchUrl)}
+  </div>`;
+}
+
+function themeIcon(theme: ThemeMode) {
+  return theme === "dark"
+    ? '<svg viewBox="0 0 24 24" aria-hidden="true" class="h-4 w-4"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.2m0 13.6V21m6.36-15.36-1.55 1.55M7.19 16.81l-1.55 1.55M21 12h-2.2M5.2 12H3m15.36 6.36-1.55-1.55M7.19 7.19 5.64 5.64M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z"/></svg>'
+    : '<svg viewBox="0 0 24 24" aria-hidden="true" class="h-4 w-4"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M21 13.2A7.5 7.5 0 0 1 10.8 3 8.5 8.5 0 1 0 21 13.2Z"/></svg>';
+}
+
+function menuIcon() {
+  return '<svg viewBox="0 0 24 24" aria-hidden="true" class="h-5 w-5"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M5 7h14M5 12h14M5 17h14"/></svg>';
+}
+
+function searchIcon(className: string) {
+  return `<svg viewBox="0 0 24 24" aria-hidden="true" class="${className}"><path fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35M10.8 18a7.2 7.2 0 1 1 0-14.4 7.2 7.2 0 0 1 0 14.4Z"/></svg>`;
+}
+
+function renderTopNav(page: FibelPage, context: FibelContext) {
+  const items = [
+    { label: "Docs Home", href: joinUrl(context.config.routing.basePath, page.locale.code), slugs: ["/"] },
+    { label: "Overview", href: joinUrl(context.config.routing.basePath, page.locale.code), slugs: ["/"] },
+    { label: "Guide", href: joinUrl(context.config.routing.basePath, page.locale.code, "runtime"), slugs: ["/runtime", "/configuration", "/search", "/theme"] },
+    { label: "API Reference", href: joinUrl(context.config.routing.basePath, page.locale.code, "plugins"), slugs: ["/plugins"] },
+  ];
+  return `<nav class="hidden items-center gap-7 text-[15px] text-zinc-700 dark:text-zinc-300 md:flex">
+    ${items
+      .map((item, index) => {
+        const active = index === 0 ? false : item.slugs.includes(page.slug);
+        return `<a class="fibel-header-link ${active ? "is-active" : ""}" href="${item.href}">${escapeHtml(item.label)}</a>`;
+      })
+      .join("")}
+  </nav>`;
+}
+
+function renderNav(nav: NavSection[], page: FibelPage) {
+  return `<nav class="space-y-5 text-sm">
+    ${nav
+      .map(
+        (section) => `<details class="group" open>
+          <summary class="flex cursor-pointer list-none items-center justify-between rounded-md px-1 py-1.5 text-[1.05rem] font-bold text-zinc-800 hover:text-zinc-950 dark:text-zinc-200 dark:hover:text-white">
+            ${escapeHtml(section.label)}
+            <span class="grid h-6 w-6 place-items-center text-zinc-400 transition group-open:rotate-90">${sectionChevronIcon()}</span>
+          </summary>
+          <div class="mt-2 space-y-1">
+            ${section.pages
+              .map((item) => {
+                const active = item.id === page.id;
+                return `<a class="block border-l-2 py-1.5 pl-4 text-[0.98rem] leading-6 ${active ? "border-[#d69e2e] font-semibold text-zinc-950 dark:border-[#f6c453] dark:text-white" : "border-transparent text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white"}" href="${item.href}">${escapeHtml(item.meta.navTitle)}</a>`;
+              })
+              .join("")}
+          </div>
+        </details>`,
+      )
+      .join("")}
+  </nav>`;
+}
+
+function renderLocaleMenu(page: FibelPage, context: FibelContext, placement: "header" | "footer") {
+  const sameSlug = context.pages.filter((candidate) => candidate.slug === page.slug);
+  if (sameSlug.length < 2) return "";
+  const current = sameSlug.find((candidate) => candidate.locale.code === page.locale.code) ?? page;
+  const placementClass = placement === "header" ? "" : "";
+  const menuClass = placement === "header" ? "right-0 top-11" : "bottom-11 left-0 sm:left-auto sm:right-0";
+  return `<div class="relative ${placementClass}" data-locale-menu>
+    <button class="inline-flex h-9 items-center gap-2 rounded-full border border-zinc-300 bg-white px-3 text-sm text-zinc-700 shadow-[0_1px_8px_rgb(0_0_0_/_0.04)] hover:border-zinc-400 dark:border-white/10 dark:bg-white/5 dark:text-zinc-200 dark:hover:bg-white/10" type="button" data-locale-trigger aria-haspopup="listbox" aria-expanded="false">
+      <span>${escapeHtml(current.locale.label)}</span>
+      <span class="grid place-items-center text-zinc-400">${chevronIcon()}</span>
+    </button>
+    <div class="absolute ${menuClass} z-50 min-w-48 space-y-1 rounded-2xl border border-zinc-200 bg-white p-2 shadow-xl shadow-zinc-950/10 dark:border-white/10 dark:bg-zinc-900 dark:shadow-black/30" data-locale-list role="listbox" aria-label="Language" hidden>
+      ${sameSlug
+        .map((candidate) => {
+          const active = candidate.locale.code === page.locale.code;
+          return `<a class="flex items-center justify-between gap-3 rounded-xl px-3 py-2 text-sm outline-none transition ${active ? "text-[#b7791f] dark:text-[#f6c453]" : "text-zinc-700 hover:bg-zinc-100 focus:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-white/10 dark:focus:bg-white/10"}" href="${candidate.href}" role="option" aria-selected="${active}" tabindex="-1"><span>${escapeHtml(candidate.locale.label)}</span>${active ? `<span class="text-[#d69e2e] dark:text-[#f6c453]">${checkIcon("h-4 w-4")}</span>` : ""}</a>`;
+        })
+        .join("")}
+    </div>
+  </div>`;
+}
+
+function sectionChevronIcon() {
+  return '<svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m7 5 5 5-5 5"/></svg>';
+}
+
+function renderFooter(page: FibelPage, context: FibelContext, theme: ThemeMode) {
+  const links = context.config.footerLinks;
+  if (links.length === 0 && context.config.locales.length < 2) return "";
+  return `<footer class="border-t border-zinc-200 bg-white dark:border-white/10 dark:bg-zinc-950">
+    <div class="mx-auto flex max-w-[120rem] flex-col gap-4 px-5 py-7 text-sm text-zinc-500 dark:text-zinc-400 sm:flex-row sm:items-center sm:justify-between lg:px-8">
+      <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+        <span>© ${new Date().getFullYear()} ${escapeHtml(context.config.title)}</span>
+        ${links.map((link) => `<a class="hover:text-[#b7791f] dark:hover:text-[#f6c453]" href="${escapeHtml(resolveFooterHref(link.value, context))}">${escapeHtml(link.label)}</a>`).join("")}
+      </div>
+      <div class="flex items-center gap-2">
+        <button class="fibel-icon-button md:hidden" type="button" data-theme-toggle aria-label="Toggle theme"><span data-theme-icon>${themeIcon(theme)}</span></button>
+        ${renderLocaleMenu(page, context, "footer")}
+      </div>
+    </div>
+  </footer>`;
+}
+
+function renderPageActions(page: FibelPage) {
+  const markdownHref = rawMarkdownHref(page);
+  const tags = page.meta.tags.slice(0, 4);
+  const updated = page.meta.updated ? `<span class="page-chip">${calendarIcon()}Updated ${escapeHtml(page.meta.updated)}</span>` : "";
+  return `<div class="mt-5 flex flex-wrap items-center gap-2">
+    <span class="page-chip">${clockIcon()}${readingTime(page.body)} min read</span>
+    ${updated}
+    ${tags.map((tag) => `<span class="page-chip page-chip-accent">#${escapeHtml(tag)}</span>`).join("")}
+    <button class="page-chip-action" type="button" data-copy-page aria-label="Copy page link" title="Copy page link"><span class="copy-feedback-icon">${linkIcon("h-3.5 w-3.5")}</span></button>
+    <button class="page-chip-action" type="button" data-copy-markdown="${escapeHtml(markdownHref)}" aria-label="Copy Markdown link" title="Copy Markdown link"><span class="copy-feedback-icon">${markdownIcon()}</span></button>
+  </div>`;
+}
+
+function rawMarkdownHref(page: FibelPage) {
+  const normalized = page.href.replace(/\/+$/g, "");
+  return `${normalized || "/index"}.md`;
+}
+
+function readingTime(markdown: string) {
+  const words = markdown
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/`[^`]*`/g, " ")
+    .replace(/<[^>]+>/g, " ")
+    .split(/\s+/)
+    .filter(Boolean).length;
+  return Math.max(1, Math.ceil(words / 220));
+}
+
+function chevronIcon() {
+  return '<svg viewBox="0 0 20 20" aria-hidden="true" class="h-3.5 w-3.5"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="m6 8 4 4 4-4"/></svg>';
+}
+
+function checkIcon(className: string) {
+  return `<svg viewBox="0 0 24 24" aria-hidden="true" class="${className}"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m20 6-11 11-5-5"/></svg>`;
+}
+
+function clockIcon() {
+  return '<svg viewBox="0 0 24 24" aria-hidden="true" class="h-3.5 w-3.5"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M12 7v5l3 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>';
+}
+
+function calendarIcon() {
+  return '<svg viewBox="0 0 24 24" aria-hidden="true" class="h-3.5 w-3.5"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M8 2v4m8-4v4M3 10h18M5 4h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/></svg>';
+}
+
+function linkIcon(className: string) {
+  return `<svg viewBox="0 0 24 24" aria-hidden="true" class="${className}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l2.12-2.12a5 5 0 0 0-7.07-7.07L11 4.93"/><path d="M14 11a5 5 0 0 0-7.07 0L4.81 13.12a5 5 0 0 0 7.07 7.07L13 19.07"/></svg>`;
+}
+
+function markdownIcon() {
+  return '<svg viewBox="0 0 24 24" aria-hidden="true" class="h-3.5 w-3.5"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M4 6h16v12H4zM7 15V9l2.5 3L12 9v6m4-6v6m0 0-2-2m2 2 2-2"/></svg>';
+}
+
+function resolveFooterHref(value: string, context: FibelContext) {
+  if (/^(https?:|mailto:|tel:|#)/.test(value)) return value;
+  if (value.startsWith("/")) return joinUrl(context.config.routing.basePath, value);
+  return value;
+}
+
+function renderPager(page: FibelPage, pages: FibelPage[]) {
+  const ordered = [...pages].sort((a, b) => a.meta.order - b.meta.order || a.href.localeCompare(b.href));
+  const index = ordered.findIndex((candidate) => candidate.id === page.id);
+  const prev = index > 0 ? ordered[index - 1] : undefined;
+  const next = index >= 0 && index < ordered.length - 1 ? ordered[index + 1] : undefined;
+  return `<div class="mt-16 grid gap-4 border-t border-zinc-200 pt-7 dark:border-white/10 sm:grid-cols-2">
+    ${prev ? `<a class="group rounded-lg border border-zinc-200 bg-white p-5 transition hover:border-[#d69e2e]/60 hover:shadow-[0_8px_28px_rgb(0_0_0_/_0.08)] dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-[#f6c453]/55" href="${prev.href}"><span class="text-xs text-zinc-500 dark:text-zinc-400">Previous</span><strong class="mt-1 block text-zinc-900 group-hover:text-[#b7791f] dark:text-white dark:group-hover:text-[#f6c453]">${escapeHtml(prev.meta.navTitle)}</strong></a>` : "<div></div>"}
+    ${next ? `<a class="group rounded-lg border border-zinc-200 bg-white p-5 text-right transition hover:border-[#d69e2e]/60 hover:shadow-[0_8px_28px_rgb(0_0_0_/_0.08)] dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-[#f6c453]/55" href="${next.href}"><span class="text-xs text-zinc-500 dark:text-zinc-400">Next</span><strong class="mt-1 block text-zinc-900 group-hover:text-[#b7791f] dark:text-white dark:group-hover:text-[#f6c453]">${escapeHtml(next.meta.navTitle)}</strong></a>` : "<div></div>"}
+  </div>`;
+}
+
+function renderSearchDialog(searchUrl: string) {
+  return `<div class="fixed inset-0 z-[70] hidden bg-slate-950/40 p-4 backdrop-blur-sm" data-search-dialog>
+    <div class="mx-auto mt-20 max-w-2xl overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-2xl shadow-zinc-950/20 ring-1 ring-black/5 dark:border-white/10 dark:bg-zinc-900 dark:shadow-black/40 dark:ring-white/10">
+      <div class="border-b border-zinc-200 bg-zinc-50/70 p-3 dark:border-white/10 dark:bg-white/[0.03]">
+        <div class="flex items-center gap-3 rounded-full bg-white px-4 py-2.5 ring-1 ring-zinc-200 focus-within:ring-2 focus-within:ring-[#d69e2e] dark:bg-white/10 dark:ring-white/10 dark:focus-within:ring-[#f6c453]">
+          <span class="text-zinc-400">${searchIcon("h-5 w-5")}</span>
+          <input class="min-w-0 flex-1 bg-transparent py-1 text-base outline-none placeholder:text-slate-400" data-search-input placeholder="Search documentation..." autocomplete="off">
+          <kbd class="rounded-full border border-zinc-200 bg-zinc-50 px-1.5 py-0.5 text-[11px] text-zinc-500 dark:border-white/10 dark:bg-white/10 dark:text-zinc-400">Esc</kbd>
+        </div>
+      </div>
+      <div class="max-h-[28rem] overflow-y-auto p-2" data-search-results data-search-url="${searchUrl}">
+        <p class="px-3 py-8 text-center text-sm text-slate-500 dark:text-slate-400">Type to search the current language. Open anytime with Mod+K.</p>
+      </div>
+    </div>
+  </div>`;
+}

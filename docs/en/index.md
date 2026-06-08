@@ -1,0 +1,92 @@
+---
+title: Fibel
+navTitle: Overview
+section: Start
+order: 1
+description: Fibel publishes Markdown documentation as a server-rendered website with search, multilingual routing, and Markdown source pages for tools.
+tags: [overview, markdown, docs]
+updated: 2026-06-09
+---
+
+# Fibel
+
+Fibel is for teams that maintain product and developer documentation in a repository and publish it as a website. Content lives in Markdown files. Fibel renders those files into pages with navigation, search, language switching, and stable links to the Markdown source.
+
+The same documentation remains usable in three workflows: code review, browser reading, and tools such as LLMs that consume Markdown directly.
+
+## Use cases
+
+- Documentation should be versioned next to the code.
+- Readers need a complete website with navigation, search, and theme support.
+- Multilingual pages should keep the same structure across locales.
+- LLMs and automation should be able to read Markdown source content directly.
+- Projects should be able to run Fibel as a docs app or mount it under a route in an existing app.
+
+## What Fibel provides
+
+- Server-rendered HTML with title, description, and canonical URL.
+- Locale folders for multilingual documentation.
+- A default theme with light and dark mode.
+- Built-in search backed by a server-side index.
+- Markdown URLs such as `/en/configuration.md` for tools and review workflows.
+- Page actions for copying page and Markdown links.
+- Heading anchors for linking to specific sections.
+- A plugin system for extending or replacing individual capabilities.
+
+## Project structure
+
+A Fibel site needs a config file and a Markdown folder. Assets are optional.
+
+```txt
+fibel.config.ts
+docs/
+  en/
+    index.md
+    configuration.md
+  de/
+    index.md
+    configuration.md
+assets/
+```
+
+Each locale has its own folder. A page at `docs/en/configuration.md` is served as `/en/configuration`. The same content is available as Markdown at `/en/configuration.md` and `/en/configuration.markdown`.
+
+## Quick start
+
+Create the project files:
+
+```sh
+bunx fibel init
+```
+
+Start the local server:
+
+```sh
+bunx fibel dev
+```
+
+Open the printed URL and edit the Markdown files in the `docs` folder.
+
+## Page model
+
+A page consists of frontmatter and Markdown content.
+
+```md
+---
+title: Configuration
+navTitle: Configuration
+section: Start
+order: 2
+description: Configure routes, locales, assets, theme, and plugins.
+tags: [config, routing]
+updated: 2026-06-09
+---
+
+# Configuration
+```
+
+Frontmatter controls metadata, navigation, and page chips. The first Markdown `#` heading is treated as the page title. The default layout renders that title once and omits the first `#` heading from the article body.
+
+## Next steps
+
+Read Configuration first when setting up a project. Read Hosting when Fibel should run inside another app. The plugin pages explain which capabilities are built in and how to add project-specific behavior.
