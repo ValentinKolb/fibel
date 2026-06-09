@@ -111,6 +111,7 @@ export type FibelContext = {
   config: ResolvedFibelConfig;
   pages: FibelPage[];
   nav: Map<string, NavSection[]>;
+  footerItems: string[];
   searchIndex: SearchEntry[];
   routes: FibelRoute[];
   services: FibelServices;

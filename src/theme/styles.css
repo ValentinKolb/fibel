@@ -229,6 +229,14 @@
   .page-chip-action[data-copied="true"] {
     @apply border-emerald-300/50 bg-emerald-50 text-emerald-700 dark:border-emerald-300/30 dark:bg-emerald-300/10 dark:text-emerald-300;
   }
+
+  .fibel-powered-by {
+    @apply text-zinc-400 dark:text-zinc-500;
+  }
+
+  .fibel-powered-by a {
+    @apply font-medium text-zinc-600 transition hover:text-[#b7791f] dark:text-zinc-300 dark:hover:text-[#f6c453];
+  }
 }
 
 @supports (view-transition-name: root) {

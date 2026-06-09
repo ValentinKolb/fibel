@@ -3,7 +3,7 @@ title: Integrierte Plugins
 navTitle: Überblick
 section: Integrierte Plugins
 order: 25
-description: Fibel liefert ein Standard-Plugin-Set für Markdown, Theme, i18n, SEO, Assets, Suche und Layout.
+description: Fibel liefert ein Standard-Plugin-Set für Markdown, Theme, i18n, SEO, Assets, Suche, Powered-by-Hinweis und Layout.
 tags: [plugins, integriert]
 updated: 2026-06-09
 ---
@@ -28,6 +28,7 @@ Das Standard-Set enthält:
 - `seoPlugin`: liefert SEO-Dateien wie Favicon, Sitemap und Robots-Ausgabe.
 - `assetsPlugin`: liefert Dateien aus dem konfigurierten Assets-Ordner.
 - `searchPlugin`: baut den Suchindex und stellt den Suchendpunkt bereit.
+- `poweredByPlugin`: ergänzt den Hinweis `Powered by fibel.dev` im Footer.
 - `layoutPlugin`: rendert Navigation, Seitenlayout, Page-Actions, Footer, Suchdialog und Client-Script.
 
 ## Standard-Set erweitern
@@ -66,6 +67,8 @@ export default defineFibel({
 ```
 
 Fibel ergänzt ausgelassene Plugins nicht automatisch. Eine eigene Liste sollte alle Funktionen enthalten, die die Website benötigt.
+
+Um den standardmäßigen Footer-Hinweis zu entfernen, verwende eine Plugin-Liste ohne `poweredByPlugin`.
 
 ## Routen und Zuständigkeiten
 

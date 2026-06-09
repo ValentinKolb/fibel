@@ -3,7 +3,7 @@ title: Built-in plugins
 navTitle: Overview
 section: Built-in plugins
 order: 25
-description: Fibel ships with a default plugin set for Markdown, theme handling, i18n, SEO, assets, search, and layout.
+description: Fibel ships with a default plugin set for Markdown, theme handling, i18n, SEO, assets, search, powered-by attribution, and layout.
 tags: [plugins, built-in]
 updated: 2026-06-09
 ---
@@ -28,6 +28,7 @@ The default set includes:
 - `seoPlugin`: serves SEO files such as favicon, sitemap, and robots output.
 - `assetsPlugin`: serves files from the configured assets folder.
 - `searchPlugin`: builds the search index and exposes the search endpoint.
+- `poweredByPlugin`: adds the `Powered by fibel.dev` attribution to the footer.
 - `layoutPlugin`: renders navigation, page layout, page actions, footer, search dialog, and client script.
 
 ## Extend the defaults
@@ -66,6 +67,8 @@ export default defineFibel({
 ```
 
 Fibel does not add omitted plugins automatically. A custom list should include every capability the website needs.
+
+To remove the default footer attribution, use a plugin list without `poweredByPlugin`.
 
 ## Routes and ownership
 

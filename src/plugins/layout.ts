@@ -196,16 +196,20 @@ function sectionChevronIcon() {
 
 function renderFooter(page: FibelPage, context: FibelContext, theme: ThemeMode) {
   const links = context.config.footerLinks;
-  if (links.length === 0 && context.config.locales.length < 2) return "";
+  const footerItems = context.footerItems;
+  if (links.length === 0 && context.config.locales.length < 2 && footerItems.length === 0) return "";
   return `<footer class="border-t border-zinc-200 bg-white dark:border-white/10 dark:bg-zinc-950">
-    <div class="mx-auto flex max-w-[120rem] flex-col gap-4 px-5 py-7 text-sm text-zinc-500 dark:text-zinc-400 sm:flex-row sm:items-center sm:justify-between lg:px-8">
+    <div class="mx-auto flex max-w-[120rem] flex-col gap-4 px-5 py-7 text-sm text-zinc-500 dark:text-zinc-400 md:flex-row md:items-center md:justify-between lg:px-8">
       <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
         <span>© ${new Date().getFullYear()} ${escapeHtml(context.config.title)}</span>
         ${links.map((link) => `<a class="hover:text-[#b7791f] dark:hover:text-[#f6c453]" href="${escapeHtml(resolveFooterHref(link.value, context))}">${escapeHtml(link.label)}</a>`).join("")}
       </div>
-      <div class="flex items-center gap-2">
-        <button class="fibel-icon-button md:hidden" type="button" data-theme-toggle aria-label="Toggle theme"><span data-theme-icon>${themeIcon(theme)}</span></button>
-        ${renderLocaleMenu(page, context, "footer")}
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-center md:ml-auto">
+        ${footerItems.length > 0 ? `<div class="flex items-center">${footerItems.join("")}</div>` : ""}
+        <div class="flex items-center gap-2">
+          <button class="fibel-icon-button md:hidden" type="button" data-theme-toggle aria-label="Toggle theme"><span data-theme-icon>${themeIcon(theme)}</span></button>
+          ${renderLocaleMenu(page, context, "footer")}
+        </div>
       </div>
     </div>
   </footer>`;
