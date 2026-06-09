@@ -35,7 +35,7 @@ The build creates a runtime entry and generated documentation files. Requests st
 ```ts
 import { Hono } from "hono";
 import config from "./fibel.config";
-import { createFibelApp } from "fibel";
+import { createFibelApp } from "@valentinkolb/fibel";
 
 const docs = await createFibelApp(config);
 const app = new Hono();

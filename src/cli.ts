@@ -39,7 +39,7 @@ async function build() {
   await mkdir(dist, { recursive: true });
   await writeFile(
     join(dist, "server.ts"),
-    `import config from ${JSON.stringify(configImport)};\nimport { createFibelApp } from "fibel";\nconst app = await createFibelApp(config);\nexport default { fetch: app.fetch, port: Number(process.env.PORT ?? 3000) };\n`,
+    `import config from ${JSON.stringify(configImport)};\nimport { createFibelApp } from "@valentinkolb/fibel";\nconst app = await createFibelApp(config);\nexport default { fetch: app.fetch, port: Number(process.env.PORT ?? 3000) };\n`,
   );
   await cp(join(root, ".fibel"), join(dist, ".fibel"), { recursive: true, force: true });
   console.log("Built Fibel runtime into dist/.");
@@ -51,7 +51,7 @@ async function initProject() {
   await mkdir("assets", { recursive: true });
   await writeFile(
     "fibel.config.ts",
-    `import { defineFibel } from "fibel";\n\nexport default defineFibel({\n  title: "My Fibel",\n  description: "Documentation built with Fibel.",\n  siteUrl: "https://example.com",\n  locales: [{ code: "en", label: "English" }],\n  defaultLocale: "en",\n});\n`,
+    `import { defineFibel } from "@valentinkolb/fibel";\n\nexport default defineFibel({\n  title: "My Fibel",\n  description: "Documentation built with Fibel.",\n  siteUrl: "https://example.com",\n  locales: [{ code: "en", label: "English" }],\n  defaultLocale: "en",\n});\n`,
   );
   await writeFile(
     "docs/en/index.md",

@@ -15,7 +15,7 @@ Plugins extend Fibel at defined points: before content is loaded, after pages ar
 ## Plugin shape
 
 ```ts
-import type { FibelPlugin } from "fibel";
+import type { FibelPlugin } from "@valentinkolb/fibel";
 
 export function projectPlugin(): FibelPlugin {
   return {
@@ -40,7 +40,7 @@ export function projectPlugin(): FibelPlugin {
 This example adds a notice before every Markdown document and then calls the existing Markdown renderer.
 
 ```ts
-import type { FibelPlugin } from "fibel";
+import type { FibelPlugin } from "@valentinkolb/fibel";
 
 export function markdownNoticePlugin(): FibelPlugin {
   return {
@@ -64,7 +64,7 @@ Use this pattern for shared notices, project banners, or small content adjustmen
 Validation plugins fail startup when content does not match project rules.
 
 ```ts
-import type { FibelPlugin } from "fibel";
+import type { FibelPlugin } from "@valentinkolb/fibel";
 
 export function requireTagsPlugin(): FibelPlugin {
   return {
@@ -87,7 +87,7 @@ Useful checks include missing descriptions, invalid tags, incomplete translation
 Routes receive the current request and the Fibel context. This example serves a small JSON manifest of all pages.
 
 ```ts
-import type { FibelPlugin } from "fibel";
+import type { FibelPlugin } from "@valentinkolb/fibel";
 
 export function docsManifestPlugin(): FibelPlugin {
   return {
@@ -120,7 +120,7 @@ Choose custom route paths so they do not collide with internal routes or page pa
 Most projects append their plugins to the default set.
 
 ```ts
-import { defineFibel, defaultPlugins } from "fibel";
+import { defineFibel, defaultPlugins } from "@valentinkolb/fibel";
 import { docsManifestPlugin } from "./plugins/docs-manifest";
 import { requireTagsPlugin } from "./plugins/require-tags";
 

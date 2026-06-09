@@ -15,7 +15,7 @@ Fibel assembles its default behavior from normal plugins. Projects can use that 
 ## Default set
 
 ```ts
-import { defaultPlugins } from "fibel";
+import { defaultPlugins } from "@valentinkolb/fibel";
 
 const plugins = defaultPlugins();
 ```
@@ -35,7 +35,7 @@ The default set includes:
 Append project plugins to the default set when the built-in behavior should remain active.
 
 ```ts
-import { defineFibel, defaultPlugins } from "fibel";
+import { defineFibel, defaultPlugins } from "@valentinkolb/fibel";
 import { projectLinksPlugin } from "./plugins/project-links";
 
 export default defineFibel({
@@ -51,7 +51,7 @@ This is the right starting point for most projects.
 Replace the plugin list when a project owns rendering, layout, search, or routes itself.
 
 ```ts
-import { defineFibel } from "fibel";
+import { defineFibel } from "@valentinkolb/fibel";
 import { searchPlugin, themePlugin } from "fibel/plugins";
 
 export default defineFibel({

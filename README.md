@@ -11,9 +11,9 @@ Fibel targets Bun.
 For an app project:
 
 ```sh
-bun add fibel
-bunx --bun fibel init
-bunx --bun fibel dev --port 5173
+bun add @valentinkolb/fibel
+bunx --bun @valentinkolb/fibel init
+bunx --bun @valentinkolb/fibel dev --port 5173
 ```
 
 Open `http://localhost:5173`. The root path redirects to the configured default locale.
@@ -64,7 +64,7 @@ Each locale has its own folder below `docs/`. A file at `docs/en/configuration.m
 Create `fibel.config.ts` at the project root:
 
 ```ts
-import { defineFibel } from "fibel";
+import { defineFibel } from "@valentinkolb/fibel";
 
 export default defineFibel({
   title: "Product Docs",
@@ -159,7 +159,7 @@ This avoids a visible switch from one theme to the other after hydration.
 Fibel exposes a Web-standard Fetch app. Hosts do not need a specific framework.
 
 ```ts
-import { createFibelApp } from "fibel";
+import { createFibelApp } from "@valentinkolb/fibel";
 import config from "./fibel.config";
 
 const fibel = await createFibelApp(config);
@@ -176,7 +176,7 @@ For a larger app, mount `fibel.fetch` below the same public route configured as 
 Plugins can replace services, validate content, add routes, or derive metadata from the loaded pages.
 
 ```ts
-import { defineFibel, defaultPlugins, type FibelPlugin } from "fibel";
+import { defineFibel, defaultPlugins, type FibelPlugin } from "@valentinkolb/fibel";
 
 function requireTagsPlugin(): FibelPlugin {
   return {
@@ -203,10 +203,10 @@ The built-in plugin set includes Markdown rendering, theme handling, i18n checks
 ## Commands
 
 ```sh
-bunx --bun fibel init
-bunx --bun fibel dev --port 5173 --config fibel.config.ts
-bunx --bun fibel build --config fibel.config.ts
-bunx --bun fibel serve --port 3000 --config fibel.config.ts
+bunx --bun @valentinkolb/fibel init
+bunx --bun @valentinkolb/fibel dev --port 5173 --config fibel.config.ts
+bunx --bun @valentinkolb/fibel build --config fibel.config.ts
+bunx --bun @valentinkolb/fibel serve --port 3000 --config fibel.config.ts
 ```
 
 Repository scripts:
@@ -223,22 +223,20 @@ bun run typecheck
 
 ## Publishing
 
-Before publishing, run the same checks npm runs through `prepublishOnly`:
+Publishing is handled by GitHub Actions through npm trusted publishing. Push a version tag to publish that version:
 
 ```sh
-bun run typecheck
-bun test
-bun run build
-npm pack --dry-run
+git tag v0.0.2
+git push origin v0.0.2
 ```
 
-For the first public release:
+The workflow runs typecheck, tests, build, package-content checks, sets `package.json` to the tag version, and publishes with provenance:
 
 ```sh
-npm whoami
-npm login
-npm publish
+npm publish --provenance --access public
 ```
+
+No npm token is required. The package is connected to `.github/workflows/publish.yml` through npm trusted publishing.
 
 ## Development
 

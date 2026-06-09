@@ -15,7 +15,7 @@ Plugins erweitern Fibel an klaren Stellen: vor dem Laden der Inhalte, nach dem R
 ## Plugin-Form
 
 ```ts
-import type { FibelPlugin } from "fibel";
+import type { FibelPlugin } from "@valentinkolb/fibel";
 
 export function projectPlugin(): FibelPlugin {
   return {
@@ -40,7 +40,7 @@ export function projectPlugin(): FibelPlugin {
 Dieses Beispiel ergänzt vor jedem Markdown-Dokument einen Hinweis und nutzt danach den bestehenden Markdown-Renderer.
 
 ```ts
-import type { FibelPlugin } from "fibel";
+import type { FibelPlugin } from "@valentinkolb/fibel";
 
 export function markdownNoticePlugin(): FibelPlugin {
   return {
@@ -64,7 +64,7 @@ Dieses Muster eignet sich für einheitliche Hinweise, Projekt-Banner oder kleine
 Validierungs-Plugins brechen den Start ab, wenn Inhalte nicht den Projektregeln entsprechen.
 
 ```ts
-import type { FibelPlugin } from "fibel";
+import type { FibelPlugin } from "@valentinkolb/fibel";
 
 export function requireTagsPlugin(): FibelPlugin {
   return {
@@ -87,7 +87,7 @@ Sinnvolle Prüfungen sind fehlende Beschreibungen, ungültige Tags, unvollständ
 Routen erhalten den aktuellen Request und den Fibel-Context. Dieses Beispiel liefert eine kleine JSON-Übersicht aller Seiten.
 
 ```ts
-import type { FibelPlugin } from "fibel";
+import type { FibelPlugin } from "@valentinkolb/fibel";
 
 export function docsManifestPlugin(): FibelPlugin {
   return {
@@ -120,7 +120,7 @@ Wähle eigene Routen so, dass sie nicht mit internen Routen oder Seitenpfaden ko
 Die meisten Projekte hängen eigene Plugins an das Standard-Set an.
 
 ```ts
-import { defineFibel, defaultPlugins } from "fibel";
+import { defineFibel, defaultPlugins } from "@valentinkolb/fibel";
 import { docsManifestPlugin } from "./plugins/docs-manifest";
 import { requireTagsPlugin } from "./plugins/require-tags";
 

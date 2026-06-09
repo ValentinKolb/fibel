@@ -1,5 +1,5 @@
 {
-  "name": "fibel",
+  "name": "@valentinkolb/fibel",
   "version": "0.0.1",
   "description": "Config-first documentation app for Markdown, i18n, search, and no-flicker themes.",
   "type": "module",

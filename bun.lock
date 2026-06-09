@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "fibel",
+      "name": "@valentinkolb/fibel",
       "dependencies": {
         "@valentinkolb/stdlib": "^0.10.0",
         "bun-plugin-tailwind": "^0.1.2",

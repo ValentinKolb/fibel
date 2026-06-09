@@ -15,7 +15,7 @@ updated: 2026-06-09
 ## Minimale Config
 
 ```ts
-import { defineFibel } from "fibel";
+import { defineFibel } from "@valentinkolb/fibel";
 
 export default defineFibel({
   title: "Meine Docs",
@@ -108,7 +108,7 @@ updated: 2026-06-09
 Wenn `plugins` nicht gesetzt ist, lädt Fibel das Default-Plugin-Set.
 
 ```ts
-import { defineFibel, defaultPlugins } from "fibel";
+import { defineFibel, defaultPlugins } from "@valentinkolb/fibel";
 import { projectPlugin } from "./plugins/project-plugin";
 
 export default defineFibel({

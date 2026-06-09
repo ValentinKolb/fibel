@@ -15,7 +15,7 @@ Fibel setzt seine Standardfunktionen aus normalen Plugins zusammen. Projekte kö
 ## Standard-Set
 
 ```ts
-import { defaultPlugins } from "fibel";
+import { defaultPlugins } from "@valentinkolb/fibel";
 
 const plugins = defaultPlugins();
 ```
@@ -35,7 +35,7 @@ Das Standard-Set enthält:
 Hänge eigene Plugins an das Standard-Set an, wenn die integrierten Funktionen erhalten bleiben sollen.
 
 ```ts
-import { defineFibel, defaultPlugins } from "fibel";
+import { defineFibel, defaultPlugins } from "@valentinkolb/fibel";
 import { projectLinksPlugin } from "./plugins/project-links";
 
 export default defineFibel({
@@ -51,7 +51,7 @@ Diese Variante ist für die meisten Projekte der richtige Startpunkt.
 Ersetze die Plugin-Liste, wenn ein Projekt Rendering, Layout, Suche oder Routen vollständig selbst steuern soll.
 
 ```ts
-import { defineFibel } from "fibel";
+import { defineFibel } from "@valentinkolb/fibel";
 import { searchPlugin, themePlugin } from "fibel/plugins";
 
 export default defineFibel({
