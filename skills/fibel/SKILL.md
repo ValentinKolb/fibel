@@ -128,7 +128,22 @@ Supported frontmatter:
 - `tags`: Tag chips below the page title.
 - `updated`: Date chip below the page title.
 
-Write docs in a clear product-documentation tone. Avoid internal planning language such as "we decided", "for V1", or "only one mode" unless the page is explicitly an architecture note.
+## Documentation style for Fibel sites
+
+When writing documentation for a Fibel site, use a professional product/developer documentation style.
+
+- Write for readers who need to understand and use the project, not for people who followed its planning history.
+- State what the project is, who it is for, and what problem it solves before listing details.
+- Do not repeat the same claim across the page description, first paragraph, and first section.
+- Avoid marketing language such as "blazing-fast", "powerful", "seamless", "beautiful", or "super easy".
+- Avoid internal roadmap language such as "V1", "we decided", "currently only", or "for now" unless the page is explicitly a roadmap or architecture note.
+- Prefer concrete nouns and behaviors over vague feature claims. Write "server-side search index" instead of "modern search".
+- Keep sentences direct. Split long feature chains into separate sentences or bullets.
+- For German documentation, write natural German. Do not mirror English sentence structure or translate English idioms literally.
+- For English documentation, use clear product documentation language, not SaaS landing-page copy.
+- Keep multilingual pages aligned in structure, meaning, and level of detail.
+- Use concrete information architecture: "Configuration", "Hosting", "Built-in plugins", "Plugin API", "Search". Avoid generic "Features" pages when the content is really a reference or guide.
+- Examples should be minimal, runnable, and include the imports or config needed to understand them.
 
 ## Built-in plugins
 
@@ -239,7 +254,7 @@ Tagged releases publish the default documentation image to GHCR:
 
 ```sh
 docker run --rm -p 3000:3000 ghcr.io/valentinkolb/fibel:latest
-docker run --rm -p 3000:3000 ghcr.io/valentinkolb/fibel:v0.0.5
+docker run --rm -p 3000:3000 ghcr.io/valentinkolb/fibel:v0.0.6
 ```
 
 ## Common tasks
