@@ -18,6 +18,16 @@ bunx --bun @valentinkolb/fibel dev --port 5173
 
 Open `http://localhost:5173`. The root path redirects to the configured default locale.
 
+## Agent skill
+
+Fibel ships a Codex agent skill for documentation work. Install it in agent environments that should understand Fibel projects:
+
+```sh
+bunx skills add ValentinKolb/fibel
+```
+
+The skill tells agents how to configure Fibel, write Markdown pages, use raw `.md` routes, extend plugins, mount the Fetch app, and verify changes.
+
 When working from this repository:
 
 ```sh
@@ -216,7 +226,7 @@ export default defineFibel({
 });
 ```
 
-The built-in plugin set includes Markdown rendering, theme handling, i18n checks, SEO routes, asset routes, search, and layout rendering.
+The built-in plugin set includes Markdown rendering, theme handling, i18n checks, SEO routes, asset routes, search, powered-by attribution, and layout rendering.
 
 ## Commands
 

@@ -67,6 +67,16 @@ bunx fibel dev
 
 Open the printed URL and edit the Markdown files in the `docs` folder.
 
+## Agent skill
+
+Install the Fibel agent skill in Codex environments that should work on Fibel projects:
+
+```sh
+bunx skills add ValentinKolb/fibel
+```
+
+The skill gives agents the current Fibel conventions for configuration, Markdown pages, raw `.md` routes, plugins, hosting, and verification.
+
 ## Page model
 
 A page consists of frontmatter and Markdown content.
