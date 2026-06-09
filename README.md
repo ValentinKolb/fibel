@@ -171,6 +171,24 @@ export default {
 
 For a larger app, mount `fibel.fetch` below the same public route configured as `routing.basePath`.
 
+## Docker
+
+The repository includes a Docker image for hosting the default Fibel documentation.
+
+```sh
+docker build -t fibel-docs .
+docker run --rm -p 3000:3000 fibel-docs
+```
+
+The image uses a pinned Bun multi-stage build. Development dependencies are installed only in the build stage, where typecheck, tests, and `fibel build` run. The runtime stage uses production dependencies and starts the generated server as the non-root `bun` user.
+
+Tagged releases publish the same image to GitHub Container Registry:
+
+```sh
+docker run --rm -p 3000:3000 ghcr.io/valentinkolb/fibel:latest
+docker run --rm -p 3000:3000 ghcr.io/valentinkolb/fibel:v0.0.2
+```
+
 ## Plugins
 
 Plugins can replace services, validate content, add routes, or derive metadata from the loaded pages.

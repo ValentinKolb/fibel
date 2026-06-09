@@ -17,7 +17,7 @@ Fibel exposes a `fetch` handler. The documentation can run as its own server or 
 Use the development command while editing content and configuration.
 
 ```sh
-bunx fibel dev --port 5173
+bunx --bun @valentinkolb/fibel dev --port 5173
 ```
 
 The command loads `fibel.config.ts`, builds the theme CSS, creates the documentation app, and starts a local server.
@@ -25,10 +25,28 @@ The command loads `fibel.config.ts`, builds the theme CSS, creates the documenta
 ## Build for deployment
 
 ```sh
-bunx fibel build
+bunx --bun @valentinkolb/fibel build
 ```
 
 The build creates a runtime entry and generated documentation files. Requests still pass through Fibel. This keeps the theme cookie, search, Markdown routes, and mounted paths consistent.
+
+## Run the default docs image
+
+The Fibel repository includes a Docker image for hosting the default documentation.
+
+```sh
+docker build -t fibel-docs .
+docker run --rm -p 3000:3000 fibel-docs
+```
+
+The image uses a Bun multi-stage build. It installs development dependencies only in the build stage, runs typecheck, tests, and build, then runs the generated server as the non-root `bun` user with production dependencies.
+
+Tagged releases publish the image to GitHub Container Registry:
+
+```sh
+docker run --rm -p 3000:3000 ghcr.io/valentinkolb/fibel:latest
+docker run --rm -p 3000:3000 ghcr.io/valentinkolb/fibel:v0.0.2
+```
 
 ## Mount in Hono
 
