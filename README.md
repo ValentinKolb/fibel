@@ -18,6 +18,8 @@ bunx --bun @valentinkolb/fibel dev --port 5173
 
 Open `http://localhost:5173`. The root path redirects to the configured default locale.
 
+`fibel dev` watches the config, docs, and assets. After a successful rebuild, connected browser tabs reload automatically. Use `--no-watch` or `--no-reload` when a plain local server is enough.
+
 ## Agent skill
 
 Fibel ships a Codex agent skill for documentation work. Install it in agent environments that should understand Fibel projects:
@@ -196,7 +198,7 @@ Tagged releases publish the same image to GitHub Container Registry:
 
 ```sh
 docker run --rm -p 3000:3000 ghcr.io/valentinkolb/fibel:latest
-docker run --rm -p 3000:3000 ghcr.io/valentinkolb/fibel:v0.0.6
+docker run --rm -p 3000:3000 ghcr.io/valentinkolb/fibel:v0.0.7
 ```
 
 ## Plugins
@@ -236,6 +238,8 @@ bunx --bun @valentinkolb/fibel dev --port 5173 --config fibel.config.ts
 bunx --bun @valentinkolb/fibel build --config fibel.config.ts
 bunx --bun @valentinkolb/fibel serve --port 3000 --config fibel.config.ts
 ```
+
+`fibel dev` rebuilds on local documentation changes and reloads connected browser tabs after the rebuild succeeds. Disable either behavior with `--no-watch` or `--no-reload`.
 
 Repository scripts:
 

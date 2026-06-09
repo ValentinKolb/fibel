@@ -22,6 +22,15 @@ bunx --bun @valentinkolb/fibel dev --port 5173
 
 Der Befehl lädt `fibel.config.ts`, baut das Theme-CSS, erstellt die Dokumentations-App und startet einen lokalen Server.
 
+Der Entwicklungsserver beobachtet die Config-Datei, den Docs-Ordner und den Assets-Ordner. Wenn sich eine Datei ändert, baut Fibel die App im Speicher neu und lädt verbundene Browser-Tabs nach erfolgreichem Rebuild neu.
+
+```sh
+bunx --bun @valentinkolb/fibel dev --no-watch
+bunx --bun @valentinkolb/fibel dev --no-reload
+```
+
+Wenn ein Rebuild fehlschlägt, liefert der Server weiter die letzte funktionierende App aus und schreibt den Fehler ins Terminal.
+
 ## Für Deployment bauen
 
 ```sh
@@ -45,7 +54,7 @@ Tagged Releases veröffentlichen das Image in der GitHub Container Registry:
 
 ```sh
 docker run --rm -p 3000:3000 ghcr.io/valentinkolb/fibel:latest
-docker run --rm -p 3000:3000 ghcr.io/valentinkolb/fibel:v0.0.6
+docker run --rm -p 3000:3000 ghcr.io/valentinkolb/fibel:v0.0.7
 ```
 
 ## In Hono mounten

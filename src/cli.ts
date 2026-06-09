@@ -2,8 +2,8 @@
 import { existsSync } from "fs";
 import { cp, mkdir, writeFile } from "fs/promises";
 import { join, relative, resolve } from "path";
-import { createFibelApp } from "./app";
 import { defineFibel, loadConfig } from "./config";
+import { startDevServer } from "./dev";
 import { buildStyles } from "./styles";
 
 type Command = "dev" | "serve" | "build" | "init" | "help";
@@ -20,12 +20,12 @@ else help();
 async function dev() {
   const configPath = flag("--config") ?? "fibel.config.ts";
   const port = Number(flag("--port") ?? process.env.PORT ?? 5173);
-  const config = await loadConfig(configPath);
-  const root = resolve(config.root ?? process.cwd());
-  await buildStyles(root, false);
-  const app = await createFibelApp(config);
-  Bun.serve({ port, fetch: app.fetch });
-  console.log(`Fibel running at http://localhost:${port}`);
+  await startDevServer({
+    configPath,
+    port,
+    reload: !hasFlag("--no-reload"),
+    watch: !hasFlag("--no-watch"),
+  });
 }
 
 async function build() {
@@ -65,13 +65,17 @@ function flag(name: string) {
   return index >= 0 ? args[index + 1] : undefined;
 }
 
+function hasFlag(name: string) {
+  return args.includes(name);
+}
+
 function relativeImport(fromDir: string, file: string) {
   const path = relative(fromDir, file).replaceAll("\\", "/");
   return path.startsWith(".") ? path : `./${path}`;
 }
 
 function help() {
-  console.log(`Fibel\n\nCommands:\n  fibel init\n  fibel dev [--port 5173] [--config fibel.config.ts]\n  fibel build [--config fibel.config.ts]\n`);
+  console.log(`Fibel\n\nCommands:\n  fibel init\n  fibel dev [--port 5173] [--config fibel.config.ts] [--no-watch] [--no-reload]\n  fibel build [--config fibel.config.ts]\n`);
 }
 
 export { defineFibel };

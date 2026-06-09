@@ -229,6 +229,8 @@ bunx --bun @valentinkolb/fibel dev --port 5173 --config fibel.config.ts
 bunx --bun @valentinkolb/fibel build --config fibel.config.ts
 ```
 
+`fibel dev` watches the config, docs, and assets by default. It rebuilds the in-memory app after changes and reloads connected browser tabs after a successful rebuild. Use `--no-watch` to disable rebuild watching and `--no-reload` to keep browser tabs from reloading automatically.
+
 When working inside the Fibel repository:
 
 ```sh
@@ -254,7 +256,7 @@ Tagged releases publish the default documentation image to GHCR:
 
 ```sh
 docker run --rm -p 3000:3000 ghcr.io/valentinkolb/fibel:latest
-docker run --rm -p 3000:3000 ghcr.io/valentinkolb/fibel:v0.0.6
+docker run --rm -p 3000:3000 ghcr.io/valentinkolb/fibel:v0.0.7
 ```
 
 ## Common tasks

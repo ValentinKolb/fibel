@@ -22,6 +22,15 @@ bunx --bun @valentinkolb/fibel dev --port 5173
 
 The command loads `fibel.config.ts`, builds the theme CSS, creates the documentation app, and starts a local server.
 
+The development server watches the config file, docs folder, and assets folder. When a change is detected, Fibel rebuilds the app in memory and reloads connected browser tabs after the rebuild succeeds.
+
+```sh
+bunx --bun @valentinkolb/fibel dev --no-watch
+bunx --bun @valentinkolb/fibel dev --no-reload
+```
+
+If a rebuild fails, the server keeps serving the last working app and prints the error in the terminal.
+
 ## Build for deployment
 
 ```sh
@@ -45,7 +54,7 @@ Tagged releases publish the image to GitHub Container Registry:
 
 ```sh
 docker run --rm -p 3000:3000 ghcr.io/valentinkolb/fibel:latest
-docker run --rm -p 3000:3000 ghcr.io/valentinkolb/fibel:v0.0.6
+docker run --rm -p 3000:3000 ghcr.io/valentinkolb/fibel:v0.0.7
 ```
 
 ## Mount in Hono
