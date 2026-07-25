@@ -101,6 +101,24 @@ describe("fibel app", () => {
     expect(head).toContain('<meta name="twitter:site" content="@fibel">');
   });
 
+  test("builds a sitemap with absolute urls, lastmod, and alternates", async () => {
+    const app = await createFibelApp(config);
+    const sitemap = await (await app.fetch(new Request("http://localhost/sitemap.xml"))).text();
+    expect(sitemap).toContain("<loc>https://fibel.dev/en/runtime</loc>");
+    expect(sitemap).toContain("<loc>https://fibel.dev/en</loc>");
+    expect(sitemap).toContain("<lastmod>2026-06-09</lastmod>");
+    expect(sitemap).toContain('<xhtml:link rel="alternate" hreflang="de" href="https://fibel.dev/de/runtime"/>');
+    expect(sitemap).not.toContain("imprint");
+  });
+
+  test("disallows internal and configured paths in robots.txt", async () => {
+    const app = await createFibelApp({ ...config, seo: { disallow: ["/en/internal"] } });
+    const robots = await (await app.fetch(new Request("http://localhost/robots.txt"))).text();
+    expect(robots).toContain("Disallow: /_fibel");
+    expect(robots).toContain("Disallow: /en/internal");
+    expect(robots).toContain("Sitemap: https://fibel.dev/sitemap.xml");
+  });
+
   test("renders powered-by attribution as a removable default plugin", async () => {
     const app = await createFibelApp(config);
     const response = await app.fetch(new Request("http://localhost/en"));

@@ -7,6 +7,11 @@ export function seoPlugin(): FibelPlugin {
     setup(context) {
       context.headTags.push(renderRobotsMeta, renderAlternates, renderSocialTags);
     },
+    afterContent(context) {
+      if (!context.config.siteUrl) {
+        console.warn("[fibel:seo] siteUrl is not set. Canonical URLs and sitemap entries stay relative, which crawlers reject.");
+      }
+    },
     routes(context) {
       return [
         {
@@ -15,21 +20,11 @@ export function seoPlugin(): FibelPlugin {
         },
         {
           path: "/robots.txt",
-          handler: () => {
-            const sitemap = context.config.siteUrl ? `Sitemap: ${context.config.siteUrl}${context.config.routing.basePath}/sitemap.xml` : "";
-            return text(["User-agent: *", "Allow: /", sitemap, ""].filter(Boolean).join("\n"));
-          },
+          handler: () => text(renderRobots(context)),
         },
         {
           path: "/sitemap.xml",
-          handler: () => {
-            const siteUrl = context.config.siteUrl ?? "";
-            const urls = context.pages.map((page) => `  <url><loc>${siteUrl}${page.href}</loc></url>`).join("\n");
-            return text(
-              `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`,
-              "application/xml; charset=utf-8",
-            );
-          },
+          handler: () => text(renderSitemap(context), "application/xml; charset=utf-8"),
         },
         {
           path: "/favicon.svg",
@@ -38,6 +33,48 @@ export function seoPlugin(): FibelPlugin {
       ];
     },
   };
+}
+
+function renderRobots(context: FibelContext) {
+  const { basePath, internalPath } = context.config.routing;
+  const disallow = [joinUrl(basePath, internalPath), ...context.config.seo.disallow.map((path) => (path.startsWith("/") ? joinUrl(basePath, path) : path))];
+  const sitemap = context.config.siteUrl ? `Sitemap: ${absoluteUrl(joinUrl(basePath, "sitemap.xml"), context)}` : "";
+  return ["User-agent: *", "Allow: /", ...disallow.map((path) => `Disallow: ${path}`), sitemap, ""].filter(Boolean).join("\n");
+}
+
+function renderSitemap(context: FibelContext) {
+  const urls = context.pages
+    .filter((page) => !page.meta.hidden)
+    .map((page) => {
+      const lines = [`    <loc>${xmlEscape(absoluteUrl(page.href, context))}</loc>`];
+      const lastmod = lastModified(page);
+      if (lastmod) lines.push(`    <lastmod>${lastmod}</lastmod>`);
+      for (const alternate of sitemapAlternates(page, context)) lines.push(alternate);
+      return `  <url>\n${lines.join("\n")}\n  </url>`;
+    })
+    .join("\n");
+
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urls}\n</urlset>\n`;
+}
+
+function sitemapAlternates(page: FibelPage, context: FibelContext) {
+  const alternates = translations(page, context);
+  if (alternates.length < 2) return [];
+  const links = alternates.map(
+    (candidate) => `    <xhtml:link rel="alternate" hreflang="${xmlEscape(candidate.locale.code)}" href="${xmlEscape(absoluteUrl(candidate.href, context))}"/>`,
+  );
+  const fallback = alternates.find((candidate) => candidate.locale.code === context.config.defaultLocale);
+  if (fallback) links.push(`    <xhtml:link rel="alternate" hreflang="x-default" href="${xmlEscape(absoluteUrl(fallback.href, context))}"/>`);
+  return links;
+}
+
+function lastModified(page: FibelPage) {
+  const updated = page.meta.updated ?? "";
+  return /^\d{4}-\d{2}-\d{2}/.test(updated) ? updated.slice(0, 10) : undefined;
+}
+
+function xmlEscape(value: string) {
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
 }
 
 export function absoluteUrl(href: string, context: FibelContext) {

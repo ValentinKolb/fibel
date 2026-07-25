@@ -18,7 +18,7 @@ export function loadPages(config: ResolvedFibelConfig): FibelPage[] {
       const raw = readFileSync(file, "utf8");
       const { data, body } = parseFrontmatter(raw);
       const slug = routeFromFile(file, localeRoot);
-      const href = joinUrl(config.routing.basePath, locale.code, slug);
+      const href = joinUrl(config.routing.basePath, locale.code, slug === "/" ? undefined : slug);
       const title = stringValue(data.title) ?? firstHeading(body) ?? titleFromSlug(slug);
       const description = stringValue(data.description) ?? firstParagraph(body) ?? config.description;
       const page: FibelPage = {
