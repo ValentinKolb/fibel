@@ -25,6 +25,14 @@ bunx --bun @valentinkolb/fibel dev
 
 `init` erzeugt `fibel.config.ts`, eine erste Seite unter `docs/en/` und ein `assets/`-Verzeichnis. `dev` liefert das Projekt aus und lädt den Browser bei Dateiänderungen neu. Der Entwicklungsserver gibt seine URL beim Start aus.
 
+In Projekten, an denen Coding-Agents arbeiten, kommt zusätzlich der Fibel-Agent-Skill dazu:
+
+```sh
+bunx skills add ValentinKolb/fibel
+```
+
+Er stellt die aktuellen Konventionen für Konfiguration, Markdown-Seiten, rohe `.md`-Routen, Plugins, Hosting und Verifikation bereit, damit Agents auf der dokumentierten API arbeiten statt zu raten.
+
 ## Funktionsumfang
 
 - Seiten aus `docs/<locale>/**/*.md`, mit Navigation, Sections und Pagination aus dem Frontmatter.
@@ -85,16 +93,6 @@ updated: 2026-06-09
 ```
 
 Das Frontmatter steuert Metadaten, Navigation und die Chips unter dem Seitentitel. Alle Felder sind optional: Fehlt `title`, greift Fibel auf die erste `#`-Überschrift zurück, fehlt `description`, auf den ersten Absatz. Das Layout rendert den Titel einmal und lässt die erste `#`-Überschrift im Text weg, sodass sie nicht doppelt erscheint.
-
-## Agent-Skill
-
-Fibel liefert einen Agent-Skill für Umgebungen mit, die an Fibel-Projekten arbeiten:
-
-```sh
-bunx skills add ValentinKolb/fibel
-```
-
-Er stellt die aktuellen Konventionen für Konfiguration, Markdown-Seiten, rohe `.md`-Routen, Plugins, Hosting und Verifikation bereit.
 
 ## Nächste Schritte
 
