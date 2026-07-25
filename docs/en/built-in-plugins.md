@@ -32,6 +32,24 @@ The default set includes:
 - `poweredByPlugin`: adds the `Powered by fibel.dev` attribution to the footer.
 - `layoutPlugin`: renders navigation, page layout, page actions, footer, search dialog, and client script.
 
+## Optional plugins
+
+Fibel ships plugins that are not part of the default set because they need configuration.
+
+`imprintPlugin` adds a footer link to legal information hosted somewhere else. Use it when the imprint belongs to the company or person behind several sites and should not be maintained as a documentation page.
+
+```ts
+import { defineFibel, defaultPlugins } from "@valentinkolb/fibel";
+import { imprintPlugin } from "@valentinkolb/fibel/plugins";
+
+export default defineFibel({
+  title: "Product Docs",
+  plugins: [...defaultPlugins(), imprintPlugin({ url: "https://example.com/imprint", label: "Imprint" })],
+});
+```
+
+The URL is used as written, so it can point at any external page. `label` defaults to `Imprint`.
+
 ## Extend the defaults
 
 Append project plugins to the default set when the built-in behavior should remain active.

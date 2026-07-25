@@ -161,6 +161,8 @@ The default plugin list is:
 - `poweredByPlugin`
 - `layoutPlugin`
 
+`imprintPlugin({ url, label })` ships with Fibel but is not in the default set. It adds a footer link to legal information hosted elsewhere. Use it instead of an imprint page when the legal text lives outside the documentation.
+
 Use `defaultPlugins()` when adding behavior without replacing the standard site:
 
 ```ts

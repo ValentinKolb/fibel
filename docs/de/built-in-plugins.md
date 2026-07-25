@@ -32,6 +32,24 @@ Das Standard-Set enthält:
 - `poweredByPlugin`: ergänzt den Hinweis `Powered by fibel.dev` im Footer.
 - `layoutPlugin`: rendert Navigation, Seitenlayout, Page-Actions, Footer, Suchdialog und Client-Script.
 
+## Optionale Plugins
+
+Fibel liefert Plugins mit, die nicht im Standard-Set stecken, weil sie Konfiguration brauchen.
+
+`imprintPlugin` ergänzt einen Footer-Link auf rechtliche Angaben, die woanders liegen. Nutze es, wenn das Impressum zur Firma oder Person hinter mehreren Seiten gehört und nicht als Dokumentationsseite gepflegt werden soll.
+
+```ts
+import { defineFibel, defaultPlugins } from "@valentinkolb/fibel";
+import { imprintPlugin } from "@valentinkolb/fibel/plugins";
+
+export default defineFibel({
+  title: "Meine Docs",
+  plugins: [...defaultPlugins(), imprintPlugin({ url: "https://example.com/impressum", label: "Impressum" })],
+});
+```
+
+Die URL wird unverändert verwendet und kann auf eine beliebige externe Seite zeigen. `label` ist standardmäßig `Imprint`.
+
 ## Standard-Set erweitern
 
 Hänge eigene Plugins an das Standard-Set an, wenn die integrierten Funktionen erhalten bleiben sollen.

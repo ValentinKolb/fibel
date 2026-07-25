@@ -66,6 +66,18 @@ describe("fibel app", () => {
     expect(english).toContain('href="/en/imprint"');
   });
 
+  test("adds an external imprint link through a plugin", async () => {
+    const { imprintPlugin } = await import("../src/plugins");
+    const app = await createFibelApp({
+      ...config,
+      footerLinks: [],
+      plugins: [...defaultPlugins(), imprintPlugin({ url: "https://example.com/imprint", label: "Impressum" })],
+    });
+
+    const html = await (await app.fetch(new Request("http://localhost/de"))).text();
+    expect(html).toContain('href="https://example.com/imprint">Impressum</a>');
+  });
+
   test("omits the header navigation when no header links are configured", async () => {
     const app = await createFibelApp({ ...config, headerLinks: [] });
     const response = await app.fetch(new Request("http://localhost/en"));
