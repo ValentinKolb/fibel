@@ -21,6 +21,9 @@ export default defineFibel({
     defaultMode: "light",
     cookieName: "fibel_theme",
   },
+  seo: {
+    ogImage: "/assets/social.png",
+  },
   footerLinks: [{ label: "GitHub", value: "https://github.com/ValentinKolb/fibel" }],
   plugins: [
     ...defaultPlugins(),
