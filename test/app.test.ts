@@ -114,7 +114,7 @@ describe("fibel app", () => {
 
   test("keeps hidden pages out of search engines", async () => {
     const app = await createFibelApp(config);
-    const hidden = (await (await app.fetch(new Request("http://localhost/en/imprint"))).text()).split("</head>")[0] ?? "";
+    const hidden = (await (await app.fetch(new Request("http://localhost/en/hidden-example"))).text()).split("</head>")[0] ?? "";
     expect(hidden).toContain('<meta name="robots" content="noindex, nofollow">');
     expect(hidden).not.toContain('hreflang="x-default"');
 
@@ -137,7 +137,7 @@ describe("fibel app", () => {
     expect(sitemap).toContain("<loc>https://fibel.dev/en</loc>");
     expect(sitemap).toContain("<lastmod>2026-06-09</lastmod>");
     expect(sitemap).toContain('<xhtml:link rel="alternate" hreflang="de" href="https://fibel.dev/de/runtime"/>');
-    expect(sitemap).not.toContain("imprint");
+    expect(sitemap).not.toContain("hidden-example");
   });
 
   test("disallows internal and configured paths in robots.txt", async () => {
@@ -162,7 +162,7 @@ describe("fibel app", () => {
     const breadcrumbs = graph.find((entry) => entry["@type"] === "BreadcrumbList");
     expect((breadcrumbs?.itemListElement as unknown[]).length).toBe(3);
 
-    const hidden = await (await app.fetch(new Request("http://localhost/en/imprint"))).text();
+    const hidden = await (await app.fetch(new Request("http://localhost/en/hidden-example"))).text();
     expect(hidden).not.toContain("application/ld+json");
   });
 
@@ -176,7 +176,7 @@ describe("fibel app", () => {
     expect(index).toContain("## Architecture");
     expect(index).toContain("[Plugin API](https://fibel.dev/en/plugins.md)");
     expect(index).toContain("https://fibel.dev/de/llms.txt");
-    expect(index).not.toContain("/en/imprint.md");
+    expect(index).not.toContain("/en/hidden-example.md");
 
     const german = await (await app.fetch(new Request("http://localhost/de/llms.txt"))).text();
     expect(german).toContain("https://fibel.dev/de/plugins.md");
@@ -187,7 +187,7 @@ describe("fibel app", () => {
     const full = await (await app.fetch(new Request("http://localhost/en/llms-full.txt"))).text();
     expect(full).toContain("Source: https://fibel.dev/en/plugins.md");
     expect(full).toContain("# Plugin API");
-    expect(full).not.toContain("Source: https://fibel.dev/en/imprint.md");
+    expect(full).not.toContain("Source: https://fibel.dev/en/hidden-example.md");
   });
 
   test("renders powered-by attribution as a removable default plugin", async () => {

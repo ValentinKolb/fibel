@@ -1,8 +1,9 @@
-import { defineFibel } from "./src";
+import { defaultPlugins, defineFibel } from "./src";
+import { imprintPlugin } from "./src/plugins";
 
 export default defineFibel({
   title: "Fibel",
-  description: "A small documentation runtime for Markdown, i18n, search, and no-flicker themes.",
+  description: "Publish Markdown documentation as a server-rendered website with search, multilingual routing, and Markdown source pages for tools.",
   siteUrl: "https://fibel.dev",
   content: "docs",
   assets: "assets",
@@ -20,8 +21,9 @@ export default defineFibel({
     defaultMode: "light",
     cookieName: "fibel_theme",
   },
-  footerLinks: [
-    { label: "GitHub", value: "https://github.com/ValentinKolb/fibel" },
-    { label: "Impressum", value: "/imprint" },
+  footerLinks: [{ label: "GitHub", value: "https://github.com/ValentinKolb/fibel" }],
+  plugins: [
+    ...defaultPlugins(),
+    imprintPlugin({ url: "https://impressum.valentin-kolb.com", label: "Impressum" }),
   ],
 });
