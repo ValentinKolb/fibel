@@ -85,6 +85,11 @@ export default defineFibel({
     internalPath: "/_fibel",
     assetsPath: "/assets",
   },
+  seo: {
+    ogImage: "/assets/social.png",
+    twitterSite: "@example",
+    disallow: ["/en/internal"],
+  },
   headerLinks: [{ label: "Guide", value: "/runtime" }],
   footerLinks: [{ label: "Imprint", value: "/imprint" }],
 });
@@ -99,6 +104,7 @@ Keep these invariants:
 - `content` defaults to `docs`, `assets` defaults to `assets`, and both resolve relative to `root`, which defaults to the current working directory.
 - When `locales` is omitted it is inferred from the folder names under the content directory, and `defaultLocale` falls back to the first entry.
 - The dev server watches content, assets, and the config file only. Changing plugin or other TypeScript code needs a restart.
+- `seo` is optional. `ogImage` is the default social preview image and is resolved under `basePath`, `twitterSite` is the handle credited on cards, and `disallow` adds paths to `robots.txt`. Set `siteUrl` in any published project, otherwise these outputs stay relative and crawlers reject the sitemap.
 - Local header and footer links are resolved against the locale of the current page. Write them as page slugs without a locale segment.
 - External URLs are left as-is in both link lists.
 
@@ -146,6 +152,7 @@ When writing documentation for a Fibel site, use a professional product/develope
 - Prefer concrete nouns and behaviors over vague feature claims. Write "server-side search index" instead of "modern search".
 - Keep sentences direct. Split long feature chains into separate sentences or bullets.
 - For German documentation, write natural German. Do not mirror English sentence structure or translate English idioms literally.
+- German documentation uses an impersonal register. Avoid direct address (`du`, `dein`) and imperatives such as `Nutze`, `Setze`, or `Lies`; write `Das Plugin eignet sich, wenn …` or ``siteUrl` ist erforderlich` instead. Never personify the tool. English documentation may use imperatives, which read as neutral there.
 - For English documentation, use clear product documentation language, not SaaS landing-page copy.
 - Keep multilingual pages aligned in structure, meaning, and level of detail.
 - Use concrete information architecture: "Configuration", "Hosting", "Built-in plugins", "Plugin API", "Search". Avoid generic "Features" pages when the content is really a reference or guide.
@@ -277,7 +284,7 @@ Tagged releases publish the default documentation image to GHCR:
 
 ```sh
 docker run --rm -p 3000:3000 ghcr.io/valentinkolb/fibel:latest
-docker run --rm -p 3000:3000 ghcr.io/valentinkolb/fibel:v0.0.7
+docker run --rm -p 3000:3000 ghcr.io/valentinkolb/fibel:v0.0.8
 ```
 
 ## Common tasks
