@@ -1,5 +1,6 @@
 import { existsSync, readdirSync } from "fs";
-import { resolve } from "path";
+import { copyFile, rm } from "fs/promises";
+import { dirname, join, resolve } from "path";
 import { pathToFileURL } from "url";
 import { defaultPlugins } from "./plugins";
 import type { FibelConfig, LocaleConfig, ResolvedFibelConfig } from "./types";
@@ -7,10 +8,26 @@ import { normalizeBasePath, normalizeRoutePath } from "./utils";
 
 export const defineFibel = (config: FibelConfig) => config;
 
-export async function loadConfig(configPath = "fibel.config.ts") {
+export async function loadConfig(configPath = "fibel.config.ts", options: { fresh?: boolean } = {}) {
   const resolved = resolve(configPath);
-  const imported = await import(`${pathToFileURL(resolved).href}?t=${Date.now()}`);
-  return imported.default as FibelConfig;
+  if (!options.fresh) {
+    const imported = await import(pathToFileURL(resolved).href);
+    return imported.default as FibelConfig;
+  }
+
+  // Bun caches modules by resolved path and ignores the query string, so a
+  // "?t=" buster does not reload an edited config. Importing a copy under a
+  // new name does. The copy sits next to the original so relative imports
+  // inside the config still resolve. Each reload leaks one module, which is
+  // acceptable for a development server.
+  const temp = join(dirname(resolved), `.fibel.config.${Date.now()}.tmp.ts`);
+  try {
+    await copyFile(resolved, temp);
+    const imported = await import(pathToFileURL(temp).href);
+    return imported.default as FibelConfig;
+  } finally {
+    await rm(temp, { force: true });
+  }
 }
 
 export function resolveConfig(config: FibelConfig): ResolvedFibelConfig {

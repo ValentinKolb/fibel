@@ -49,7 +49,7 @@ export async function startDevServer(options: DevServerOptions) {
 }
 
 async function rebuild(configPath: string) {
-  const config = await loadConfig(configPath);
+  const config = await loadConfig(configPath, { fresh: true });
   const root = resolve(config.root ?? process.cwd());
   await buildStyles(root, false);
   return createFibelApp(config);
