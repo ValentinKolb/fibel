@@ -38,7 +38,7 @@ export default defineFibel({
 });
 ```
 
-`content` zeigt auf den Ordner mit Markdown-Dateien. `assets` zeigt auf Dateien, die zusammen mit der Dokumentation ausgeliefert werden, zum Beispiel Bilder, PDFs oder Downloads.
+Beide Schlüssel sind optional. `content` steht standardmäßig auf `docs` und zeigt auf den Ordner mit Markdown-Dateien. `assets` steht standardmäßig auf `assets` und zeigt auf Dateien, die zusammen mit der Dokumentation ausgeliefert werden, zum Beispiel Bilder, PDFs oder Downloads. Beide werden relativ zu `root` aufgelöst. `root` ist standardmäßig das aktuelle Arbeitsverzeichnis und muss nur gesetzt werden, wenn die Config-Datei nicht im Projektwurzelverzeichnis liegt.
 
 Halte Links in Markdown-Dateien stabil und relativ zur Dokumentation. Das erleichtert den Betrieb unter einem Base Path.
 
@@ -70,7 +70,11 @@ export default defineFibel({
 });
 ```
 
-Jedes Locale entspricht einem Ordner unter `docs`. Übersetzungen sollten denselben Slug verwenden. `docs/en/search.md` und `docs/de/search.md` beschreiben also dieselbe Seite in unterschiedlichen Sprachen.
+Jedes Locale entspricht einem Ordner unter `docs`. Übersetzungen sollten denselben Slug verwenden. `docs/en/search.md` und `docs/de/search.md` beschreiben also dieselbe Seite in unterschiedlichen Sprachen. Genau über den Slug werden sie auch für Sprachumschaltung und `hreflang` einander zugeordnet.
+
+Fehlt `locales`, leitet Fibel die Sprachen aus den Ordnernamen im Content-Verzeichnis ab und nutzt den großgeschriebenen Ordnernamen als Label. `defaultLocale` fällt dann auf das erste Locale der Liste zurück. Setze für eine veröffentlichte Seite beides explizit, sonst entscheidet die Ordnerreihenfolge über die Standardsprache.
+
+`defaultLocale` muss in `locales` enthalten sein. Andernfalls bricht Fibel beim Start mit einem Fehler ab.
 
 ## SEO
 
@@ -139,7 +143,7 @@ updated: 2026-06-09
 image: /assets/konfiguration.png
 ```
 
-`title` ist der Seitentitel. `navTitle` ist das Label in der Sidebar. `section` bestimmt die Sidebar-Gruppe. `order` sortiert Seiten innerhalb eines Locales. `description` wird für SEO, Suche und das Intro genutzt. `hidden` entfernt eine Seite aus Navigation und Pagination und markiert sie als `noindex`. `tags` werden als Chips angezeigt. `updated` zeigt ein Aktualisierungsdatum an und füllt `article:modified_time`. `image` überschreibt das Social-Preview-Bild dieser Seite.
+Alle Felder sind optional. `title` ist der Seitentitel; fehlt er, nutzt Fibel die erste `#`-Überschrift und danach den Slug in Titelschreibweise. `navTitle` ist das Label in der Sidebar und entspricht standardmäßig dem Titel. `section` bestimmt die Sidebar-Gruppe und ist standardmäßig `Guide`. `order` sortiert Seiten innerhalb eines Locales und ist standardmäßig `100`. `description` wird für SEO, Suche und das Intro genutzt; fehlt sie, nimmt Fibel den ersten Absatz auf 180 Zeichen gekürzt und fällt danach auf die Seitenbeschreibung zurück. `hidden` entfernt eine Seite aus Navigation, Pagination, der seiteneigenen Suche, `llms.txt` und der Sitemap und markiert sie als `noindex`. Die Seite bleibt unter ihrer URL erreichbar, genau das macht sie für Seiten nützlich, die nur im Footer verlinkt sind. `tags` werden als Chips angezeigt. `updated` zeigt ein Aktualisierungsdatum an und füllt `article:modified_time`. `image` überschreibt das Social-Preview-Bild dieser Seite.
 
 ## Plugin-Liste
 

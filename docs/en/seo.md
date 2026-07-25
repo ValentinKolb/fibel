@@ -62,7 +62,7 @@ Fibel renders Open Graph and Twitter card tags from the page title and descripti
 
 ## Structured data
 
-Every indexable page carries JSON-LD with a `TechArticle` and a `BreadcrumbList` built from the sidebar section. Locale index pages also carry a `WebSite` entry.
+Every indexable page carries JSON-LD with a `TechArticle`. Content pages add a `BreadcrumbList` built from the sidebar section. Locale index pages add a `WebSite` entry instead of the breadcrumbs.
 
 Fibel does not declare a `SearchAction`. That markup promises crawlers a URL that renders search results as a page, and Fibel's search is a JSON endpoint used by the spotlight dialog.
 

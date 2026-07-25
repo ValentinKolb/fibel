@@ -31,6 +31,8 @@ bunx --bun @valentinkolb/fibel dev --no-reload
 
 Wenn ein Rebuild fehlschlägt, liefert der Server weiter die letzte funktionierende App aus und schreibt den Fehler ins Terminal.
 
+Der Watcher erfasst nur Content, Assets und die Config-Datei. Änderungen an einem Projekt-Plugin oder einer anderen TypeScript-Datei lösen keinen Rebuild aus. Starte den Server nach Änderungen am Plugin-Code neu.
+
 ## Für Deployment bauen
 
 ```sh
@@ -126,6 +128,7 @@ Eine Fibel-App verarbeitet:
 - Markdown-Quellen wie `/de/configuration.md`.
 - interne Dateien unter `routing.internalPath`.
 - Assets unter `routing.assetsPath`.
-- Plugin-Routen.
+- Plugin-Routen, einschließlich der SEO- und `llms.txt`-Dateien.
+- Eine Weiterleitung vom Mount-Root auf das Standard-Locale, `/` landet also auf `/de`.
 
 Wenn ein Projekt unter einem Base Path läuft, sollten externe Links und Reverse-Proxies diesen Pfad unverändert weitergeben.

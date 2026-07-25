@@ -96,6 +96,9 @@ Keep these invariants:
 - `routing.basePath` must match the public mount path when Fibel is served as a sub-app.
 - `routing.internalPath` is for framework endpoints such as search and CSS.
 - `routing.assetsPath` is for files from the configured assets directory.
+- `content` defaults to `docs`, `assets` defaults to `assets`, and both resolve relative to `root`, which defaults to the current working directory.
+- When `locales` is omitted it is inferred from the folder names under the content directory, and `defaultLocale` falls back to the first entry.
+- The dev server watches content, assets, and the config file only. Changing plugin or other TypeScript code needs a restart.
 - Local header and footer links are resolved against the locale of the current page. Write them as page slugs without a locale segment.
 - External URLs are left as-is in both link lists.
 
@@ -126,9 +129,10 @@ Supported frontmatter:
 - `section`: Sidebar section.
 - `order`: Numeric sort order.
 - `description`: SEO description and page summary.
-- `hidden`: Hide from navigation when `true`.
+- `hidden`: Remove from navigation, pagination, site search, `llms.txt`, and the sitemap, and render with `noindex`. The page stays reachable at its URL.
 - `tags`: Tag chips below the page title.
-- `updated`: Date chip below the page title.
+- `updated`: Date chip below the page title, also used as `article:modified_time` and sitemap `lastmod`.
+- `image`: Social preview image for this page, overriding `seo.ogImage`.
 
 ## Documentation style for Fibel sites
 
@@ -160,6 +164,8 @@ The default plugin list is:
 - `searchPlugin`
 - `poweredByPlugin`
 - `layoutPlugin`
+
+Import paths matter. `createFibelApp`, `defineFibel`, `defaultPlugins`, and the exported types come from `@valentinkolb/fibel`. The individual plugins above come from the `@valentinkolb/fibel/plugins` subpath and are not re-exported from the root.
 
 `imprintPlugin({ url, label })` ships with Fibel but is not in the default set. It adds a footer link to legal information hosted elsewhere. Use it instead of an imprint page when the legal text lives outside the documentation.
 
@@ -304,7 +310,7 @@ Check:
 Check:
 
 - The page is loaded into `context.pages`.
-- The page is not hidden when expecting navigation visibility.
+- The page is not `hidden`. Hidden pages are excluded from the search index entirely, not just from navigation.
 - The query is sent to `${basePath}${internalPath}/search`.
 - The page title, description, section, and Markdown body contain searchable text.
 
@@ -318,7 +324,6 @@ Check:
 
 ## Guardrails
 
-- Do not pass functions, callbacks, DOM nodes, or class instances across SSR/island serialization boundaries when integrating with `@valentinkolb/ssr`.
 - Do not add MDX unless the user explicitly asks for it; Fibel's core content model is Markdown.
 - Do not assume Hono is required. Fibel exposes a Fetch handler.
 - Do not call raw Markdown routes an export feature; they are regular routes ending in `.md` or `.markdown`.

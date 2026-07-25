@@ -113,6 +113,8 @@ export function docsManifestPlugin(): FibelPlugin {
 }
 ```
 
+A `path` ending in `/*` matches by prefix instead of exactly. The assets plugin uses this to serve a whole directory.
+
 Choose custom route paths so they do not collide with internal routes or page paths.
 
 ## Add head tags
@@ -171,3 +173,22 @@ type FibelContext = {
 ```
 
 The context is the shared workspace for plugins. It contains configuration, loaded pages, navigation, footer items, head tags, search data, registered routes, and replaceable services.
+
+Every type shown on this page is exported from `@valentinkolb/fibel` as a type import.
+
+## Service reference
+
+Four services can be replaced or wrapped in `setup`. Replace one to change behavior; wrap one to extend it.
+
+```ts
+type FibelServices = {
+  renderMarkdown: (markdown: string, page: FibelPage, context: FibelContext) => string;
+  renderPage: (page: FibelPage, request: Request, context: FibelContext) => string;
+  getTheme: (request: Request, context: FibelContext) => ThemeMode;
+  search: (query: string, locale: string, context: FibelContext) => SearchEntry[];
+};
+```
+
+`renderMarkdown` turns page bodies into HTML and runs once per page at startup. `renderPage` produces the full HTML document for a request. `getTheme` resolves the theme before rendering. `search` answers queries from the search endpoint.
+
+The default implementations live in the Markdown, layout, theme, and search plugins. A plugin list without one of them leaves that service at its no-op default.

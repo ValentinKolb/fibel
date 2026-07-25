@@ -95,7 +95,7 @@ updated: 2026-06-09
 # Konfiguration
 ```
 
-Das Frontmatter steuert Metadaten, Navigation und Page-Chips. Die erste Markdown-Überschrift `#` gilt als Seitentitel. Das Default-Layout rendert diesen Titel einmal und lässt die erste `#`-Überschrift im Artikel aus.
+Das Frontmatter steuert Metadaten, Navigation und Page-Chips. Das Feld `title` ist der Seitentitel; fehlt es, greift Fibel auf die erste Markdown-Überschrift `#` zurück. In beiden Fällen rendert das Default-Layout diesen Titel einmal und lässt die erste `#`-Überschrift im Artikel aus, damit sie nicht doppelt erscheint.
 
 ## Nächste Schritte
 

@@ -62,7 +62,7 @@ Fibel rendert Open-Graph- und Twitter-Card-Tags aus Titel und Beschreibung der S
 
 ## Strukturierte Daten
 
-Jede indexierbare Seite trägt JSON-LD mit einem `TechArticle` und einer `BreadcrumbList` aus der Sidebar-Section. Die Locale-Startseiten tragen zusätzlich einen `WebSite`-Eintrag.
+Jede indexierbare Seite trägt JSON-LD mit einem `TechArticle`. Inhaltsseiten ergänzen eine `BreadcrumbList` aus der Sidebar-Section. Die Locale-Startseiten tragen stattdessen einen `WebSite`-Eintrag.
 
 Fibel deklariert bewusst keine `SearchAction`. Dieses Markup verspricht Crawlern eine URL, die Suchergebnisse als Seite rendert, und Fibels Suche ist ein JSON-Endpunkt für den Spotlight-Dialog.
 

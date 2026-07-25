@@ -49,7 +49,7 @@ bun run src/cli.ts dev --port 5173
 - Native language routing and language switching
 - Light and dark mode without client-side theme flicker
 - Static assets from an `assets/` directory
-- SEO routes for `robots.txt`, `sitemap.xml`, and `favicon.ico`
+- SEO routes for `robots.txt`, `sitemap.xml`, `favicon.ico`, and `favicon.svg`
 - Language alternates, social cards, and structured data on every page
 - `llms.txt` and `llms-full.txt` routes for language models
 - A Tailwind-based default theme
@@ -142,7 +142,7 @@ Supported frontmatter fields:
 - `section`: Sidebar section label.
 - `order`: Numeric sort order inside a locale and section.
 - `description`: SEO description and page summary.
-- `hidden`: Hide the page from navigation, the sitemap, and search engines when set to `true`.
+- `hidden`: Remove the page from navigation, pagination, site search, `llms.txt`, and the sitemap, and render it with `noindex`. The page stays reachable at its URL.
 - `tags`: List of tags rendered as page chips.
 - `updated`: Date string rendered as a page chip and used as `article:modified_time`.
 - `image`: Social preview image for this page, overriding `seo.ogImage`.
@@ -177,7 +177,7 @@ export default defineFibel({
 
 Pages marked `hidden` are left out of the sitemap and rendered with `noindex`. Social cards use `seo.ogImage` unless a page sets `image` in its frontmatter.
 
-Every indexable page also carries JSON-LD with a `TechArticle` and a `BreadcrumbList`.
+Every indexable page also carries JSON-LD with a `TechArticle`. Content pages add a `BreadcrumbList` built from the sidebar section; locale index pages add a `WebSite` entry instead.
 
 ## Discovery for language models
 
@@ -270,7 +270,7 @@ export default defineFibel({
 });
 ```
 
-The built-in plugin set includes Markdown rendering, theme handling, i18n checks, SEO routes, asset routes, search, powered-by attribution, and layout rendering.
+The built-in plugin set includes Markdown rendering, theme handling, i18n checks, SEO metadata and routes, `llms.txt` routes, asset routes, search, powered-by attribution, and layout rendering. Individual plugins are exported from `@valentinkolb/fibel/plugins`.
 
 ## Commands
 
@@ -278,10 +278,11 @@ The built-in plugin set includes Markdown rendering, theme handling, i18n checks
 bunx --bun @valentinkolb/fibel init
 bunx --bun @valentinkolb/fibel dev --port 5173 --config fibel.config.ts
 bunx --bun @valentinkolb/fibel build --config fibel.config.ts
-bunx --bun @valentinkolb/fibel serve --port 3000 --config fibel.config.ts
 ```
 
-`fibel dev` rebuilds on local documentation changes and reloads connected browser tabs after the rebuild succeeds. Disable either behavior with `--no-watch` or `--no-reload`.
+`fibel dev` rebuilds on local documentation changes and reloads connected browser tabs after the rebuild succeeds. Disable either behavior with `--no-watch` or `--no-reload`. `fibel serve` is an alias for `fibel dev` and starts the same watching development server.
+
+`fibel build` writes the deployable runtime. Serve it with `bun dist/server.ts`, which listens on `PORT` and defaults to `3000`.
 
 Repository scripts:
 

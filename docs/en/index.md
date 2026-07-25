@@ -95,7 +95,7 @@ updated: 2026-06-09
 # Configuration
 ```
 
-Frontmatter controls metadata, navigation, and page chips. The first Markdown `#` heading is treated as the page title. The default layout renders that title once and omits the first `#` heading from the article body.
+Frontmatter controls metadata, navigation, and page chips. The `title` field is the page title; without it Fibel falls back to the first Markdown `#` heading. Either way the default layout renders that title once and omits the first `#` heading from the article body, so the heading is not repeated.
 
 ## Next steps
 

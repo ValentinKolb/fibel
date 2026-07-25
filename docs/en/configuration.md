@@ -38,7 +38,7 @@ export default defineFibel({
 });
 ```
 
-`content` points to the Markdown folder. `assets` points to files that should be served with the documentation, such as images, PDFs, or downloads.
+Both keys are optional. `content` defaults to `docs` and points to the Markdown folder. `assets` defaults to `assets` and points to files served with the documentation, such as images, PDFs, or downloads. Both are resolved relative to `root`, which defaults to the current working directory and only needs to be set when the config file does not sit at the project root.
 
 Keep links in Markdown files stable and relative to the documentation. This makes mounted deployments easier to maintain.
 
@@ -70,7 +70,11 @@ export default defineFibel({
 });
 ```
 
-Each locale maps to a folder under `docs`. Translated pages should use the same slug. `docs/en/search.md` and `docs/de/search.md` describe the same page in different languages.
+Each locale maps to a folder under `docs`. Translated pages should use the same slug. `docs/en/search.md` and `docs/de/search.md` describe the same page in different languages, which is also what pairs them for language switching and `hreflang`.
+
+When `locales` is omitted, Fibel infers them from the folder names under the content directory and uses the uppercased folder name as the label. `defaultLocale` then falls back to the first locale in the list. Set both explicitly for a published site, because folder order decides the default otherwise.
+
+`defaultLocale` must appear in `locales`. Fibel throws at startup when it does not.
 
 ## SEO
 
@@ -139,7 +143,7 @@ updated: 2026-06-09
 image: /assets/configuration.png
 ```
 
-`title` is the page title. `navTitle` is the sidebar label. `section` selects the sidebar group. `order` sorts pages within a locale. `description` is used for SEO, search, and the intro. `hidden` removes a page from navigation and pagination and marks the page as `noindex`. `tags` are displayed as chips. `updated` displays an update date and fills `article:modified_time`. `image` overrides the social preview image for this page.
+Every field is optional. `title` is the page title; without it Fibel uses the first `#` heading, then a title-cased version of the slug. `navTitle` is the sidebar label and defaults to the title. `section` selects the sidebar group and defaults to `Guide`. `order` sorts pages within a locale and defaults to `100`. `description` is used for SEO, search, and the intro; without it Fibel takes the first paragraph, shortened to 180 characters, and falls back to the site description. `hidden` removes a page from navigation, pagination, the site's own search, `llms.txt`, and the sitemap, and marks it as `noindex`. The page stays reachable at its URL, which is what makes it useful for pages linked only from the footer. `tags` are displayed as chips. `updated` displays an update date and fills `article:modified_time`. `image` overrides the social preview image for this page.
 
 ## Plugin list
 

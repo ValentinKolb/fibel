@@ -72,7 +72,7 @@ Replace the plugin list when a project owns rendering, layout, search, or routes
 
 ```ts
 import { defineFibel } from "@valentinkolb/fibel";
-import { searchPlugin, themePlugin } from "fibel/plugins";
+import { searchPlugin, themePlugin } from "@valentinkolb/fibel/plugins";
 
 export default defineFibel({
   title: "Product Docs",
