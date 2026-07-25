@@ -119,6 +119,24 @@ describe("fibel app", () => {
     expect(robots).toContain("Sitemap: https://fibel.dev/sitemap.xml");
   });
 
+  test("embeds structured data for articles and breadcrumbs", async () => {
+    const app = await createFibelApp(config);
+    const html = await (await app.fetch(new Request("http://localhost/en/runtime"))).text();
+    const payload = html.match(/<script type="application\/ld\+json">(.*?)<\/script>/s)?.[1];
+    expect(payload).toBeDefined();
+
+    const graph = JSON.parse(payload ?? "{}")["@graph"] as Array<Record<string, unknown>>;
+    const article = graph.find((entry) => entry["@type"] === "TechArticle");
+    expect(article?.url).toBe("https://fibel.dev/en/runtime");
+    expect(article?.dateModified).toBe("2026-06-09");
+
+    const breadcrumbs = graph.find((entry) => entry["@type"] === "BreadcrumbList");
+    expect((breadcrumbs?.itemListElement as unknown[]).length).toBe(3);
+
+    const hidden = await (await app.fetch(new Request("http://localhost/en/imprint"))).text();
+    expect(hidden).not.toContain("application/ld+json");
+  });
+
   test("renders powered-by attribution as a removable default plugin", async () => {
     const app = await createFibelApp(config);
     const response = await app.fetch(new Request("http://localhost/en"));

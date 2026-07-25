@@ -5,7 +5,7 @@ export function seoPlugin(): FibelPlugin {
   return {
     name: "seo",
     setup(context) {
-      context.headTags.push(renderRobotsMeta, renderAlternates, renderSocialTags);
+      context.headTags.push(renderRobotsMeta, renderAlternates, renderSocialTags, renderStructuredData);
     },
     afterContent(context) {
       if (!context.config.siteUrl) {
@@ -126,6 +126,53 @@ function renderSocialTags(page: FibelPage, context: FibelContext) {
   tags.push(`<meta name="twitter:description" content="${escapeHtml(page.meta.description)}">`);
 
   return tags.join("\n    ");
+}
+
+function renderStructuredData(page: FibelPage, context: FibelContext) {
+  if (page.meta.hidden) return "";
+  const config = context.config;
+  const home = absoluteUrl(joinUrl(config.routing.basePath, page.locale.code), context);
+  const site = { "@type": "WebSite", name: config.title, url: home, inLanguage: page.locale.code };
+
+  const article: Record<string, unknown> = {
+    "@type": "TechArticle",
+    headline: page.meta.title,
+    description: page.meta.description,
+    inLanguage: page.locale.code,
+    url: absoluteUrl(page.href, context),
+    isPartOf: site,
+  };
+  const modified = lastModified(page);
+  if (modified) article.dateModified = modified;
+  const image = resolveImage(page, context);
+  if (image) article.image = image;
+
+  const graph: Record<string, unknown>[] = [article];
+  if (page.slug === "/") graph.push(site);
+  else graph.push(breadcrumbs(page, context, home));
+
+  return `<script type="application/ld+json">${jsonLd({ "@context": "https://schema.org", "@graph": graph })}</script>`;
+}
+
+function breadcrumbs(page: FibelPage, context: FibelContext, home: string) {
+  const trail = [
+    { name: context.config.title, item: home },
+    { name: page.meta.section },
+    { name: page.meta.title, item: absoluteUrl(page.href, context) },
+  ];
+  return {
+    "@type": "BreadcrumbList",
+    itemListElement: trail.map((entry, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: entry.name,
+      ...(entry.item ? { item: entry.item } : {}),
+    })),
+  };
+}
+
+function jsonLd(value: unknown) {
+  return JSON.stringify(value).replace(/</g, "\\u003c");
 }
 
 function resolveImage(page: FibelPage, context: FibelContext) {
