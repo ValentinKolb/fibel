@@ -115,6 +115,25 @@ export function docsManifestPlugin(): FibelPlugin {
 
 Wähle eigene Routen so, dass sie nicht mit internen Routen oder Seitenpfaden kollidieren.
 
+## Head-Tags hinzufügen
+
+`context.headTags` sammelt Funktionen, die Markup in den `<head>` jeder Seite rendern. Jede Funktion bekommt die aktuelle Seite und den Context, Tags können also pro Seite und pro Sprache unterschiedlich ausfallen.
+
+```ts
+import type { FibelPlugin } from "@valentinkolb/fibel";
+
+export function analyticsPlugin(siteId: string): FibelPlugin {
+  return {
+    name: "analytics",
+    setup(context) {
+      context.headTags.push(() => `<script defer data-site="${siteId}" src="https://example.com/a.js"></script>`);
+    },
+  };
+}
+```
+
+Gib einen leeren String zurück, um eine Seite zu überspringen. Das eingebaute SEO-Plugin nutzt diesen Hook für Sprachalternativen, Social Cards und strukturierte Daten.
+
 ## Mit Defaults kombinieren
 
 Die meisten Projekte hängen eigene Plugins an das Standard-Set an.
@@ -143,10 +162,12 @@ type FibelContext = {
   config: ResolvedFibelConfig;
   pages: FibelPage[];
   nav: Map<string, NavSection[]>;
+  footerItems: string[];
+  headTags: HeadTag[];
   searchIndex: SearchEntry[];
   routes: FibelRoute[];
   services: FibelServices;
 };
 ```
 
-Der Context ist die gemeinsame Arbeitsfläche der Plugins. Er enthält Konfiguration, geladene Seiten, Navigation, Suchdaten, registrierte Routen und austauschbare Services.
+Der Context ist die gemeinsame Arbeitsfläche der Plugins. Er enthält Konfiguration, geladene Seiten, Navigation, Footer-Einträge, Head-Tags, Suchdaten, registrierte Routen und austauschbare Services.

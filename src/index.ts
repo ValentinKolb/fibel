@@ -9,6 +9,8 @@ export type {
   FibelRoute,
   FibelRoutingConfig,
   FibelThemeConfig,
+  HeadTag,
   LocaleConfig,
+  NavLink,
   SearchEntry,
 } from "./types";

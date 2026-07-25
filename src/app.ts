@@ -12,6 +12,7 @@ export async function createFibelApp(input: FibelConfig): Promise<FibelApp> {
     pages: [],
     nav: new Map(),
     footerItems: [],
+    headTags: [],
     searchIndex: [],
     routes: [],
     services: {

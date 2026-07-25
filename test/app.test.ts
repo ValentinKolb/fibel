@@ -55,6 +55,25 @@ describe("fibel app", () => {
     expect(await response.text()).not.toContain("fibel-header-link");
   });
 
+  test("renders plugin head tags into the document head", async () => {
+    const app = await createFibelApp({
+      ...config,
+      plugins: [
+        ...defaultPlugins(),
+        {
+          name: "test-head",
+          setup(context) {
+            context.headTags.push((page) => `<meta name="test-locale" content="${page.locale.code}">`);
+            context.headTags.push(() => "");
+          },
+        },
+      ],
+    });
+
+    const head = (await (await app.fetch(new Request("http://localhost/de"))).text()).split("</head>")[0] ?? "";
+    expect(head).toContain('<meta name="test-locale" content="de">');
+  });
+
   test("renders powered-by attribution as a removable default plugin", async () => {
     const app = await createFibelApp(config);
     const response = await app.fetch(new Request("http://localhost/en"));

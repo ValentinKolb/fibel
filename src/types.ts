@@ -104,6 +104,8 @@ export type FibelRoute = {
   handler: (request: Request, context: FibelContext) => Response | Promise<Response>;
 };
 
+export type HeadTag = (page: FibelPage, context: FibelContext) => string;
+
 export type FibelServices = {
   renderMarkdown: (markdown: string, page: FibelPage, context: FibelContext) => string;
   renderPage: (page: FibelPage, request: Request, context: FibelContext) => string;
@@ -116,6 +118,7 @@ export type FibelContext = {
   pages: FibelPage[];
   nav: Map<string, NavSection[]>;
   footerItems: string[];
+  headTags: HeadTag[];
   searchIndex: SearchEntry[];
   routes: FibelRoute[];
   services: FibelServices;

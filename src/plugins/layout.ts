@@ -45,7 +45,7 @@ function renderDocument(page: FibelPage, request: Request, context: FibelContext
     <meta property="og:description" content="${escapeHtml(page.meta.description)}">
     <meta property="og:url" content="${escapeHtml(canonical)}">
     <link rel="icon" type="image/svg+xml" href="${favicon}">
-    <link rel="stylesheet" href="${stylesheet}">
+    <link rel="stylesheet" href="${stylesheet}">${renderHeadTags(page, context)}
   </head>
   <body class="min-h-screen bg-white text-zinc-950 antialiased dark:bg-zinc-950 dark:text-zinc-100">
     ${renderShell(page, context.nav.get(page.locale.code) ?? [], theme, searchUrl, context)}
@@ -58,6 +58,11 @@ function renderDocument(page: FibelPage, request: Request, context: FibelContext
     <script type="module" src="${client}"></script>
   </body>
 </html>`;
+}
+
+function renderHeadTags(page: FibelPage, context: FibelContext) {
+  const tags = context.headTags.map((tag) => tag(page, context)).filter(Boolean);
+  return tags.length ? `\n    ${tags.join("\n    ")}` : "";
 }
 
 function renderShell(page: FibelPage, nav: NavSection[], theme: ThemeMode, searchUrl: string, context: FibelContext) {
