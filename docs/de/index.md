@@ -3,39 +3,54 @@ title: Fibel
 navTitle: Überblick
 section: Start
 order: 1
-description: Fibel veröffentlicht Markdown-Dokumentation als serverseitig gerenderte Website mit Suche, Mehrsprachigkeit und Markdown-Quellen für Werkzeuge.
+description: Fibel veröffentlicht Markdown-Dokumentation als serverseitig gerenderte Website mit Suche, mehrsprachigem Routing und Markdown-Quellseiten für Werkzeuge.
 tags: [überblick, markdown, docs]
-updated: 2026-06-09
+updated: 2026-07-25
 ---
 
 # Fibel
 
-Fibel richtet sich an Teams, die Produkt- und Entwicklerdokumentation im Repository pflegen und als Website veröffentlichen möchten. Die Inhalte liegen als Markdown-Dateien vor. Fibel rendert daraus Seiten mit Navigation, Suchindex, Sprachumschaltung und stabilen Links auf die Markdown-Quelle.
+Fibel liest Markdown aus einem Content-Verzeichnis und liefert es als Website aus. Die Quelldateien bleiben im Repository lesbar, und jede Seite steht zusätzlich als rohes Markdown bereit. Reviewer, Skripte und Sprachmodelle arbeiten damit auf derselben Quelle, aus der die Website gebaut wird.
 
-So bleibt dieselbe Dokumentation in drei Arbeitskontexten nutzbar: im Code-Review, im Browser und in Werkzeugen wie LLMs, die Markdown direkt verarbeiten.
+Sämtliche eingebauten Funktionen sind Plugins: Markdown-Rendering, Layout, Suche, Theme-Handling, i18n-Prüfung und SEO-Ausgabe. Das Standard-Set lässt sich erweitern, einzelne Plugins ersetzen oder die Liste vollständig neu zusammenstellen. Rendering, Navigation, Suche und Routing bleiben damit in der Hand des Projekts statt vom Framework vorgegeben.
 
-## Wofür Fibel gedacht ist
+Fibel läuft auf Bun und wird in einer einzigen Datei konfiguriert. Inhalte benötigen keinen Build-Schritt, ausgelieferte Seiten enthalten kein Client-Framework.
 
-- Dokumentation soll versioniert neben dem Code liegen.
-- Leser sollen eine vollständige Website mit Navigation, Suche und Theme erhalten.
-- Mehrsprachige Seiten sollen dieselbe Struktur verwenden.
-- LLMs und Automationen sollen den Markdown-Inhalt direkt lesen können.
-- Projekte sollen Fibel als eigene Docs-App starten oder unter einer Route in eine bestehende App mounten können.
+## Schnellstart
 
-## Was Fibel bereitstellt
+```sh
+bunx --bun @valentinkolb/fibel init
+bunx --bun @valentinkolb/fibel dev
+```
 
-- Serverseitig gerendertes HTML mit Titel, Beschreibung und Canonical URL.
-- Locale-Ordner für mehrsprachige Dokumentation.
-- Ein Standard-Theme mit Light und Dark Mode.
-- Integrierte Suche mit serverseitigem Index.
-- Markdown-URLs wie `/de/configuration.md` für Werkzeuge und Reviews.
-- Page-Actions zum Kopieren von Seiten- und Markdown-Links.
-- Heading-Anker für Links auf einzelne Abschnitte.
-- Ein Plugin-System zum Erweitern oder Ersetzen einzelner Funktionen.
+`init` erzeugt `fibel.config.ts`, eine erste Seite unter `docs/en/` und ein `assets/`-Verzeichnis. `dev` liefert das Projekt aus und lädt den Browser bei Dateiänderungen neu. Der Entwicklungsserver gibt seine URL beim Start aus.
+
+## Funktionsumfang
+
+- Seiten aus `docs/<locale>/**/*.md`, mit Navigation, Sections und Pagination aus dem Frontmatter.
+- Serverseitige Suche mit Spotlight-Dialog, zu öffnen mit `/` oder `Mod+K`.
+- Native Sprachrouten und ein Sprachumschalter, der die aktuelle Seite beibehält.
+- Light und Dark Mode serverseitig aufgelöst, der erste Frame stimmt damit bereits.
+- Canonical-URLs, `hreflang`-Alternativen, Sitemap und strukturierte Daten für Suchmaschinen.
+- `llms.txt` und rohe `.md`-Routen für Werkzeuge, die Dokumentation direkt lesen.
+- Eine Plugin-API zum Ersetzen oder Erweitern sämtlicher eingebauter Funktionen.
+
+## Maschinenlesbare Ausgabe
+
+Dokumentation wird zunehmend von Werkzeugen verarbeitet statt im Browser gelesen. Fibel stellt jede Seite in einer Form bereit, die diese Werkzeuge verarbeiten können, ohne separaten Export-Schritt:
+
+```txt
+/de/configuration        die gerenderte Seite
+/de/configuration.md     die Markdown-Quelle
+/llms.txt                ein Index aller Seiten, nach Section gruppiert
+/llms-full.txt           die vollständige Dokumentation in einer Datei
+```
+
+Es handelt sich um stabile URLs, nicht um Datei-Downloads. Seiten, die aus der Navigation ausgenommen sind, fehlen auch hier.
 
 ## Projektstruktur
 
-Eine Fibel-Seite benötigt eine Config-Datei und einen Markdown-Ordner. Assets sind optional.
+Ein Fibel-Projekt besteht aus einer Config-Datei und einem Content-Verzeichnis. Assets sind optional.
 
 ```txt
 fibel.config.ts
@@ -49,33 +64,7 @@ docs/
 assets/
 ```
 
-Jedes Locale hat einen eigenen Ordner. Eine Seite unter `docs/de/configuration.md` wird als `/de/configuration` ausgeliefert. Derselbe Inhalt ist unter `/de/configuration.md` und `/de/configuration.markdown` als Markdown verfügbar.
-
-## Schnellstart
-
-Erzeuge die Projektdateien:
-
-```sh
-bunx --bun @valentinkolb/fibel init
-```
-
-Starte den lokalen Server:
-
-```sh
-bunx --bun @valentinkolb/fibel dev
-```
-
-Öffne die ausgegebene URL und bearbeite die Markdown-Dateien im `docs`-Ordner.
-
-## Agent-Skill
-
-Installiere den Fibel-Agent-Skill in Codex-Umgebungen, die an Fibel-Projekten arbeiten sollen:
-
-```sh
-bunx skills add ValentinKolb/fibel
-```
-
-Der Skill gibt Agenten die aktuellen Fibel-Konventionen für Konfiguration, Markdown-Seiten, rohe `.md`-Routen, Plugins, Hosting und Verifikation.
+Jedes Locale hat ein eigenes Verzeichnis. `docs/de/configuration.md` wird als `/de/configuration` und als `/de/configuration.md` ausgeliefert. Seiten mit identischem Slug in mehreren Sprachen gelten als Übersetzungen voneinander; daraus ergeben sich sowohl der Sprachumschalter als auch die `hreflang`-Ausgabe.
 
 ## Seitenmodell
 
@@ -95,8 +84,18 @@ updated: 2026-06-09
 # Konfiguration
 ```
 
-Das Frontmatter steuert Metadaten, Navigation und Page-Chips. Das Feld `title` ist der Seitentitel; fehlt es, greift Fibel auf die erste Markdown-Überschrift `#` zurück. In beiden Fällen rendert das Default-Layout diesen Titel einmal und lässt die erste `#`-Überschrift im Artikel aus, damit sie nicht doppelt erscheint.
+Das Frontmatter steuert Metadaten, Navigation und die Chips unter dem Seitentitel. Alle Felder sind optional: Fehlt `title`, greift Fibel auf die erste `#`-Überschrift zurück, fehlt `description`, auf den ersten Absatz. Das Layout rendert den Titel einmal und lässt die erste `#`-Überschrift im Text weg, sodass sie nicht doppelt erscheint.
+
+## Agent-Skill
+
+Fibel liefert einen Agent-Skill für Umgebungen mit, die an Fibel-Projekten arbeiten:
+
+```sh
+bunx skills add ValentinKolb/fibel
+```
+
+Er stellt die aktuellen Konventionen für Konfiguration, Markdown-Seiten, rohe `.md`-Routen, Plugins, Hosting und Verifikation bereit.
 
 ## Nächste Schritte
 
-Lies zuerst die [Konfiguration](/de/configuration), wenn du ein Projekt einrichtest. Lies [Hosting](/de/runtime), wenn Fibel als Server oder in einer bestehenden App laufen soll. [Integrierte Plugins](/de/built-in-plugins) listet auf, was Fibel mitbringt, und die [Plugin-API](/de/plugins) erklärt, wie du eigenes Verhalten ergänzt.
+Die [Konfiguration](/de/configuration) behandelt die Einrichtung eines Projekts. [Hosting](/de/runtime) beschreibt den Betrieb als Server oder das Einbinden in eine bestehende Anwendung. [SEO](/de/seo) dokumentiert, was Suchmaschinen und Sprachmodelle erhalten. [Integrierte Plugins](/de/built-in-plugins) listet den Funktionsumfang auf, die [Plugin-API](/de/plugins) beschreibt dessen Erweiterung.
