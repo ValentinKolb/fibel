@@ -39,7 +39,8 @@ function renderRobots(context: FibelContext) {
   const { basePath, internalPath } = context.config.routing;
   const disallow = [joinUrl(basePath, internalPath), ...context.config.seo.disallow.map((path) => (path.startsWith("/") ? joinUrl(basePath, path) : path))];
   const sitemap = context.config.siteUrl ? `Sitemap: ${absoluteUrl(joinUrl(basePath, "sitemap.xml"), context)}` : "";
-  return ["User-agent: *", "Allow: /", ...disallow.map((path) => `Disallow: ${path}`), sitemap, ""].filter(Boolean).join("\n");
+  const lines = ["User-agent: *", "Allow: /", ...disallow.map((path) => `Disallow: ${path}`), sitemap].filter(Boolean);
+  return `${lines.join("\n")}\n`;
 }
 
 function renderSitemap(context: FibelContext) {
