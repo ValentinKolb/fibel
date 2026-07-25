@@ -74,6 +74,33 @@ describe("fibel app", () => {
     expect(head).toContain('<meta name="test-locale" content="de">');
   });
 
+  test("links translations with hreflang alternates", async () => {
+    const app = await createFibelApp(config);
+    const head = (await (await app.fetch(new Request("http://localhost/en/runtime"))).text()).split("</head>")[0] ?? "";
+    expect(head).toContain('<link rel="alternate" hreflang="en" href="https://fibel.dev/en/runtime">');
+    expect(head).toContain('<link rel="alternate" hreflang="de" href="https://fibel.dev/de/runtime">');
+    expect(head).toContain('<link rel="alternate" hreflang="x-default" href="https://fibel.dev/en/runtime">');
+    expect(head).toContain('<meta property="og:locale:alternate" content="de">');
+  });
+
+  test("keeps hidden pages out of search engines", async () => {
+    const app = await createFibelApp(config);
+    const hidden = (await (await app.fetch(new Request("http://localhost/en/imprint"))).text()).split("</head>")[0] ?? "";
+    expect(hidden).toContain('<meta name="robots" content="noindex, nofollow">');
+    expect(hidden).not.toContain('hreflang="x-default"');
+
+    const visible = (await (await app.fetch(new Request("http://localhost/en/runtime"))).text()).split("</head>")[0] ?? "";
+    expect(visible).not.toContain('name="robots"');
+  });
+
+  test("renders social cards with a configured image", async () => {
+    const app = await createFibelApp({ ...config, seo: { ogImage: "/assets/social.png", twitterSite: "@fibel" } });
+    const head = (await (await app.fetch(new Request("http://localhost/en"))).text()).split("</head>")[0] ?? "";
+    expect(head).toContain('<meta property="og:image" content="https://fibel.dev/assets/social.png">');
+    expect(head).toContain('<meta name="twitter:card" content="summary_large_image">');
+    expect(head).toContain('<meta name="twitter:site" content="@fibel">');
+  });
+
   test("renders powered-by attribution as a removable default plugin", async () => {
     const app = await createFibelApp(config);
     const response = await app.fetch(new Request("http://localhost/en"));

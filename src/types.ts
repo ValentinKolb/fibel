@@ -17,6 +17,12 @@ export type FibelThemeConfig = {
   cookieName?: string;
 };
 
+export type FibelSeoConfig = {
+  ogImage?: string;
+  twitterSite?: string;
+  disallow?: string[];
+};
+
 export type NavLink = {
   label: string;
   value: string;
@@ -35,6 +41,7 @@ export type FibelConfig = {
   locales?: LocaleConfig[];
   defaultLocale?: string;
   theme?: FibelThemeConfig;
+  seo?: FibelSeoConfig;
   headerLinks?: NavLink[];
   footerLinks?: NavLink[];
   plugins?: FibelPlugin[];
@@ -49,6 +56,7 @@ export type ResolvedFibelConfig = Required<
   locales: LocaleConfig[];
   defaultLocale: string;
   theme: Required<FibelThemeConfig>;
+  seo: { ogImage?: string; twitterSite?: string; disallow: string[] };
   headerLinks: NavLink[];
   footerLinks: NavLink[];
   plugins: FibelPlugin[];
@@ -63,6 +71,7 @@ export type PageMeta = {
   hidden: boolean;
   tags: string[];
   updated?: string;
+  image?: string;
 };
 
 export type Heading = {

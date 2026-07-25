@@ -42,6 +42,11 @@ export function resolveConfig(config: FibelConfig): ResolvedFibelConfig {
       defaultMode: config.theme?.defaultMode ?? "light",
       cookieName: config.theme?.cookieName ?? "fibel_theme",
     },
+    seo: {
+      ogImage: config.seo?.ogImage,
+      twitterSite: config.seo?.twitterSite,
+      disallow: config.seo?.disallow ?? [],
+    },
     headerLinks: config.headerLinks ?? [],
     footerLinks: config.footerLinks ?? [],
     plugins: config.plugins ?? defaultPlugins(),

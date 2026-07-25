@@ -40,6 +40,7 @@ export function loadPages(config: ResolvedFibelConfig): FibelPage[] {
           hidden: booleanValue(data.hidden) ?? false,
           tags: stringArrayValue(data.tags),
           updated: stringValue(data.updated),
+          image: stringValue(data.image),
         },
       };
       pages.push(page);

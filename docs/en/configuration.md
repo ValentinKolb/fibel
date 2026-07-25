@@ -72,6 +72,26 @@ export default defineFibel({
 
 Each locale maps to a folder under `docs`. Translated pages should use the same slug. `docs/en/search.md` and `docs/de/search.md` describe the same page in different languages.
 
+## SEO
+
+```ts
+export default defineFibel({
+  title: "My Docs",
+  siteUrl: "https://docs.example.com",
+  seo: {
+    ogImage: "/assets/social.png",
+    twitterSite: "@example",
+    disallow: ["/en/internal"],
+  },
+});
+```
+
+Set `siteUrl` for search engines. It turns canonical URLs, language alternates, and sitemap entries into absolute URLs. Without it Fibel falls back to relative paths and the sitemap is not valid for crawlers.
+
+`ogImage` is the social preview image used when a page does not define its own. Local paths are resolved under the base path and turned into absolute URLs. `twitterSite` is the handle credited on cards. `disallow` adds paths to `robots.txt`.
+
+Pages marked `hidden` are excluded from the sitemap and get a `noindex` meta tag.
+
 ## Header links
 
 ```ts
@@ -118,9 +138,10 @@ description: Configure content, routes, locales, assets, theme, and plugins.
 hidden: false
 tags: [config, routing]
 updated: 2026-06-09
+image: /assets/configuration.png
 ```
 
-`title` is the page title. `navTitle` is the sidebar label. `section` selects the sidebar group. `order` sorts pages within a locale. `description` is used for SEO, search, and the intro. `hidden` removes a page from navigation and pagination. `tags` are displayed as chips. `updated` displays an update date.
+`title` is the page title. `navTitle` is the sidebar label. `section` selects the sidebar group. `order` sorts pages within a locale. `description` is used for SEO, search, and the intro. `hidden` removes a page from navigation and pagination and marks the page as `noindex`. `tags` are displayed as chips. `updated` displays an update date and fills `article:modified_time`. `image` overrides the social preview image for this page.
 
 ## Plugin list
 

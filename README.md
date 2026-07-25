@@ -140,9 +140,10 @@ Supported frontmatter fields:
 - `section`: Sidebar section label.
 - `order`: Numeric sort order inside a locale and section.
 - `description`: SEO description and page summary.
-- `hidden`: Hide the page from navigation when set to `true`.
+- `hidden`: Hide the page from navigation, the sitemap, and search engines when set to `true`.
 - `tags`: List of tags rendered as page chips.
-- `updated`: Date string rendered as a page chip.
+- `updated`: Date string rendered as a page chip and used as `article:modified_time`.
+- `image`: Social preview image for this page, overriding `seo.ogImage`.
 
 ## Assets
 
@@ -155,6 +156,24 @@ Place files in the configured assets directory. Fibel serves them below the conf
 ```
 
 If the app is mounted under `basePath`, link to assets through that public route.
+
+## SEO
+
+Set `siteUrl` so canonical URLs, language alternates, and sitemap entries become absolute. Fibel then adds `hreflang` alternates for every translation of a page plus an `x-default`, so search engines treat the language versions as one page instead of competitors.
+
+```ts
+export default defineFibel({
+  title: "Product Docs",
+  siteUrl: "https://docs.example.com",
+  seo: {
+    ogImage: "/assets/social.png",
+    twitterSite: "@example",
+    disallow: ["/en/internal"],
+  },
+});
+```
+
+Pages marked `hidden` are left out of the sitemap and rendered with `noindex`. Social cards use `seo.ogImage` unless a page sets `image` in its frontmatter.
 
 ## Search
 

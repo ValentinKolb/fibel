@@ -72,6 +72,26 @@ export default defineFibel({
 
 Jedes Locale entspricht einem Ordner unter `docs`. Übersetzungen sollten denselben Slug verwenden. `docs/en/search.md` und `docs/de/search.md` beschreiben also dieselbe Seite in unterschiedlichen Sprachen.
 
+## SEO
+
+```ts
+export default defineFibel({
+  title: "Meine Docs",
+  siteUrl: "https://docs.example.com",
+  seo: {
+    ogImage: "/assets/social.png",
+    twitterSite: "@example",
+    disallow: ["/de/intern"],
+  },
+});
+```
+
+Setze `siteUrl` für Suchmaschinen. Damit werden Canonical-URLs, Sprachalternativen und Sitemap-Einträge zu absoluten URLs. Ohne den Wert fällt Fibel auf relative Pfade zurück und die Sitemap ist für Crawler ungültig.
+
+`ogImage` ist das Social-Preview-Bild für Seiten ohne eigenes Bild. Lokale Pfade werden unter dem Base Path aufgelöst und zu absoluten URLs ergänzt. `twitterSite` ist das Handle, das auf Cards genannt wird. `disallow` ergänzt Pfade in der `robots.txt`.
+
+Seiten mit `hidden` erscheinen nicht in der Sitemap und bekommen ein `noindex`-Meta-Tag.
+
 ## Header-Links
 
 ```ts
@@ -118,9 +138,10 @@ description: Konfiguriere Content, Routen, Locales, Assets, Theme und Plugins.
 hidden: false
 tags: [config, routing]
 updated: 2026-06-09
+image: /assets/konfiguration.png
 ```
 
-`title` ist der Seitentitel. `navTitle` ist das Label in der Sidebar. `section` bestimmt die Sidebar-Gruppe. `order` sortiert Seiten innerhalb eines Locales. `description` wird für SEO, Suche und das Intro genutzt. `hidden` entfernt eine Seite aus Navigation und Pagination. `tags` werden als Chips angezeigt. `updated` zeigt ein Aktualisierungsdatum an.
+`title` ist der Seitentitel. `navTitle` ist das Label in der Sidebar. `section` bestimmt die Sidebar-Gruppe. `order` sortiert Seiten innerhalb eines Locales. `description` wird für SEO, Suche und das Intro genutzt. `hidden` entfernt eine Seite aus Navigation und Pagination und markiert sie als `noindex`. `tags` werden als Chips angezeigt. `updated` zeigt ein Aktualisierungsdatum an und füllt `article:modified_time`. `image` überschreibt das Social-Preview-Bild dieser Seite.
 
 ## Plugin-Liste
 
