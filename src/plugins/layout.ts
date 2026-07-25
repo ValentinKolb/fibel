@@ -68,7 +68,7 @@ function renderShell(page: FibelPage, nav: NavSection[], theme: ThemeMode, searc
           <span class="sr-only">Open navigation</span>
           ${menuIcon()}
         </button>
-        <a class="absolute left-1/2 flex -translate-x-1/2 items-center text-[2rem] font-medium leading-none tracking-tight md:static md:translate-x-0" style="color:#d69e2e" href="${joinUrl(context.config.routing.basePath, page.locale.code)}">
+        <a class="absolute left-1/2 flex -translate-x-1/2 items-center text-[2rem] font-medium leading-[1.3] tracking-tight md:static md:translate-x-0" style="color:#d69e2e" href="${joinUrl(context.config.routing.basePath, page.locale.code)}">
           <span class="truncate lowercase">${escapeHtml(context.config.title)}</span><span class="ml-0.5 opacity-80">|</span>
         </a>
         ${renderTopNav(page, context)}
@@ -168,9 +168,8 @@ function renderLocaleMenu(page: FibelPage, context: FibelContext, placement: "he
   const sameSlug = context.pages.filter((candidate) => candidate.slug === page.slug);
   if (sameSlug.length < 2) return "";
   const current = sameSlug.find((candidate) => candidate.locale.code === page.locale.code) ?? page;
-  const placementClass = placement === "header" ? "" : "";
   const menuClass = placement === "header" ? "right-0 top-11" : "bottom-11 left-0 sm:left-auto sm:right-0";
-  return `<div class="relative ${placementClass}" data-locale-menu>
+  return `<div class="relative" data-locale-menu>
     <button class="inline-flex h-9 items-center gap-2 rounded-full border border-zinc-300 bg-white px-3 text-sm text-zinc-700 shadow-[0_1px_8px_rgb(0_0_0_/_0.04)] hover:border-zinc-400 dark:border-white/10 dark:bg-white/5 dark:text-zinc-200 dark:hover:bg-white/10" type="button" data-locale-trigger aria-haspopup="listbox" aria-expanded="false">
       <span>${escapeHtml(current.locale.label)}</span>
       <span class="grid place-items-center text-zinc-400">${chevronIcon()}</span>
