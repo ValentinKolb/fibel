@@ -79,6 +79,6 @@ The index follows the `llms.txt` convention: a title, a short summary, then the 
 
 Hidden pages are excluded from both.
 
-## Add your own tags
+## Custom head tags
 
-Analytics snippets and verification tags belong in a plugin, not in a replaced layout. See [Plugin API](/en/plugins) for the `headTags` hook.
+Analytics snippets and verification tags belong in a plugin rather than in a replaced layout. The [Plugin API](/en/plugins) documents the `headTags` hook.

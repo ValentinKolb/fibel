@@ -40,7 +40,7 @@ export default defineFibel({
 
 Beide Schlüssel sind optional. `content` steht standardmäßig auf `docs` und zeigt auf den Ordner mit Markdown-Dateien. `assets` steht standardmäßig auf `assets` und zeigt auf Dateien, die zusammen mit der Dokumentation ausgeliefert werden, zum Beispiel Bilder, PDFs oder Downloads. Beide werden relativ zu `root` aufgelöst. `root` ist standardmäßig das aktuelle Arbeitsverzeichnis und muss nur gesetzt werden, wenn die Config-Datei nicht im Projektwurzelverzeichnis liegt.
 
-Halte Links in Markdown-Dateien stabil und relativ zur Dokumentation. Das erleichtert den Betrieb unter einem Base Path.
+Links in Markdown-Dateien bleiben stabil und relativ zur Dokumentation. Das erleichtert den Betrieb unter einem Base Path.
 
 ## Routing
 
@@ -55,7 +55,7 @@ export default defineFibel({
 });
 ```
 
-`basePath` ist der öffentliche Pfad der Dokumentation. Setze ihn, wenn Fibel unter einer Sub-Route läuft. `internalPath` ist für generierte Dateien und interne Endpunkte reserviert. `assetsPath` ist der öffentliche Pfad für den Assets-Ordner.
+`basePath` ist der öffentliche Pfad der Dokumentation und wird gesetzt, wenn Fibel unter einer Sub-Route läuft. `internalPath` ist für generierte Dateien und interne Endpunkte reserviert. `assetsPath` ist der öffentliche Pfad für den Assets-Ordner.
 
 ## Locales
 
@@ -72,7 +72,7 @@ export default defineFibel({
 
 Jedes Locale entspricht einem Ordner unter `docs`. Übersetzungen sollten denselben Slug verwenden. `docs/en/search.md` und `docs/de/search.md` beschreiben also dieselbe Seite in unterschiedlichen Sprachen. Genau über den Slug werden sie auch für Sprachumschaltung und `hreflang` einander zugeordnet.
 
-Fehlt `locales`, leitet Fibel die Sprachen aus den Ordnernamen im Content-Verzeichnis ab und nutzt den großgeschriebenen Ordnernamen als Label. `defaultLocale` fällt dann auf das erste Locale der Liste zurück. Setze für eine veröffentlichte Seite beides explizit, sonst entscheidet die Ordnerreihenfolge über die Standardsprache.
+Fehlt `locales`, leitet Fibel die Sprachen aus den Ordnernamen im Content-Verzeichnis ab und nutzt den großgeschriebenen Ordnernamen als Label. `defaultLocale` fällt dann auf das erste Locale der Liste zurück. Für eine veröffentlichte Seite sollten beide Werte explizit gesetzt sein, sonst entscheidet die Ordnerreihenfolge über die Standardsprache.
 
 `defaultLocale` muss in `locales` enthalten sein. Andernfalls bricht Fibel beim Start mit einem Fehler ab.
 
@@ -90,7 +90,7 @@ export default defineFibel({
 });
 ```
 
-Setze `siteUrl` für Suchmaschinen. Damit werden Canonical-URLs, Sprachalternativen und Sitemap-Einträge zu absoluten URLs. Ohne den Wert fällt Fibel auf relative Pfade zurück und die Sitemap ist für Crawler ungültig.
+`siteUrl` ist für Suchmaschinen erforderlich. Damit werden Canonical-URLs, Sprachalternativen und Sitemap-Einträge zu absoluten URLs. Ohne den Wert fällt Fibel auf relative Pfade zurück und die Sitemap ist für Crawler ungültig.
 
 `ogImage` ist das Social-Preview-Bild für Seiten ohne eigenes Bild. Lokale Pfade werden unter dem Base Path aufgelöst und zu absoluten URLs ergänzt. `twitterSite` ist das Handle, das auf Cards genannt wird. `disallow` ergänzt Pfade in der `robots.txt`.
 
@@ -159,4 +159,4 @@ export default defineFibel({
 });
 ```
 
-Hänge eigene Plugins an die Defaults an, wenn die integrierten Funktionen erhalten bleiben sollen. Ersetze die Liste nur, wenn das Projekt Rendering, Suche, Layout oder Routen vollständig selbst steuern soll.
+Eigene Plugins werden an die Defaults angehängt, wenn die integrierten Funktionen erhalten bleiben sollen. Eine vollständige Ersetzung der Liste ist nur nötig, wenn das Projekt Rendering, Suche, Layout oder Routen selbst steuert.

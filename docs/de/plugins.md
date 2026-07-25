@@ -29,11 +29,11 @@ export function projectPlugin(): FibelPlugin {
 }
 ```
 
-`setup` läuft vor dem Laden der Markdown-Dateien. Nutze diesen Hook, um Services zu ersetzen oder zu umschließen.
+`setup` läuft vor dem Laden der Markdown-Dateien und dient dem Ersetzen oder Umschließen von Services.
 
-`afterContent` läuft nach dem Laden und Rendern der Seiten. Nutze diesen Hook für Validierung, Indizes oder abgeleitete Metadaten.
+`afterContent` läuft nach dem Laden und Rendern der Seiten und eignet sich für Validierung, Indizes oder abgeleitete Metadaten.
 
-`routes` ergänzt Fetch-Routen. Nutze diesen Hook für generierte Dateien, interne Endpunkte oder projektspezifische APIs.
+`routes` ergänzt Fetch-Routen, etwa für generierte Dateien, interne Endpunkte oder projektspezifische APIs.
 
 ## Service umschließen
 
@@ -115,7 +115,7 @@ export function docsManifestPlugin(): FibelPlugin {
 
 Ein `path`, der auf `/*` endet, wird als Präfix statt exakt abgeglichen. Das Assets-Plugin liefert damit ein ganzes Verzeichnis aus.
 
-Wähle eigene Routen so, dass sie nicht mit internen Routen oder Seitenpfaden kollidieren.
+Eigene Routenpfade sollten nicht mit internen Routen oder Seitenpfaden kollidieren.
 
 ## Head-Tags hinzufügen
 
@@ -134,7 +134,7 @@ export function analyticsPlugin(siteId: string): FibelPlugin {
 }
 ```
 
-Gib einen leeren String zurück, um eine Seite zu überspringen. Das eingebaute SEO-Plugin nutzt diesen Hook für Sprachalternativen, Social Cards und strukturierte Daten.
+Ein leerer Rückgabewert überspringt die jeweilige Seite. Das eingebaute SEO-Plugin nutzt diesen Hook für Sprachalternativen, Social Cards und strukturierte Daten.
 
 ## Mit Defaults kombinieren
 
@@ -178,7 +178,7 @@ Alle auf dieser Seite gezeigten Typen sind als Type-Import aus `@valentinkolb/fi
 
 ## Service-Referenz
 
-Vier Services lassen sich in `setup` ersetzen oder umschließen. Ersetze einen, um Verhalten zu ändern, umschließe ihn, um es zu erweitern.
+Vier Services lassen sich in `setup` ersetzen oder umschließen. Ein Ersetzen ändert das Verhalten, ein Umschließen erweitert es.
 
 ```ts
 type FibelServices = {

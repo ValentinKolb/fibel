@@ -79,6 +79,6 @@ Der Index folgt der `llms.txt`-Konvention: Titel, kurze Zusammenfassung, dann di
 
 Versteckte Seiten fehlen in beiden.
 
-## Eigene Tags ergänzen
+## Eigene Head-Tags
 
-Analytics-Snippets und Verification-Tags gehören in ein Plugin, nicht in ein ersetztes Layout. Die [Plugin-API](/de/plugins) beschreibt den `headTags`-Hook.
+Analytics-Snippets und Verification-Tags gehören in ein Plugin statt in ein ersetztes Layout. Die [Plugin-API](/de/plugins) dokumentiert den `headTags`-Hook.

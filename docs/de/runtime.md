@@ -14,7 +14,7 @@ Fibel stellt einen `fetch`-Handler bereit. Dadurch kann die Dokumentation direkt
 
 ## Lokal entwickeln
 
-Nutze den Development-Befehl, während du Inhalte und Konfiguration bearbeitest.
+Der Development-Befehl dient der Arbeit an Inhalten und Konfiguration.
 
 ```sh
 bunx --bun @valentinkolb/fibel dev --port 5173
@@ -31,7 +31,7 @@ bunx --bun @valentinkolb/fibel dev --no-reload
 
 Wenn ein Rebuild fehlschlägt, liefert der Server weiter die letzte funktionierende App aus und schreibt den Fehler ins Terminal.
 
-Der Watcher erfasst nur Content, Assets und die Config-Datei. Änderungen an einem Projekt-Plugin oder einer anderen TypeScript-Datei lösen keinen Rebuild aus. Starte den Server nach Änderungen am Plugin-Code neu.
+Der Watcher erfasst nur Content, Assets und die Config-Datei. Änderungen an einem Projekt-Plugin oder einer anderen TypeScript-Datei lösen keinen Rebuild aus. Nach Änderungen am Plugin-Code ist ein Neustart des Servers erforderlich.
 
 ## Für Deployment bauen
 
@@ -56,9 +56,9 @@ services:
       - traefik.http.services.docs.loadbalancer.server.port=3000
 ```
 
-Der Server lauscht auf `PORT`, standardmäßig `3000`. Setze `siteUrl` in `fibel.config.ts` auf denselben Host, damit Canonical-URLs und Sitemap zum Deployment passen.
+Der Server lauscht auf `PORT`, standardmäßig `3000`. `siteUrl` in `fibel.config.ts` verweist auf denselben Host, damit Canonical-URLs und Sitemap zum Deployment passen.
 
-Für die eigene Dokumentation baust du ein Image aus dem Projekt statt das Fibel-Image zu nutzen und behältst dieselben Labels.
+Für eigene Dokumentation entsteht das Image aus dem jeweiligen Projekt statt aus dem Fibel-Image; die Labels bleiben identisch.
 
 ## Default-Docs-Image ausführen
 
@@ -91,7 +91,7 @@ const app = new Hono();
 app.mount("/docs", docs.fetch);
 ```
 
-Setze `routing.basePath` auf denselben Pfad:
+`routing.basePath` verweist auf denselben Pfad:
 
 ```ts
 export default defineFibel({

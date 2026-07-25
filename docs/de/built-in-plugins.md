@@ -36,7 +36,7 @@ Das Standard-Set enthält:
 
 Fibel liefert Plugins mit, die nicht im Standard-Set stecken, weil sie Konfiguration brauchen.
 
-`imprintPlugin` ergänzt einen Footer-Link auf rechtliche Angaben, die woanders liegen. Nutze es, wenn das Impressum zur Firma oder Person hinter mehreren Seiten gehört und nicht als Dokumentationsseite gepflegt werden soll.
+`imprintPlugin` ergänzt einen Footer-Link auf rechtliche Angaben, die an anderer Stelle liegen. Das Plugin eignet sich, wenn das Impressum zur Firma oder Person hinter mehreren Seiten gehört und nicht als Dokumentationsseite gepflegt werden soll.
 
 ```ts
 import { defineFibel, defaultPlugins } from "@valentinkolb/fibel";
@@ -52,7 +52,7 @@ Die URL wird unverändert verwendet und kann auf eine beliebige externe Seite ze
 
 ## Standard-Set erweitern
 
-Hänge eigene Plugins an das Standard-Set an, wenn die integrierten Funktionen erhalten bleiben sollen.
+Eigene Plugins werden an das Standard-Set angehängt, wenn die integrierten Funktionen erhalten bleiben sollen.
 
 ```ts
 import { defineFibel, defaultPlugins } from "@valentinkolb/fibel";
@@ -68,7 +68,7 @@ Diese Variante ist für die meisten Projekte der richtige Startpunkt. Die [Plugi
 
 ## Standard-Set ersetzen
 
-Ersetze die Plugin-Liste, wenn ein Projekt Rendering, Layout, Suche oder Routen vollständig selbst steuern soll.
+Die Plugin-Liste wird vollständig ersetzt, wenn ein Projekt Rendering, Layout, Suche oder Routen selbst steuern soll.
 
 ```ts
 import { defineFibel } from "@valentinkolb/fibel";
