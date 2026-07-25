@@ -39,6 +39,25 @@ bunx --bun @valentinkolb/fibel build
 
 Der Build erzeugt einen Runtime-Einstieg und die generierten Dateien für die Dokumentation. Requests laufen weiterhin durch Fibel. Dadurch funktionieren Theme-Cookie, Suche, Markdown-Routen und gemountete Pfade konsistent.
 
+## Hinter Traefik deployen
+
+Der empfohlene Weg ist das Container-Image hinter Traefik.
+
+```yaml
+services:
+  docs:
+    image: ghcr.io/valentinkolb/fibel:latest
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.docs.rule=Host(`docs.example.com`)
+      - traefik.http.routers.docs.tls.certresolver=letsencrypt
+      - traefik.http.services.docs.loadbalancer.server.port=3000
+```
+
+Der Server lauscht auf `PORT`, standardmäßig `3000`. Setze `siteUrl` in `fibel.config.ts` auf denselben Host, damit Canonical-URLs und Sitemap zum Deployment passen.
+
+Für die eigene Dokumentation baust du ein Image aus dem Projekt statt das Fibel-Image zu nutzen und behältst dieselben Labels.
+
 ## Default-Docs-Image ausführen
 
 Das Fibel-Repository enthält ein Docker-Image, mit dem die offizielle Default-Dokumentation gehostet werden kann.
