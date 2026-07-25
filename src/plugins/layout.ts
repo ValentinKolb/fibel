@@ -129,17 +129,13 @@ function searchIcon(className: string) {
 }
 
 function renderTopNav(page: FibelPage, context: FibelContext) {
-  const items = [
-    { label: "Docs Home", href: joinUrl(context.config.routing.basePath, page.locale.code), slugs: ["/"] },
-    { label: "Overview", href: joinUrl(context.config.routing.basePath, page.locale.code), slugs: ["/"] },
-    { label: "Guide", href: joinUrl(context.config.routing.basePath, page.locale.code, "runtime"), slugs: ["/runtime", "/configuration", "/search", "/theme"] },
-    { label: "API Reference", href: joinUrl(context.config.routing.basePath, page.locale.code, "plugins"), slugs: ["/plugins"] },
-  ];
+  const links = context.config.headerLinks;
+  if (links.length === 0) return "";
   return `<nav class="hidden items-center gap-7 text-[15px] text-zinc-700 dark:text-zinc-300 md:flex">
-    ${items
-      .map((item, index) => {
-        const active = index === 0 ? false : item.slugs.includes(page.slug);
-        return `<a class="fibel-header-link ${active ? "is-active" : ""}" href="${item.href}">${escapeHtml(item.label)}</a>`;
+    ${links
+      .map((link) => {
+        const active = isLocalPath(link.value) && normalizeSlug(link.value) === page.slug;
+        return `<a class="fibel-header-link ${active ? "is-active" : ""}" href="${escapeHtml(resolveHeaderHref(link.value, page, context))}">${escapeHtml(link.label)}</a>`;
       })
       .join("")}
   </nav>`;
@@ -267,10 +263,20 @@ function markdownIcon() {
   return '<svg viewBox="0 0 24 24" aria-hidden="true" class="h-3.5 w-3.5"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M4 6h16v12H4zM7 15V9l2.5 3L12 9v6m4-6v6m0 0-2-2m2 2 2-2"/></svg>';
 }
 
+const isLocalPath = (value: string) => value.startsWith("/") && !/^\/\//.test(value);
+
+const normalizeSlug = (value: string) => value.replace(/\/+$/g, "") || "/";
+
 function resolveFooterHref(value: string, context: FibelContext) {
   if (/^(https?:|mailto:|tel:|#)/.test(value)) return value;
-  if (value.startsWith("/")) return joinUrl(context.config.routing.basePath, value);
+  if (isLocalPath(value)) return joinUrl(context.config.routing.basePath, value);
   return value;
+}
+
+function resolveHeaderHref(value: string, page: FibelPage, context: FibelContext) {
+  if (!isLocalPath(value)) return value;
+  const slug = normalizeSlug(value);
+  return joinUrl(context.config.routing.basePath, page.locale.code, slug === "/" ? undefined : slug);
 }
 
 function renderPager(page: FibelPage, pages: FibelPage[]) {

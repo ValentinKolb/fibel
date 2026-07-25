@@ -96,6 +96,10 @@ export default defineFibel({
     defaultMode: "light",
     cookieName: "fibel_theme",
   },
+  headerLinks: [
+    { label: "Guide", value: "/runtime" },
+    { label: "Plugins", value: "/plugins" },
+  ],
   footerLinks: [
     { label: "Imprint", value: "/imprint" },
     { label: "GitHub", value: "https://github.com/example/project" },
@@ -105,7 +109,9 @@ export default defineFibel({
 
 `basePath` is the public mount path. With the config above, pages live under `/docs`, the search endpoint lives under `/docs/_fibel/search`, and assets live under `/docs/assets/...`.
 
-Footer link values can be external URLs or local paths. Local absolute paths are prefixed with `basePath`.
+`headerLinks` fills the navigation next to the site title. Local values are resolved against the current locale, so `/runtime` points to `/en/runtime` on an English page and to `/de/runtime` on a German one. A link is marked as active when its value matches the slug of the current page. The header navigation is empty when `headerLinks` is not set.
+
+Footer link values can be external URLs or local paths. Local absolute paths are prefixed with `basePath` but are not locale-aware, so write them with the locale segment when they point at a page.
 
 ## Content
 

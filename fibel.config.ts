@@ -20,6 +20,11 @@ export default defineFibel({
     defaultMode: "light",
     cookieName: "fibel_theme",
   },
+  headerLinks: [
+    { label: "Overview", value: "/" },
+    { label: "Guide", value: "/runtime" },
+    { label: "Plugins", value: "/plugins" },
+  ],
   footerLinks: [
     { label: "GitHub", value: "https://github.com/ValentinKolb/fibel" },
     { label: "Impressum", value: "/en/imprint" },

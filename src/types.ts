@@ -17,10 +17,12 @@ export type FibelThemeConfig = {
   cookieName?: string;
 };
 
-export type FooterLink = {
+export type NavLink = {
   label: string;
   value: string;
 };
+
+export type FooterLink = NavLink;
 
 export type FibelConfig = {
   title: string;
@@ -33,7 +35,8 @@ export type FibelConfig = {
   locales?: LocaleConfig[];
   defaultLocale?: string;
   theme?: FibelThemeConfig;
-  footerLinks?: FooterLink[];
+  headerLinks?: NavLink[];
+  footerLinks?: NavLink[];
   plugins?: FibelPlugin[];
 };
 
@@ -46,7 +49,8 @@ export type ResolvedFibelConfig = Required<
   locales: LocaleConfig[];
   defaultLocale: string;
   theme: Required<FibelThemeConfig>;
-  footerLinks: FooterLink[];
+  headerLinks: NavLink[];
+  footerLinks: NavLink[];
   plugins: FibelPlugin[];
 };
 

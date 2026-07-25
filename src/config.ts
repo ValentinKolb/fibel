@@ -42,6 +42,7 @@ export function resolveConfig(config: FibelConfig): ResolvedFibelConfig {
       defaultMode: config.theme?.defaultMode ?? "light",
       cookieName: config.theme?.cookieName ?? "fibel_theme",
     },
+    headerLinks: config.headerLinks ?? [],
     footerLinks: config.footerLinks ?? [],
     plugins: config.plugins ?? defaultPlugins(),
   };

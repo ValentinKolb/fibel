@@ -72,6 +72,23 @@ export default defineFibel({
 
 Each locale maps to a folder under `docs`. Translated pages should use the same slug. `docs/en/search.md` and `docs/de/search.md` describe the same page in different languages.
 
+## Header links
+
+```ts
+export default defineFibel({
+  title: "My Docs",
+  headerLinks: [
+    { label: "Overview", value: "/" },
+    { label: "Guide", value: "/runtime" },
+    { label: "Changelog", value: "https://github.com/example/docs/releases" },
+  ],
+});
+```
+
+`headerLinks` fills the navigation next to the site title. Local values are resolved against the locale of the current page, so `/runtime` points to `/en/runtime` for an English reader and to `/de/runtime` for a German one. Write the value as the page slug without a locale segment.
+
+A link is marked as active when its value matches the slug of the current page. When `headerLinks` is not set, the header shows no navigation.
+
 ## Footer links
 
 ```ts
@@ -85,6 +102,8 @@ export default defineFibel({
 ```
 
 Each link has a `label` and a `value`. Relative values are resolved under the configured base path. Absolute `https:`, `mailto:`, `tel:`, and hash links are used as written.
+
+Footer links are not locale-aware. Include the locale segment when a footer link points at a documentation page.
 
 ## Frontmatter
 

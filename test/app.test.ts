@@ -28,6 +28,33 @@ describe("fibel app", () => {
     expect(await longResponse.text()).toContain("# Plugin API");
   });
 
+  test("resolves header links against the locale of the current page", async () => {
+    const app = await createFibelApp({
+      ...config,
+      headerLinks: [
+        { label: "Overview", value: "/" },
+        { label: "Guide", value: "/runtime" },
+        { label: "Source", value: "https://github.com/ValentinKolb/fibel" },
+      ],
+    });
+
+    const german = await (await app.fetch(new Request("http://localhost/de/runtime"))).text();
+    expect(german).toContain('href="/de/runtime"');
+    expect(german).toContain('href="/de"');
+    expect(german).toContain('href="https://github.com/ValentinKolb/fibel"');
+    expect(german).toContain('fibel-header-link is-active" href="/de/runtime"');
+
+    const english = await (await app.fetch(new Request("http://localhost/en"))).text();
+    expect(english).toContain('fibel-header-link is-active" href="/en"');
+    expect(english).not.toContain('fibel-header-link is-active" href="/en/runtime"');
+  });
+
+  test("omits the header navigation when no header links are configured", async () => {
+    const app = await createFibelApp({ ...config, headerLinks: [] });
+    const response = await app.fetch(new Request("http://localhost/en"));
+    expect(await response.text()).not.toContain("fibel-header-link");
+  });
+
   test("renders powered-by attribution as a removable default plugin", async () => {
     const app = await createFibelApp(config);
     const response = await app.fetch(new Request("http://localhost/en"));
