@@ -73,8 +73,8 @@ function renderShell(page: FibelPage, nav: NavSection[], theme: ThemeMode, searc
           <span class="sr-only">Open navigation</span>
           ${menuIcon()}
         </button>
-        <a class="absolute left-1/2 flex -translate-x-1/2 items-center text-[2rem] font-medium leading-[1.3] tracking-tight md:static md:translate-x-0" style="color:#d69e2e" href="${joinUrl(context.config.routing.basePath, page.locale.code)}">
-          <span class="truncate lowercase">${escapeHtml(context.config.title)}</span><span class="ml-0.5 opacity-80">|</span>
+        <a class="absolute left-1/2 flex min-w-0 -translate-x-1/2 items-center text-2xl font-medium leading-[1.3] tracking-tight md:static md:translate-x-0 md:text-[2rem]" style="color:#d69e2e" href="${joinUrl(context.config.routing.basePath, page.locale.code)}">
+          <span class="max-w-[calc(100vw-9.5rem)] truncate lowercase md:max-w-none">${escapeHtml(context.config.title)}</span><span class="ml-0.5 opacity-80">|</span>
         </a>
         ${renderTopNav(page, context)}
         <div class="ml-auto hidden items-center gap-3 md:flex">
