@@ -300,8 +300,8 @@ bun run typecheck
 Publishing is handled by GitHub Actions through npm trusted publishing. Push a version tag to publish that version:
 
 ```sh
-git tag v0.0.6
-git push origin v0.0.6
+git tag v0.0.8
+git push origin v0.0.8
 ```
 
 The workflow runs typecheck, tests, build, package-content checks, sets `package.json` to the tag version, and publishes with provenance:

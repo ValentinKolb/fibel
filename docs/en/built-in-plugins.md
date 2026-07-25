@@ -23,12 +23,12 @@ const plugins = defaultPlugins();
 The default set includes:
 
 - `markdownPlugin`: renders Markdown to HTML, processes code blocks, and creates heading anchors.
-- `themePlugin`: reads the theme cookie and provides the selected theme to the layout.
+- `themePlugin`: reads the theme cookie and provides the selected theme to the layout. See [Theme](/en/theme).
 - `i18nPlugin`: checks whether translated pages exist in the configured locales.
 - `seoPlugin`: serves SEO files such as favicon, sitemap, and robots output, and adds language alternates and social card metadata to every page.
 - `llmsPlugin`: serves `llms.txt` and `llms-full.txt` so language models can discover and read the documentation.
 - `assetsPlugin`: serves files from the configured assets folder.
-- `searchPlugin`: builds the search index and exposes the search endpoint.
+- `searchPlugin`: builds the search index and exposes the search endpoint. See [Search](/en/search).
 - `poweredByPlugin`: adds the `Powered by fibel.dev` attribution to the footer.
 - `layoutPlugin`: renders navigation, page layout, page actions, footer, search dialog, and client script.
 
@@ -46,7 +46,7 @@ export default defineFibel({
 });
 ```
 
-This is the right starting point for most projects.
+This is the right starting point for most projects. The [Plugin API](/en/plugins) describes the available hooks.
 
 ## Replace the defaults
 

@@ -56,13 +56,13 @@ Jedes Locale hat einen eigenen Ordner. Eine Seite unter `docs/de/configuration.m
 Erzeuge die Projektdateien:
 
 ```sh
-bunx fibel init
+bunx --bun @valentinkolb/fibel init
 ```
 
 Starte den lokalen Server:
 
 ```sh
-bunx fibel dev
+bunx --bun @valentinkolb/fibel dev
 ```
 
 Öffne die ausgegebene URL und bearbeite die Markdown-Dateien im `docs`-Ordner.
@@ -99,4 +99,4 @@ Das Frontmatter steuert Metadaten, Navigation und Page-Chips. Die erste Markdown
 
 ## Nächste Schritte
 
-Lies zuerst die Konfiguration, wenn du ein Projekt einrichtest. Lies Hosting, wenn Fibel in eine bestehende App eingebunden werden soll. Die Plugin-Seiten erklären, welche Funktionen Fibel mitbringt und wie du eigenes Verhalten ergänzt.
+Lies zuerst die [Konfiguration](/de/configuration), wenn du ein Projekt einrichtest. Lies [Hosting](/de/runtime), wenn Fibel als Server oder in einer bestehenden App laufen soll. [Integrierte Plugins](/de/built-in-plugins) listet auf, was Fibel mitbringt, und die [Plugin-API](/de/plugins) erklärt, wie du eigenes Verhalten ergänzt.

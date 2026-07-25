@@ -56,13 +56,13 @@ Each locale has its own folder. A page at `docs/en/configuration.md` is served a
 Create the project files:
 
 ```sh
-bunx fibel init
+bunx --bun @valentinkolb/fibel init
 ```
 
 Start the local server:
 
 ```sh
-bunx fibel dev
+bunx --bun @valentinkolb/fibel dev
 ```
 
 Open the printed URL and edit the Markdown files in the `docs` folder.
@@ -99,4 +99,4 @@ Frontmatter controls metadata, navigation, and page chips. The first Markdown `#
 
 ## Next steps
 
-Read Configuration first when setting up a project. Read Hosting when Fibel should run inside another app. The plugin pages explain which capabilities are built in and how to add project-specific behavior.
+Read [Configuration](/en/configuration) first when setting up a project. Read [Hosting](/en/runtime) when Fibel should run as a server or inside another app. [Built-in plugins](/en/built-in-plugins) lists what Fibel brings along, and [Plugin API](/en/plugins) explains how to add project-specific behavior.
