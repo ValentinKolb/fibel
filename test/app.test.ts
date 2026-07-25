@@ -137,6 +137,30 @@ describe("fibel app", () => {
     expect(hidden).not.toContain("application/ld+json");
   });
 
+  test("publishes an llms.txt index per locale", async () => {
+    const app = await createFibelApp(config);
+    const response = await app.fetch(new Request("http://localhost/llms.txt"));
+    expect(response.headers.get("content-type")).toContain("text/markdown");
+
+    const index = await response.text();
+    expect(index).toContain("# Fibel");
+    expect(index).toContain("## Architecture");
+    expect(index).toContain("[Plugin API](https://fibel.dev/en/plugins.md)");
+    expect(index).toContain("https://fibel.dev/de/llms.txt");
+    expect(index).not.toContain("/en/imprint.md");
+
+    const german = await (await app.fetch(new Request("http://localhost/de/llms.txt"))).text();
+    expect(german).toContain("https://fibel.dev/de/plugins.md");
+  });
+
+  test("publishes the full documentation text for language models", async () => {
+    const app = await createFibelApp(config);
+    const full = await (await app.fetch(new Request("http://localhost/en/llms-full.txt"))).text();
+    expect(full).toContain("Source: https://fibel.dev/en/plugins.md");
+    expect(full).toContain("# Plugin API");
+    expect(full).not.toContain("Source: https://fibel.dev/en/imprint.md");
+  });
+
   test("renders powered-by attribution as a removable default plugin", async () => {
     const app = await createFibelApp(config);
     const response = await app.fetch(new Request("http://localhost/en"));

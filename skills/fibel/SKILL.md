@@ -156,6 +156,7 @@ The default plugin list is:
 - `themePlugin`
 - `i18nPlugin`
 - `seoPlugin`
+- `llmsPlugin`
 - `assetsPlugin`
 - `searchPlugin`
 - `poweredByPlugin`
@@ -174,6 +175,16 @@ export default defineFibel({
 ```
 
 Replace `plugins` completely only when the project owns rendering, layout, search, or routes itself. To remove the default footer attribution, provide a plugin list without `poweredByPlugin`.
+
+## Discovery routes
+
+`seoPlugin` serves `robots.txt`, `sitemap.xml`, and the favicon, and pushes language alternates, social card tags, and JSON-LD into the head of every page. `llmsPlugin` serves `llms.txt` and `llms-full.txt`, per locale and for the default locale at the root.
+
+Set `siteUrl` in any project that will be published. Without it these routes emit relative URLs, which crawlers reject.
+
+Pages with `hidden: true` are excluded from the sitemap and the `llms.txt` index and are rendered with a `noindex` meta tag.
+
+Plugins add head markup through `context.headTags`, a list of `(page, context) => string` functions. Use it for analytics snippets or verification tags instead of replacing `layoutPlugin`.
 
 ## Plugin pattern
 

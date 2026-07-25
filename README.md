@@ -50,6 +50,8 @@ bun run src/cli.ts dev --port 5173
 - Light and dark mode without client-side theme flicker
 - Static assets from an `assets/` directory
 - SEO routes for `robots.txt`, `sitemap.xml`, and `favicon.ico`
+- Language alternates, social cards, and structured data on every page
+- `llms.txt` and `llms-full.txt` routes for language models
 - A Tailwind-based default theme
 - A small plugin API for replacing or extending built-in behavior
 
@@ -174,6 +176,21 @@ export default defineFibel({
 ```
 
 Pages marked `hidden` are left out of the sitemap and rendered with `noindex`. Social cards use `seo.ogImage` unless a page sets `image` in its frontmatter.
+
+Every indexable page also carries JSON-LD with a `TechArticle` and a `BreadcrumbList`.
+
+## Discovery for language models
+
+Fibel publishes an `llms.txt` index next to the raw Markdown routes.
+
+```txt
+/llms.txt              index for the default locale
+/en/llms.txt           index for a specific locale
+/llms-full.txt         every page of the default locale in one file
+/en/llms-full.txt      every page of a locale in one file
+```
+
+The index lists each page grouped by sidebar section and links to the raw `.md` route with its description. Hidden pages are excluded.
 
 ## Search
 

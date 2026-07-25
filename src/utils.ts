@@ -20,6 +20,8 @@ export const joinUrl = (...parts: Array<string | undefined>) => {
   return joined.startsWith("/") ? joined : `/${joined}`;
 };
 
+export const absoluteUrl = (href: string, siteUrl?: string) => (siteUrl ? `${siteUrl.replace(/\/+$/g, "")}${href}` : href);
+
 export const withoutBasePath = (pathname: string, basePath: string) => {
   if (!basePath) return pathname || "/";
   if (pathname === basePath) return "/";

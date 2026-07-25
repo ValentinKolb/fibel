@@ -1,5 +1,5 @@
 import type { FibelContext, FibelPage, FibelPlugin } from "../types";
-import { escapeHtml, joinUrl, text } from "../utils";
+import { absoluteUrl as toAbsoluteUrl, escapeHtml, joinUrl, text } from "../utils";
 
 export function seoPlugin(): FibelPlugin {
   return {
@@ -77,9 +77,8 @@ function xmlEscape(value: string) {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
 }
 
-export function absoluteUrl(href: string, context: FibelContext) {
-  const siteUrl = context.config.siteUrl?.replace(/\/+$/g, "");
-  return siteUrl ? `${siteUrl}${href}` : href;
+function absoluteUrl(href: string, context: FibelContext) {
+  return toAbsoluteUrl(href, context.config.siteUrl);
 }
 
 function translations(page: FibelPage, context: FibelContext) {

@@ -26,6 +26,7 @@ Das Standard-Set enthält:
 - `themePlugin`: liest den Theme-Cookie und stellt das ausgewählte Theme für das Layout bereit.
 - `i18nPlugin`: prüft, ob übersetzte Seiten in den konfigurierten Locales vorhanden sind.
 - `seoPlugin`: liefert SEO-Dateien wie Favicon, Sitemap und Robots-Ausgabe und ergänzt jede Seite um Sprachalternativen und Social-Card-Metadaten.
+- `llmsPlugin`: liefert `llms.txt` und `llms-full.txt`, damit Sprachmodelle die Dokumentation finden und lesen können.
 - `assetsPlugin`: liefert Dateien aus dem konfigurierten Assets-Ordner.
 - `searchPlugin`: baut den Suchindex und stellt den Suchendpunkt bereit.
 - `poweredByPlugin`: ergänzt den Hinweis `Powered by fibel.dev` im Footer.

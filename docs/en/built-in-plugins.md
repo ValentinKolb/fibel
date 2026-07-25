@@ -26,6 +26,7 @@ The default set includes:
 - `themePlugin`: reads the theme cookie and provides the selected theme to the layout.
 - `i18nPlugin`: checks whether translated pages exist in the configured locales.
 - `seoPlugin`: serves SEO files such as favicon, sitemap, and robots output, and adds language alternates and social card metadata to every page.
+- `llmsPlugin`: serves `llms.txt` and `llms-full.txt` so language models can discover and read the documentation.
 - `assetsPlugin`: serves files from the configured assets folder.
 - `searchPlugin`: builds the search index and exposes the search endpoint.
 - `poweredByPlugin`: adds the `Powered by fibel.dev` attribution to the footer.
