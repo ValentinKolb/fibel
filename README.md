@@ -113,7 +113,7 @@ export default defineFibel({
 
 `headerLinks` fills the navigation next to the site title. Local values are resolved against the current locale, so `/runtime` points to `/en/runtime` on an English page and to `/de/runtime` on a German one. A link is marked as active when its value matches the slug of the current page. The header navigation is empty when `headerLinks` is not set.
 
-Footer link values can be external URLs or local paths. Local absolute paths are prefixed with `basePath` but are not locale-aware, so write them with the locale segment when they point at a page.
+`footerLinks` works the same way. Both lists take external URLs as written and resolve local paths against the current locale.
 
 ## Content
 

@@ -115,15 +115,13 @@ Ein Link wird als aktiv markiert, wenn sein Wert dem Slug der aktuellen Seite en
 export default defineFibel({
   title: "Meine Docs",
   footerLinks: [
-    { label: "Impressum", value: "/de/imprint" },
+    { label: "Impressum", value: "/imprint" },
     { label: "GitHub", value: "https://github.com/example/docs" },
   ],
 });
 ```
 
-Jeder Link besteht aus `label` und `value`. Relative Werte werden unter dem konfigurierten Base Path aufgelöst. Absolute `https:`, `mailto:`, `tel:` und Hash-Links werden unverändert verwendet.
-
-Footer-Links sind nicht locale-abhängig. Nimm das Locale-Segment mit auf, wenn ein Footer-Link auf eine Dokumentationsseite zeigt.
+Jeder Link besteht aus `label` und `value`. Lokale Werte werden wie Header-Links gegen das Locale der aktuellen Seite aufgelöst. `/imprint` zeigt also für englische Leser auf `/en/imprint` und für deutsche auf `/de/imprint`. Absolute `https:`, `mailto:`, `tel:` und Hash-Links werden unverändert verwendet.
 
 ## Frontmatter
 

@@ -140,7 +140,7 @@ function renderTopNav(page: FibelPage, context: FibelContext) {
     ${links
       .map((link) => {
         const active = isLocalPath(link.value) && normalizeSlug(link.value) === page.slug;
-        return `<a class="fibel-header-link ${active ? "is-active" : ""}" href="${escapeHtml(resolveHeaderHref(link.value, page, context))}">${escapeHtml(link.label)}</a>`;
+        return `<a class="fibel-header-link ${active ? "is-active" : ""}" href="${escapeHtml(resolveNavHref(link.value, page, context))}">${escapeHtml(link.label)}</a>`;
       })
       .join("")}
   </nav>`;
@@ -202,7 +202,7 @@ function renderFooter(page: FibelPage, context: FibelContext, theme: ThemeMode) 
     <div class="mx-auto flex max-w-[120rem] flex-col gap-4 px-5 py-7 text-sm text-zinc-500 dark:text-zinc-400 md:flex-row md:items-center md:justify-between lg:px-8">
       <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
         <span>© ${new Date().getFullYear()} ${escapeHtml(context.config.title)}</span>
-        ${links.map((link) => `<a class="hover:text-[#b7791f] dark:hover:text-[#f6c453]" href="${escapeHtml(resolveFooterHref(link.value, context))}">${escapeHtml(link.label)}</a>`).join("")}
+        ${links.map((link) => `<a class="hover:text-[#b7791f] dark:hover:text-[#f6c453]" href="${escapeHtml(resolveNavHref(link.value, page, context))}">${escapeHtml(link.label)}</a>`).join("")}
       </div>
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center md:ml-auto">
         ${footerItems.length > 0 ? `<div class="flex items-center">${footerItems.join("")}</div>` : ""}
@@ -271,13 +271,7 @@ const isLocalPath = (value: string) => value.startsWith("/") && !/^\/\//.test(va
 
 const normalizeSlug = (value: string) => value.replace(/\/+$/g, "") || "/";
 
-function resolveFooterHref(value: string, context: FibelContext) {
-  if (/^(https?:|mailto:|tel:|#)/.test(value)) return value;
-  if (isLocalPath(value)) return joinUrl(context.config.routing.basePath, value);
-  return value;
-}
-
-function resolveHeaderHref(value: string, page: FibelPage, context: FibelContext) {
+function resolveNavHref(value: string, page: FibelPage, context: FibelContext) {
   if (!isLocalPath(value)) return value;
   const slug = normalizeSlug(value);
   return joinUrl(context.config.routing.basePath, page.locale.code, slug === "/" ? undefined : slug);

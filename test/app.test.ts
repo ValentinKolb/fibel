@@ -49,6 +49,23 @@ describe("fibel app", () => {
     expect(english).not.toContain('fibel-header-link is-active" href="/en/runtime"');
   });
 
+  test("resolves footer links against the locale of the current page", async () => {
+    const app = await createFibelApp({
+      ...config,
+      footerLinks: [
+        { label: "Imprint", value: "/imprint" },
+        { label: "Source", value: "https://github.com/ValentinKolb/fibel" },
+      ],
+    });
+
+    const german = await (await app.fetch(new Request("http://localhost/de/runtime"))).text();
+    expect(german).toContain('href="/de/imprint"');
+    expect(german).toContain('href="https://github.com/ValentinKolb/fibel"');
+
+    const english = await (await app.fetch(new Request("http://localhost/en/runtime"))).text();
+    expect(english).toContain('href="/en/imprint"');
+  });
+
   test("omits the header navigation when no header links are configured", async () => {
     const app = await createFibelApp({ ...config, headerLinks: [] });
     const response = await app.fetch(new Request("http://localhost/en"));

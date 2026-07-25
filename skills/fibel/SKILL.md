@@ -86,7 +86,7 @@ export default defineFibel({
     assetsPath: "/assets",
   },
   headerLinks: [{ label: "Guide", value: "/runtime" }],
-  footerLinks: [{ label: "Imprint", value: "/en/imprint" }],
+  footerLinks: [{ label: "Imprint", value: "/imprint" }],
 });
 ```
 
@@ -96,8 +96,7 @@ Keep these invariants:
 - `routing.basePath` must match the public mount path when Fibel is served as a sub-app.
 - `routing.internalPath` is for framework endpoints such as search and CSS.
 - `routing.assetsPath` is for files from the configured assets directory.
-- Local header links are resolved against the locale of the current page. Write them as page slugs without a locale segment.
-- Local footer links are prefixed with `basePath` only. Include the locale segment when they point at a page.
+- Local header and footer links are resolved against the locale of the current page. Write them as page slugs without a locale segment.
 - External URLs are left as-is in both link lists.
 
 ## Markdown content

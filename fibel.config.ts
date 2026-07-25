@@ -27,6 +27,6 @@ export default defineFibel({
   ],
   footerLinks: [
     { label: "GitHub", value: "https://github.com/ValentinKolb/fibel" },
-    { label: "Impressum", value: "/en/imprint" },
+    { label: "Impressum", value: "/imprint" },
   ],
 });
