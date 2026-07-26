@@ -120,7 +120,7 @@ The server package uses Redis through Bun. Also provide `createSessionStore` whe
 
 ## Control context
 
-`systemPrompt` is trusted operator guidance. Keep stable product rules there, not the full documentation.
+`systemPrompt` is trusted operator guidance. Keep a short product brief and stable product rules there, not the full documentation. Fibel also supplies the resolved site description and current page description as trusted overview context. The assistant can answer simple identity, high-level capability, and current-page overview questions from this context without a tool call. Detailed instructions, configuration, API, code, and exact behavior still require search followed by reading one result.
 
 For simple request context, use template variables:
 
@@ -128,11 +128,11 @@ For simple request context, use template variables:
 assistantPlugin({
   provider: providerFromEnv(),
   systemPrompt:
-    "Help {{language}} readers with {{siteTitle}}. The current page is {{currentPageTitle}} ({{currentPage}}). Today is {{weekday}}, {{date}}.",
+    "Help {{language}} readers with {{siteTitle}}.\nSite summary: {{siteDescription}}\nCurrent page: {{currentPageTitle}} ({{currentPage}})\nCurrent page summary: {{currentPageDescription}}\nToday is {{weekday}}, {{date}}.",
 });
 ```
 
-The available variables are `{{siteTitle}}`, `{{locale}}`, `{{language}}`, `{{currentPage}}`, `{{currentPageTitle}}`, `{{date}}`, `{{time}}`, `{{weekday}}`, and `{{timezone}}`. Date and time use the server's timezone.
+The available variables are `{{siteTitle}}`, `{{siteDescription}}`, `{{locale}}`, `{{language}}`, `{{currentPage}}`, `{{currentPageTitle}}`, `{{currentPageDescription}}`, `{{date}}`, `{{time}}`, `{{weekday}}`, and `{{timezone}}`. Date and time use the server's timezone.
 
 Use a synchronous function when composing the guidance in TypeScript is clearer:
 
@@ -144,7 +144,7 @@ assistantPlugin({
 });
 ```
 
-For each request, the plugin adds the current language and page, a bounded session history, and documentation retrieved by the tools. Hidden pages are excluded. Tool results are treated as untrusted reference text and cannot replace the system instructions.
+For each request, the plugin adds the trusted overview context, current language and page, a bounded session history, and documentation retrieved by the tools. Hidden pages are excluded. Tool results are treated as untrusted reference text and cannot replace the system instructions.
 
 ## Markdown answers
 

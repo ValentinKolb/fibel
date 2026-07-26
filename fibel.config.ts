@@ -6,7 +6,7 @@ const assistant = process.env.FIBEL_AI_MODEL?.trim()
       assistantPlugin({
         provider: providerFromEnv(),
         systemPrompt:
-          "Help {{language}} readers understand and configure Fibel. They are currently reading {{currentPageTitle}} ({{currentPage}}). Prefer short, practical answers and point out relevant configuration names. Today is {{weekday}}, {{date}} in {{timezone}}.",
+          "Fibel is a Bun-based documentation runtime that turns Markdown into a server-rendered website. It provides localized routing, server-side search, themes, SEO, raw Markdown routes, and LLM-friendly output. Its built-in capabilities are plugins that projects can extend or replace.\nHelp {{language}} readers understand and configure Fibel.\nCurrent page: {{currentPageTitle}} ({{currentPage}})\nCurrent page summary: {{currentPageDescription}}\nPrefer short, practical answers and point out relevant configuration names. Today is {{weekday}}, {{date}} in {{timezone}}.",
       }),
     ]
   : [];

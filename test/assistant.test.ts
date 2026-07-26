@@ -150,7 +150,7 @@ describe("assistant plugin", () => {
         assistantPlugin({
           provider: docsProvider(requests),
           systemPrompt:
-            "Prefer configuration examples for {{siteTitle}} in {{language}} ({{locale}}) on {{currentPage}} / {{currentPageTitle}}. Today is {{weekday}}, {{date}} at {{time}} {{timezone}}.",
+            "Prefer configuration examples for {{siteTitle}}.\nSite summary: {{siteDescription}}\nUse {{language}} ({{locale}}).\nCurrent page: {{currentPage}} / {{currentPageTitle}}\nCurrent page summary: {{currentPageDescription}}\nToday is {{weekday}}, {{date}} at {{time}} {{timezone}}.",
           onUsage(event) {
             usage.push({ provider: event.provider, total: event.usage.total });
           },
@@ -190,16 +190,40 @@ describe("assistant plugin", () => {
     ]);
     expect(events.at(-1)?.type).toBe("done");
     expect(requests).toHaveLength(3);
-    expect(requests[0]?.systemPrompt).toContain("Prefer configuration examples for Fibel in English (en)");
-    expect(requests[0]?.systemPrompt).toContain("on /en/configuration / Configuration");
+    expect(requests[0]?.systemPrompt).toContain("Prefer configuration examples for Fibel.");
+    expect(requests[0]?.systemPrompt).toContain(
+      "Site summary: Publish Markdown documentation",
+    );
+    expect(requests[0]?.systemPrompt).toContain("Use English (en)");
+    expect(requests[0]?.systemPrompt).toContain(
+      "Current page: /en/configuration / Configuration",
+    );
+    expect(requests[0]?.systemPrompt).toContain(
+      "Current page summary: Configure content folders",
+    );
     expect(requests[0]?.systemPrompt).not.toContain("{{");
     expect(requests[0]?.systemPrompt).toMatch(/Today is \w+, \d{4}-\d{2}-\d{2} at \d{2}:\d{2} \S+\./);
     expect(requests[0]?.systemPrompt).toContain("You answer only questions that can be answered from the Fibel documentation.");
+    expect(requests[0]?.systemPrompt).toContain(
+      "Do not call tools when that context fully answers the question.",
+    );
+    expect(requests[0]?.systemPrompt).toContain(
+      "For instructions, configuration, APIs, code, exact behavior",
+    );
+    expect(requests[0]?.systemPrompt).toContain(
+      "site_description=Publish Markdown documentation as a server-rendered website",
+    );
+    expect(requests[0]?.systemPrompt).toContain(
+      "current_page_description=Configure content folders",
+    );
     expect(requests[0]?.systemPrompt).toContain("fenced code blocks with a language");
     expect(requests[0]?.systemPrompt).toContain("Never imitate those structures with bullet glyphs");
     expect(requests[0]?.systemPrompt).toContain('Write a React Hello World app.');
     expect(requests[0]?.tools?.map((tool) => tool.name)).toEqual(["search_docs", "read_doc"]);
     expect(JSON.stringify(requests[0]?.tools)).toContain("Do not use for unrelated requests");
+    expect(JSON.stringify(requests[0]?.tools)).toContain(
+      "simple overview questions already answered",
+    );
     expect(JSON.stringify(requests[2]?.messages)).toContain("/en/theme");
     expect(usage).toEqual([{ provider: "test", total: 52 }]);
   });
@@ -237,10 +261,12 @@ describe("assistant plugin", () => {
     expect(received).toEqual(
       expect.objectContaining({
         siteTitle: "Fibel",
+        siteDescription: expect.stringContaining("Publish Markdown documentation"),
         locale: "en",
         language: "English",
         currentPage: "/en/configuration",
         currentPageTitle: "Configuration",
+        currentPageDescription: expect.stringContaining("Configure content folders"),
       }),
     );
     expect(received?.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);

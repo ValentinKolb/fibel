@@ -192,7 +192,7 @@ Replace `plugins` completely only when the project owns rendering, layout, searc
 
 ## AI documentation assistant
 
-`assistantPlugin` is optional and uses `@k2b/nessi` with two read-only tools: search visible pages in the current language, then read one matching page. Documentation is retrieved on demand instead of copied into every prompt.
+`assistantPlugin` is optional and uses `@k2b/nessi` with two read-only tools: search visible pages in the current language, then read one matching page. Fibel injects the resolved site and current-page descriptions as trusted overview context; detailed documentation is retrieved on demand instead of copied into every prompt.
 
 Prefer `providerFromEnv()` when provider selection belongs to deployment configuration. Keep the plugin conditional when the same project must also run without AI credentials:
 
@@ -227,13 +227,14 @@ Keep deployment decisions proportional:
 
 ### Write a useful system prompt
 
-`systemPrompt` is trusted operator guidance wrapped by Fibel's built-in documentation-only prompt; it does not replace the built-in scope, tool order, prompt-injection boundary, language context, or source handling.
+`systemPrompt` is trusted operator guidance wrapped by Fibel's built-in documentation-only prompt; it does not replace the built-in scope, conditional tool policy, prompt-injection boundary, language context, or source handling.
 
 Keep it short and stable:
 
 - Put product terminology, audience, supported deployment assumptions, and answer style in `systemPrompt`.
-- Use `{{siteTitle}}`, `{{locale}}`, `{{language}}`, `{{currentPage}}`, `{{currentPageTitle}}`, `{{date}}`, `{{time}}`, `{{weekday}}`, or `{{timezone}}` when stable guidance needs request context. Date and time use the server timezone.
+- Use `{{siteTitle}}`, `{{siteDescription}}`, `{{locale}}`, `{{language}}`, `{{currentPage}}`, `{{currentPageTitle}}`, `{{currentPageDescription}}`, `{{date}}`, `{{time}}`, `{{weekday}}`, or `{{timezone}}` when stable guidance needs request context. Date and time use the server timezone.
 - Use the synchronous `systemPrompt: (context) => string` form when TypeScript composition is clearer than templates. Keep the returned guidance deterministic and fast.
+- Keep a short stable product brief in `systemPrompt` when the site description alone does not cover common overview questions. Simple overview answers should use trusted prompt context; detailed, procedural, configuration, API, code, and exact-behavior claims should use search followed by reading one result.
 - Keep the documentation itself in Markdown. The search and read tools retrieve current visible pages, so pasting documentation into the prompt wastes context and becomes stale.
 - State additional boundaries concretely and positively. One representative in-scope or out-of-scope example is more effective than a long list of vague prohibitions.
 - Do not put credentials, per-user data, request-specific text, or other dynamic secrets in `systemPrompt`.
