@@ -1,5 +1,5 @@
 import { Marked, type Tokens } from "marked";
-import { highlight } from "@valentinkolb/stdlib";
+import { highlight } from "@k2b/stdlib";
 import type { FibelPlugin } from "../types";
 import { escapeHtml, slugify } from "../utils";
 
@@ -31,14 +31,44 @@ function renderMarkdown(markdown: string) {
         return `<h${token.depth} id="${id}">${text}</h${token.depth}>`;
       },
       code(token: Tokens.Code) {
-        const language = normalizeLanguage(token.lang);
-        const label = language || "txt";
-        const highlighted = highlightCode(token.text, language);
-        const copyPayload = encodeCopyPayload(token.text);
-        return `<div class="code-frame" data-language="${escapeHtml(label)}"><button class="code-copy" type="button" data-copy-code="${copyPayload}" aria-label="Copy ${escapeHtml(label)} code"><span class="code-copy-label">${escapeHtml(label)}</span><span class="code-copy-icon" aria-hidden="true">${copyIcon()}</span></button><pre><code>${highlighted}</code></pre></div>`;
+        return renderCode(token);
       },
       codespan(token: Tokens.Codespan) {
         return `<code>${escapeHtml(token.text)}</code>`;
+      },
+    },
+  });
+
+  return String(marked.parse(markdown));
+}
+
+export function renderAssistantMarkdown(markdown: string) {
+  const marked = new Marked({ gfm: true, breaks: true });
+
+  marked.use({
+    renderer: {
+      heading(token: Tokens.Heading) {
+        return `<h${token.depth}>${this.parser.parseInline(token.tokens)}</h${token.depth}>`;
+      },
+      code(token: Tokens.Code) {
+        return renderCode(token);
+      },
+      codespan(token: Tokens.Codespan) {
+        return `<code>${escapeHtml(token.text)}</code>`;
+      },
+      html(token: Tokens.HTML | Tokens.Tag) {
+        return escapeHtml(token.text);
+      },
+      link(token: Tokens.Link) {
+        const label = this.parser.parseInline(token.tokens);
+        const href = safeAssistantHref(token.href);
+        if (!href) return label;
+        const title = token.title ? ` title="${escapeHtml(token.title)}"` : "";
+        const external = /^https?:\/\//i.test(href) ? ' target="_blank" rel="noreferrer noopener"' : "";
+        return `<a href="${escapeHtml(href)}"${title}${external}>${label}</a>`;
+      },
+      image(token: Tokens.Image) {
+        return escapeHtml(token.text);
       },
     },
   });
@@ -50,9 +80,31 @@ function normalizeLanguage(language: string | undefined) {
   return language?.trim().toLowerCase().split(/\s+/)[0] ?? "";
 }
 
+function renderCode(token: Tokens.Code) {
+  const language = normalizeLanguage(token.lang);
+  const label = language || "txt";
+  const highlighted = highlightCode(token.text, language);
+  const copyPayload = encodeCopyPayload(token.text);
+  return `<div class="code-frame" data-language="${escapeHtml(label)}"><div class="code-toolbar"><span class="code-language">${escapeHtml(label)}</span><button class="code-copy" type="button" data-copy-code="${copyPayload}" aria-label="Copy ${escapeHtml(label)} code"><span class="code-copy-icon" aria-hidden="true">${copyIcon()}</span></button></div><pre><code>${highlighted}</code></pre></div>`;
+}
+
+function safeAssistantHref(href: string) {
+  const value = href.trim();
+  if (/^(https?:|mailto:)/i.test(value)) return value;
+  if (value && !value.startsWith("//") && !/^[a-z][a-z0-9+.-]*:/i.test(value)) return value;
+  return undefined;
+}
+
 function highlightCode(code: string, language: string) {
   if (["bash", "sh", "shell", "zsh"].includes(language)) return highlight.presets.shell(code);
-  if (["js", "jsx", "ts", "tsx", "json", "css", "html"].includes(language)) return highlight.presets.code(code);
+  if (["sql", "pgsql", "postgres", "postgresql", "mysql", "mariadb", "sqlite"].includes(language)) {
+    return highlight.presets.sql(code);
+  }
+  if (
+    ["js", "jsx", "javascript", "ts", "tsx", "typescript", "json", "css", "html", "xml"].includes(language)
+  ) {
+    return highlight.presets.code(code);
+  }
   return highlight.escape(code);
 }
 

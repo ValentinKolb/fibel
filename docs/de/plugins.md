@@ -113,7 +113,7 @@ export function docsManifestPlugin(): FibelPlugin {
 }
 ```
 
-Ein `path`, der auf `/*` endet, wird als Präfix statt exakt abgeglichen. Das Assets-Plugin liefert damit ein ganzes Verzeichnis aus.
+Ein `path`, der auf `/*` endet, wird als Präfix statt exakt abgeglichen. Das Assets-Plugin liefert damit ein ganzes Verzeichnis aus. Mit `scope: "internal"` ist eine Route nur unter `routing.internalPath` erreichbar, mit `scope: "public"` nur unter dem öffentlichen Pfad. Routen ohne Scope behalten das bestehende Verhalten und passen auf beide Pfade.
 
 Eigene Routenpfade sollten nicht mit internen Routen oder Seitenpfaden kollidieren.
 
@@ -135,6 +135,10 @@ export function analyticsPlugin(siteId: string): FibelPlugin {
 ```
 
 Ein leerer Rückgabewert überspringt die jeweilige Seite. Das eingebaute SEO-Plugin nutzt diesen Hook für Sprachalternativen, Social Cards und strukturierte Daten.
+
+## Body-Einträge hinzufügen
+
+`context.bodyItems` funktioniert wie `headTags`, rendert Markup aber nach dem Seiten-Shell und vor Fibels Client-Script. Der Hook eignet sich für optionale Overlays oder Launcher, die aktuelle Seite und Sprache benötigen. Ein leerer Rückgabewert überspringt die jeweilige Seite.
 
 ## Mit Defaults kombinieren
 
@@ -166,13 +170,14 @@ type FibelContext = {
   nav: Map<string, NavSection[]>;
   footerItems: string[];
   headTags: HeadTag[];
+  bodyItems: BodyItem[];
   searchIndex: SearchEntry[];
   routes: FibelRoute[];
   services: FibelServices;
 };
 ```
 
-Der Context ist die gemeinsame Arbeitsfläche der Plugins. Er enthält Konfiguration, geladene Seiten, Navigation, Footer-Einträge, Head-Tags, Suchdaten, registrierte Routen und austauschbare Services.
+Der Context ist die gemeinsame Arbeitsfläche der Plugins. Er enthält Konfiguration, geladene Seiten, Navigation, Footer- und Body-Einträge, Head-Tags, Suchdaten, registrierte Routen und austauschbare Services.
 
 Alle auf dieser Seite gezeigten Typen sind als Type-Import aus `@valentinkolb/fibel` verfügbar.
 

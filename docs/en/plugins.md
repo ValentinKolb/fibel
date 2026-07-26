@@ -113,7 +113,7 @@ export function docsManifestPlugin(): FibelPlugin {
 }
 ```
 
-A `path` ending in `/*` matches by prefix instead of exactly. The assets plugin uses this to serve a whole directory.
+A `path` ending in `/*` matches by prefix instead of exactly. The assets plugin uses this to serve a whole directory. Set `scope: "internal"` to expose a route only below `routing.internalPath`, or `scope: "public"` to expose it only at the public path. Routes without a scope keep the existing behavior and match both.
 
 Choose custom route paths so they do not collide with internal routes or page paths.
 
@@ -135,6 +135,10 @@ export function analyticsPlugin(siteId: string): FibelPlugin {
 ```
 
 Return an empty string to skip a page. The built-in SEO plugin uses this hook for language alternates, social cards, and structured data.
+
+## Add body items
+
+`context.bodyItems` works like `headTags`, but renders markup after the page shell and before Fibel's client script. Use it for opt-in overlays or launchers that need the current page and locale. Return an empty string to skip a page.
 
 ## Compose with defaults
 
@@ -166,13 +170,14 @@ type FibelContext = {
   nav: Map<string, NavSection[]>;
   footerItems: string[];
   headTags: HeadTag[];
+  bodyItems: BodyItem[];
   searchIndex: SearchEntry[];
   routes: FibelRoute[];
   services: FibelServices;
 };
 ```
 
-The context is the shared workspace for plugins. It contains configuration, loaded pages, navigation, footer items, head tags, search data, registered routes, and replaceable services.
+The context is the shared workspace for plugins. It contains configuration, loaded pages, navigation, footer and body items, head tags, search data, registered routes, and replaceable services.
 
 Every type shown on this page is exported from `@valentinkolb/fibel` as a type import.
 

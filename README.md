@@ -272,6 +272,27 @@ export default defineFibel({
 
 The built-in plugin set includes Markdown rendering, theme handling, i18n checks, SEO metadata and routes, `llms.txt` routes, asset routes, search, powered-by attribution, and layout rendering. Individual plugins are exported from `@valentinkolb/fibel/plugins`.
 
+### Documentation assistant
+
+The optional assistant plugin uses `@k2b/nessi` to answer from visible documentation pages. Its default `@k2b/sync/browser` rate limiters and sessions live in the Fibel process, so a single-server deployment needs no Redis or database.
+
+```ts
+import { assistantPlugin, providerFromEnv } from "@valentinkolb/fibel/plugins";
+
+assistantPlugin({
+  provider: providerFromEnv(),
+  systemPrompt: "Help readers configure Product. Keep answers concise.",
+});
+```
+
+```sh
+FIBEL_AI_PROVIDER=openrouter
+FIBEL_AI_MODEL=provider/model-name
+OPENROUTER_API_KEY=...
+```
+
+The defaults limit each session to 5 requests per minute, the process to 100 requests per day, each response to 3 agent turns and 600 output tokens, and concurrent generations to 2. In-memory limits reset on restart and are separate per replica. Multiple replicas can inject Redis-backed limiters from `@k2b/sync` plus a shared Nessi session store. Configure a provider-account spending cap as the final financial limit.
+
 ## Commands
 
 ```sh

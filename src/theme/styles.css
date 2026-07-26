@@ -64,7 +64,7 @@
   }
 
   .fibel-search-button {
-    @apply inline-flex h-9 min-w-72 items-center gap-2 rounded-full border border-zinc-300 bg-white px-4 text-left text-sm text-zinc-500 shadow-[0_1px_8px_rgb(0_0_0_/_0.05)] transition hover:border-zinc-400 dark:border-white/15 dark:bg-white/5 dark:text-zinc-400;
+    @apply inline-flex h-9 min-w-72 items-center gap-2 rounded-full border-0 bg-zinc-100 px-4 text-left text-sm text-zinc-500 transition hover:bg-zinc-200/70 focus-visible:outline-none focus-visible:bg-zinc-200/70 dark:bg-white/[0.07] dark:text-zinc-400 dark:hover:bg-white/10 dark:focus-visible:bg-white/10;
   }
 
   .fibel-header-link {
@@ -141,8 +141,16 @@
     @apply relative overflow-hidden rounded-md border border-zinc-200 bg-zinc-950 shadow-sm dark:border-white/10;
   }
 
+  .fibel-prose .code-toolbar {
+    @apply absolute inset-x-2 top-2 z-10 flex items-center justify-between;
+  }
+
+  .fibel-prose .code-language {
+    @apply font-mono text-xs uppercase tracking-wide text-zinc-400;
+  }
+
   .fibel-prose .code-copy {
-    @apply absolute right-2 top-2 z-10 inline-flex items-center gap-1.5 rounded-md bg-white/8 px-2 py-1 font-mono text-xs uppercase text-zinc-400 transition hover:bg-white/12 hover:text-zinc-100;
+    @apply inline-grid h-7 w-7 place-items-center rounded-md bg-white/8 text-zinc-400 transition hover:bg-white/12 hover:text-zinc-100;
   }
 
   .fibel-prose .code-copy[data-copied="true"] {
@@ -154,7 +162,7 @@
   }
 
   .fibel-prose .code-frame pre {
-    @apply overflow-x-auto p-4 text-sm leading-6 text-slate-100;
+    @apply overflow-x-auto p-4 pt-12 text-sm leading-6 text-slate-100;
   }
 
   .fibel-prose .code-frame code {
@@ -183,6 +191,18 @@
 
   .fibel-prose .hl-variable {
     @apply text-violet-300;
+  }
+
+  .fibel-prose .hl-identifier {
+    @apply text-cyan-200;
+  }
+
+  .fibel-prose .hl-parameter {
+    @apply text-violet-300;
+  }
+
+  .fibel-prose .hl-function {
+    @apply text-sky-200;
   }
 
   .fibel-prose table {

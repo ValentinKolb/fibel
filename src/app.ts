@@ -13,6 +13,7 @@ export async function createFibelApp(input: FibelConfig): Promise<FibelApp> {
     nav: new Map(),
     footerItems: [],
     headTags: [],
+    bodyItems: [],
     searchIndex: [],
     routes: [],
     services: {
@@ -49,7 +50,7 @@ async function handleRequest(request: Request, context: FibelContext) {
     return handleInternalRoute(request, localPath.slice(internal.length) || "/", context);
   }
 
-  const seoRoute = matchRoute(localPath, context.routes);
+  const seoRoute = matchRoute(localPath, context.routes, "public");
   if (seoRoute) return seoRoute.handler(request, context);
 
   const markdownPage = findRawMarkdownPage(url.pathname, context);
@@ -81,11 +82,16 @@ async function handleInternalRoute(request: Request, path: string, context: Fibe
     return new Response("", { headers: { "Content-Type": "text/css; charset=utf-8" } });
   }
 
-  const route = matchRoute(path, context.routes);
+  const route = matchRoute(path, context.routes, "internal");
   if (route) return route.handler(request, context);
   return new Response("Not found", { status: 404 });
 }
 
-function matchRoute(path: string, routes: FibelRoute[]) {
-  return routes.find((route) => route.path === path || (route.path.endsWith("/*") && path.startsWith(route.path.slice(0, -1))));
+function matchRoute(path: string, routes: FibelRoute[], scope: "public" | "internal") {
+  return routes.find((route) => {
+    const routeScope = route.scope ?? "both";
+    const matchesScope = routeScope === "both" || routeScope === scope;
+    const matchesPath = route.path === path || (route.path.endsWith("/*") && path.startsWith(route.path.slice(0, -1)));
+    return matchesScope && matchesPath;
+  });
 }

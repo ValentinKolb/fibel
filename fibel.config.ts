@@ -1,5 +1,15 @@
 import { defaultPlugins, defineFibel } from "./src";
-import { imprintPlugin } from "./src/plugins";
+import { assistantPlugin, imprintPlugin, providerFromEnv } from "./src/plugins";
+
+const assistant = process.env.FIBEL_AI_MODEL?.trim()
+  ? [
+      assistantPlugin({
+        provider: providerFromEnv(),
+        systemPrompt:
+          "Help {{language}} readers understand and configure Fibel. They are currently reading {{currentPageTitle}} ({{currentPage}}). Prefer short, practical answers and point out relevant configuration names. Today is {{weekday}}, {{date}} in {{timezone}}.",
+      }),
+    ]
+  : [];
 
 export default defineFibel({
   title: "Fibel",
@@ -28,5 +38,6 @@ export default defineFibel({
   plugins: [
     ...defaultPlugins(),
     imprintPlugin({ url: "https://impressum.valentin-kolb.com", label: "Impressum" }),
+    ...assistant,
   ],
 });

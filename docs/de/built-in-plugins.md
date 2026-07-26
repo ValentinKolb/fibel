@@ -36,6 +36,8 @@ Das Standard-Set enthält:
 
 Fibel liefert Plugins mit, die nicht im Standard-Set stecken, weil sie Konfiguration brauchen.
 
+`assistantPlugin` ergänzt einen begrenzten Dokumentationschat mit `@k2b/nessi`. Das Plugin nutzt standardmäßig In-Memory-Rate-Limits und behält Provider-Zugangsdaten auf dem Server. Siehe [Dokumentationsassistent](/de/assistant).
+
 `imprintPlugin` ergänzt einen Footer-Link auf rechtliche Angaben, die an anderer Stelle liegen. Das Plugin eignet sich, wenn das Impressum zur Firma oder Person hinter mehreren Seiten gehört und nicht als Dokumentationsseite gepflegt werden soll.
 
 ```ts

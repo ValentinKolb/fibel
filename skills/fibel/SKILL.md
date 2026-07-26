@@ -1,6 +1,6 @@
 ---
 name: fibel
-description: Build, configure, document, debug, or extend Fibel documentation sites. Use this skill whenever the user mentions Fibel, fibel.config.ts, Fibel docs, Markdown documentation sites, raw .md routes for LLMs, Fibel plugins, Fibel themes, Fibel search, Fibel i18n, the @valentinkolb/fibel package, or mounting a Fibel Fetch app inside another server. This skill helps agents choose the right Fibel API, avoid unsupported assumptions, and verify sites with Bun commands and browser checks.
+description: Build, configure, document, debug, or extend Fibel documentation sites. Use this skill whenever the user mentions Fibel, fibel.config.ts, Fibel docs, Markdown documentation sites, raw .md routes for LLMs, Fibel plugins, the Fibel AI assistant or its system prompt, Nessi providers, Fibel themes, Fibel search, Fibel i18n, the @valentinkolb/fibel package, or mounting a Fibel Fetch app inside another server. This skill helps agents choose the right Fibel API, avoid unsupported assumptions, and verify sites with Bun commands and browser checks.
 ---
 
 # Fibel
@@ -190,6 +190,60 @@ export default defineFibel({
 
 Replace `plugins` completely only when the project owns rendering, layout, search, or routes itself. To remove the default footer attribution, provide a plugin list without `poweredByPlugin`.
 
+## AI documentation assistant
+
+`assistantPlugin` is optional and uses `@k2b/nessi` with two read-only tools: search visible pages in the current language, then read one matching page. Documentation is retrieved on demand instead of copied into every prompt.
+
+Prefer `providerFromEnv()` when provider selection belongs to deployment configuration. Keep the plugin conditional when the same project must also run without AI credentials:
+
+```ts
+import { defaultPlugins, defineFibel } from "@valentinkolb/fibel";
+import { assistantPlugin, providerFromEnv } from "@valentinkolb/fibel/plugins";
+
+const assistant = process.env.FIBEL_AI_MODEL?.trim()
+  ? [
+      assistantPlugin({
+        provider: providerFromEnv(),
+        systemPrompt:
+          "Help readers configure Product. Use Product terminology and prefer short, practical answers.",
+      }),
+    ]
+  : [];
+
+export default defineFibel({
+  title: "Product Docs",
+  plugins: [...defaultPlugins(), ...assistant],
+});
+```
+
+`providerFromEnv()` reads `FIBEL_AI_PROVIDER`, required `FIBEL_AI_MODEL`, optional `FIBEL_AI_BASE_URL`, and the selected provider's native key variable. Supported providers are `openrouter`, `openai`, `anthropic`, `gemini`, `mistral`, and `ollama`.
+
+Keep deployment decisions proportional:
+
+- One Bun process needs no extra service. Default `@k2b/sync/browser` rate limiters and bounded Nessi sessions live in memory.
+- Multiple replicas need injected server-side `@k2b/sync` rate limiters. Add `createSessionStore` only when chat history must follow a user between replicas.
+- Keep request, concurrency, turn, output-token, history, and tool-result limits bounded. Also recommend a provider-account spending cap because application limits reset with the process and are not a financial backstop.
+- Use `onUsage` when existing logs or metrics should receive aggregate provider usage. Do not introduce a separate queue or telemetry service solely for the assistant.
+
+### Write a useful system prompt
+
+`systemPrompt` is trusted operator guidance wrapped by Fibel's built-in documentation-only prompt; it does not replace the built-in scope, tool order, prompt-injection boundary, language context, or source handling.
+
+Keep it short and stable:
+
+- Put product terminology, audience, supported deployment assumptions, and answer style in `systemPrompt`.
+- Use `{{siteTitle}}`, `{{locale}}`, `{{language}}`, `{{currentPage}}`, `{{currentPageTitle}}`, `{{date}}`, `{{time}}`, `{{weekday}}`, or `{{timezone}}` when stable guidance needs request context. Date and time use the server timezone.
+- Use the synchronous `systemPrompt: (context) => string` form when TypeScript composition is clearer than templates. Keep the returned guidance deterministic and fast.
+- Keep the documentation itself in Markdown. The search and read tools retrieve current visible pages, so pasting documentation into the prompt wastes context and becomes stale.
+- State additional boundaries concretely and positively. One representative in-scope or out-of-scope example is more effective than a long list of vague prohibitions.
+- Do not put credentials, per-user data, request-specific text, or other dynamic secrets in `systemPrompt`.
+- Do not treat prompt wording as a cost or security control. Rate limits, bounded turns and output, server-only credentials, hidden-page filtering, and provider spending caps enforce those boundaries.
+- Test with the deployment's actual model. At minimum verify an answerable documentation question, a question the docs do not answer, and an unrelated request such as writing a generic React application. The unrelated request should receive only the brief documentation-scope refusal and should not produce documentation sources.
+
+If a model repeatedly calls tools instead of answering, simplify the operator guidance before increasing `maxTurns`. Extra turns increase latency and cost and can hide an unclear prompt.
+
+Assistant answers are rendered with Fibel's server-side Markdown and highlighting stack using compact chat typography. Raw model HTML, unsafe link protocols, and images are not rendered.
+
 ## Discovery routes
 
 `seoPlugin` serves `robots.txt`, `sitemap.xml`, and the favicon, and pushes language alternates, social card tags, and JSON-LD into the head of every page. `llmsPlugin` serves `llms.txt` and `llms-full.txt`, per locale and for the default locale at the root.
@@ -198,7 +252,7 @@ Set `siteUrl` in any project that will be published. Without it these routes emi
 
 Pages with `hidden: true` are excluded from the sitemap and the `llms.txt` index and are rendered with a `noindex` meta tag.
 
-Plugins add head markup through `context.headTags`, a list of `(page, context) => string` functions. Use it for analytics snippets or verification tags instead of replacing `layoutPlugin`.
+Plugins add head markup through `context.headTags`, a list of `(page, context) => string` functions. Use it for analytics snippets or verification tags instead of replacing `layoutPlugin`. `context.bodyItems` has the same callback shape and renders opt-in overlays after the page shell. Routes can set `scope: "internal"` to stay below `routing.internalPath` or `scope: "public"` to avoid an internal alias.
 
 ## Plugin pattern
 

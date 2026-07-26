@@ -110,10 +110,12 @@ export type SearchEntry = {
 
 export type FibelRoute = {
   path: string;
+  scope?: "public" | "internal" | "both";
   handler: (request: Request, context: FibelContext) => Response | Promise<Response>;
 };
 
 export type HeadTag = (page: FibelPage, context: FibelContext) => string;
+export type BodyItem = (page: FibelPage, context: FibelContext) => string;
 
 export type FibelServices = {
   renderMarkdown: (markdown: string, page: FibelPage, context: FibelContext) => string;
@@ -128,6 +130,7 @@ export type FibelContext = {
   nav: Map<string, NavSection[]>;
   footerItems: string[];
   headTags: HeadTag[];
+  bodyItems: BodyItem[];
   searchIndex: SearchEntry[];
   routes: FibelRoute[];
   services: FibelServices;

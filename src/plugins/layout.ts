@@ -49,6 +49,7 @@ function renderDocument(page: FibelPage, request: Request, context: FibelContext
   </head>
   <body class="min-h-screen bg-white text-zinc-950 antialiased dark:bg-zinc-950 dark:text-zinc-100">
     ${renderShell(page, context.nav.get(page.locale.code) ?? [], theme, searchUrl, context)}
+    ${renderBodyItems(page, context)}
     <script>window.__FIBEL__=${JSON.stringify({
       cookieName: config.theme.cookieName,
       defaultTheme: config.theme.defaultMode,
@@ -63,6 +64,10 @@ function renderDocument(page: FibelPage, request: Request, context: FibelContext
 function renderHeadTags(page: FibelPage, context: FibelContext) {
   const tags = context.headTags.map((tag) => tag(page, context)).filter(Boolean);
   return tags.length ? `\n    ${tags.join("\n    ")}` : "";
+}
+
+function renderBodyItems(page: FibelPage, context: FibelContext) {
+  return context.bodyItems.map((item) => item(page, context)).filter(Boolean).join("\n    ");
 }
 
 function renderShell(page: FibelPage, nav: NavSection[], theme: ThemeMode, searchUrl: string, context: FibelContext) {
@@ -291,10 +296,10 @@ function renderPager(page: FibelPage, pages: FibelPage[]) {
 function renderSearchDialog(searchUrl: string) {
   return `<div class="fixed inset-0 z-[70] hidden bg-slate-950/40 p-4 backdrop-blur-sm" data-search-dialog>
     <div class="mx-auto mt-20 max-w-2xl overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-2xl shadow-zinc-950/20 ring-1 ring-black/5 dark:border-white/10 dark:bg-zinc-900 dark:shadow-black/40 dark:ring-white/10">
-      <div class="border-b border-zinc-200 bg-zinc-50/70 p-3 dark:border-white/10 dark:bg-white/[0.03]">
-        <div class="flex items-center gap-3 rounded-full bg-white px-4 py-2.5 ring-1 ring-zinc-200 focus-within:ring-2 focus-within:ring-[#d69e2e] dark:bg-white/10 dark:ring-white/10 dark:focus-within:ring-[#f6c453]">
+      <div class="p-3">
+        <div class="flex items-center gap-3 rounded-[1.45rem] bg-zinc-100 px-4 py-2.5 transition-colors focus-within:bg-zinc-200/70 dark:bg-white/[0.07] dark:focus-within:bg-white/10">
           <span class="text-zinc-400">${searchIcon("h-5 w-5")}</span>
-          <input class="min-w-0 flex-1 bg-transparent py-1 text-base outline-none placeholder:text-slate-400" data-search-input placeholder="Search documentation..." autocomplete="off">
+          <input class="min-w-0 flex-1 border-0 bg-transparent py-1 text-base outline-none placeholder:text-slate-400" data-search-input placeholder="Search documentation..." autocomplete="off">
           <kbd class="rounded-full border border-zinc-200 bg-zinc-50 px-1.5 py-0.5 text-[11px] text-zinc-500 dark:border-white/10 dark:bg-white/10 dark:text-zinc-400">Esc</kbd>
         </div>
       </div>

@@ -36,6 +36,8 @@ The default set includes:
 
 Fibel ships plugins that are not part of the default set because they need configuration.
 
+`assistantPlugin` adds a bounded documentation chat powered by `@k2b/nessi`. It uses in-memory rate limits by default and keeps provider credentials on the server. See [Documentation assistant](/en/assistant).
+
 `imprintPlugin` adds a footer link to legal information hosted somewhere else. Use it when the imprint belongs to the company or person behind several sites and should not be maintained as a documentation page.
 
 ```ts

@@ -1,4 +1,5 @@
 import { assetsPlugin } from "./assets";
+import { assistantPlugin } from "./assistant";
 import { i18nPlugin } from "./i18n";
 import { imprintPlugin } from "./imprint";
 import { layoutPlugin } from "./layout";
@@ -10,7 +11,17 @@ import { seoPlugin } from "./seo";
 import { themePlugin } from "./theme";
 import type { FibelPlugin } from "../types";
 
-export { assetsPlugin, i18nPlugin, imprintPlugin, layoutPlugin, llmsPlugin, markdownPlugin, poweredByPlugin, searchPlugin, seoPlugin, themePlugin };
+export { providerFromEnv } from "./assistant-provider";
+export { assistantPlugin, assetsPlugin, i18nPlugin, imprintPlugin, layoutPlugin, llmsPlugin, markdownPlugin, poweredByPlugin, searchPlugin, seoPlugin, themePlugin };
+export type {
+  AssistantLimits,
+  AssistantOptions,
+  AssistantRateLimiters,
+  AssistantSystemPrompt,
+  AssistantSystemPromptContext,
+  AssistantUsageEvent,
+} from "./assistant";
+export type { AssistantProviderEnv, AssistantProviderName } from "./assistant-provider";
 export type { ImprintOptions } from "./imprint";
 
 export function defaultPlugins(): FibelPlugin[] {
