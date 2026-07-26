@@ -146,6 +146,8 @@ assistantPlugin({
 
 For each request, the plugin adds the trusted overview context, current language and page, a bounded session history, and documentation retrieved by the tools. Hidden pages are excluded. Tool results are treated as untrusted reference text and cannot replace the system instructions.
 
+Custom pages need no additional tool or registry. Their `context` Markdown is available through the existing search and read tools, and opening the assistant on a custom route resolves that page as the current page automatically.
+
 ## Markdown answers
 
 Assistant answers use Fibel's existing server-side Markdown and syntax-highlighting stack, with a compact typographic scale for chat. Lists, links, tables, blockquotes, inline code, and fenced code blocks are supported. Raw model HTML, unsafe link protocols, and images are not rendered.

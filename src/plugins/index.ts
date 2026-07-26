@@ -23,6 +23,7 @@ export type {
 } from "./assistant";
 export type { AssistantProviderEnv, AssistantProviderName } from "./assistant-provider";
 export type { ImprintOptions } from "./imprint";
+export type { LayoutOptions } from "./layout";
 
 export function defaultPlugins(): FibelPlugin[] {
   return [markdownPlugin(), themePlugin(), i18nPlugin(), seoPlugin(), llmsPlugin(), assetsPlugin(), searchPlugin(), poweredByPlugin(), layoutPlugin()];

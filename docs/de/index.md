@@ -3,7 +3,7 @@ title: Fibel
 navTitle: Überblick
 section: Start
 order: 1
-description: Fibel veröffentlicht Markdown-Dokumentation als serverseitig gerenderte Website mit Suche, mehrsprachigem Routing und Markdown-Quellseiten für Werkzeuge.
+description: Fibel veröffentlicht Markdown und von Hosts gerenderte Anwendungsseiten in einer Dokumentations-Shell mit Suche, mehrsprachigem Routing und Markdown-Quellen für Werkzeuge.
 tags: [überblick, markdown, docs]
 updated: 2026-07-26
 ---
@@ -14,7 +14,7 @@ Fibel liest Markdown aus einem Content-Verzeichnis und liefert es als Website au
 
 Sämtliche eingebauten Funktionen sind Plugins: Markdown-Rendering, Layout, Suche, Theme-Handling, i18n-Prüfung und SEO-Ausgabe. Das Standard-Set lässt sich erweitern, einzelne Plugins ersetzen oder die Liste vollständig neu zusammenstellen. Rendering, Navigation, Suche und Routing bleiben damit in der Hand des Projekts statt vom Framework vorgegeben.
 
-Fibel läuft auf Bun und wird in einer einzigen Datei konfiguriert. Inhalte benötigen keinen Build-Schritt, ausgelieferte Seiten enthalten kein Client-Framework.
+Fibel läuft auf Bun und wird in einer einzigen Datei konfiguriert. Markdown-Inhalte benötigen keinen Build-Schritt. Anwendungen können zusätzlich eigene serverseitig gerenderte Seiten und optionale Solid-Islands in dieselbe Shell einfügen und explizites Markdown für Suche und Werkzeuge bereitstellen.
 
 ## Schnellstart
 
@@ -38,6 +38,7 @@ Er stellt die aktuellen Konventionen für Konfiguration, Markdown-Seiten, rohe `
 ## Funktionsumfang
 
 - Seiten aus `docs/<locale>/**/*.md`, mit Navigation, Sections und Pagination aus dem Frontmatter.
+- Eigene serverseitig gerenderte Seiten mit durchsuchbarem Markdown-Kontext und optionaler Solid-SSR-Brücke.
 - Serverseitige Suche mit Spotlight-Dialog, zu öffnen mit `/` oder `Mod+K`.
 - Native Sprachrouten und ein Sprachumschalter, der die aktuelle Seite beibehält.
 - Light und Dark Mode serverseitig aufgelöst, der erste Frame stimmt damit bereits.

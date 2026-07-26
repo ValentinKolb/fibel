@@ -31,6 +31,8 @@ The index includes:
 - Sidebar section.
 - Markdown text of the page.
 
+For custom pages, optional `context` Markdown is indexed instead of rendered component HTML. Separate Fibel instances therefore produce naturally separate search result sets.
+
 Search is locale-aware. An English query searches English pages. A German query searches German pages.
 
 ## Spotlight interface

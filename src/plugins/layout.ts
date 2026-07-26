@@ -1,12 +1,43 @@
-import type { FibelContext, FibelPage, FibelPlugin, NavSection, ThemeMode } from "../types";
+import { renderFibelHeader } from "../layout";
+import type {
+  FibelContext,
+  FibelHeaderHref,
+  FibelHeaderLinkContext,
+  FibelPage,
+  FibelPageDocument,
+  FibelPlugin,
+  NavSection,
+  ThemeMode,
+} from "../types";
 import { escapeHtml, joinUrl } from "../utils";
 import { clientScript } from "../client/script";
 
-export function layoutPlugin(): FibelPlugin {
+export type LayoutOptions = {
+  header?: boolean;
+};
+
+export function layoutPlugin(options: LayoutOptions = {}): FibelPlugin {
   return {
     name: "layout",
     setup(context) {
-      context.services.renderPage = (page, request) => renderDocument(page, request, context);
+      context.services.renderPage = async (page, request) => {
+        const renderDocumentForPage = (document: FibelPageDocument) =>
+          renderDocument(page, request, context, document, options);
+        if (!page.render) return renderDocumentForPage({ body: page.html });
+
+        const rendered = await page.render({
+          request,
+          page,
+          context: {
+            markdown: page.body,
+            html: page.html,
+          },
+          fibel: context,
+          renderDocument: renderDocumentForPage,
+        });
+        if (rendered instanceof Response) return rendered;
+        return renderDocumentForPage(typeof rendered === "string" ? { body: rendered } : rendered);
+      };
     },
     routes() {
       return [
@@ -19,7 +50,13 @@ export function layoutPlugin(): FibelPlugin {
   };
 }
 
-function renderDocument(page: FibelPage, request: Request, context: FibelContext) {
+function renderDocument(
+  page: FibelPage,
+  request: Request,
+  context: FibelContext,
+  document: FibelPageDocument,
+  options: LayoutOptions,
+) {
   const theme = context.services.getTheme(request, context);
   const config = context.config;
   const stylesheet = joinUrl(config.routing.basePath, config.routing.internalPath, "styles.css");
@@ -30,7 +67,7 @@ function renderDocument(page: FibelPage, request: Request, context: FibelContext
   const title = page.meta.title === config.title ? page.meta.title : `${page.meta.title} - ${config.title}`;
 
   return `<!doctype html>
-<html lang="${page.locale.code}" dir="${page.locale.dir ?? "ltr"}" class="${theme}" data-theme="${theme}" style="color-scheme:${theme}">
+<html lang="${page.locale.code}" dir="${page.locale.dir ?? "ltr"}" class="${theme}" data-theme="${theme}" style="color-scheme:${theme}${options.header === false ? ";--fibel-nav-h:0rem" : ""}">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -48,7 +85,7 @@ function renderDocument(page: FibelPage, request: Request, context: FibelContext
     <link rel="stylesheet" href="${stylesheet}">${renderHeadTags(page, context)}
   </head>
   <body class="min-h-screen bg-white text-zinc-950 antialiased dark:bg-zinc-950 dark:text-zinc-100">
-    ${renderShell(page, context.nav.get(page.locale.code) ?? [], theme, searchUrl, context)}
+    ${renderShell(page, context.nav.get(page.locale.code) ?? [], theme, searchUrl, context, document.body, options)}
     ${renderBodyItems(page, context)}
     <script>window.__FIBEL__=${JSON.stringify({
       cookieName: config.theme.cookieName,
@@ -57,6 +94,7 @@ function renderDocument(page: FibelPage, request: Request, context: FibelContext
       locale: page.locale.code,
     })}</script>
     <script type="module" src="${client}"></script>
+    ${document.scripts ?? ""}
   </body>
 </html>`;
 }
@@ -70,58 +108,56 @@ function renderBodyItems(page: FibelPage, context: FibelContext) {
   return context.bodyItems.map((item) => item(page, context)).filter(Boolean).join("\n    ");
 }
 
-function renderShell(page: FibelPage, nav: NavSection[], theme: ThemeMode, searchUrl: string, context: FibelContext) {
+function renderShell(
+  page: FibelPage,
+  nav: NavSection[],
+  theme: ThemeMode,
+  searchUrl: string,
+  context: FibelContext,
+  body: string,
+  options: LayoutOptions,
+) {
+  const headerVisible = options.header !== false;
+  const header = context.config.header;
+  const searchEnabled = header.search !== false;
+  const themeToggle = header.themeToggle !== false;
+  const sidebarPosition = headerVisible
+    ? "top-16 lg:top-16 lg:h-[calc(100vh-4rem)]"
+    : "top-0 lg:top-0 lg:h-screen";
+  const backdropTop = headerVisible ? "top-16" : "top-0";
   return `<div class="fibel-app min-h-screen">
-    <header class="fibel-topbar sticky top-0 z-40 border-b border-zinc-200 bg-white/92 backdrop-blur-xl dark:border-white/10 dark:bg-zinc-950/90">
-      <div class="relative mx-auto grid h-16 max-w-[120rem] grid-cols-[auto_1fr_auto] items-center gap-3 px-4 md:flex md:gap-5 md:px-5 lg:px-8">
-        <button class="fibel-icon-button md:hidden" type="button" data-nav-toggle aria-label="Open navigation" aria-expanded="false">
-          <span class="sr-only">Open navigation</span>
-          ${menuIcon()}
-        </button>
-        <a class="absolute left-1/2 flex min-w-0 -translate-x-1/2 items-center text-2xl font-medium leading-[1.3] tracking-tight md:static md:translate-x-0 md:text-[2rem]" style="color:#d69e2e" href="${joinUrl(context.config.routing.basePath, page.locale.code)}">
-          <span class="max-w-[calc(100vw-9.5rem)] truncate lowercase md:max-w-none">${escapeHtml(context.config.title)}</span><span class="ml-0.5 opacity-80">|</span>
-        </a>
-        ${renderTopNav(page, context)}
-        <div class="ml-auto hidden items-center gap-3 md:flex">
-          <button class="fibel-search-button" type="button" data-search-open>
-            <span class="text-zinc-400">${searchIcon("h-4 w-4")}</span>
-            <span class="text-zinc-400">Search docs</span>
-            <span class="ml-auto flex items-center gap-1">
-              <kbd class="rounded-full border border-zinc-200 bg-zinc-50 px-1.5 py-0.5 text-[11px] text-zinc-500 dark:border-white/10 dark:bg-white/10 dark:text-zinc-400">⌘K</kbd>
-              <kbd class="rounded-full border border-zinc-200 bg-zinc-50 px-1.5 py-0.5 text-[11px] text-zinc-500 dark:border-white/10 dark:bg-white/10 dark:text-zinc-400">/</kbd>
-            </span>
-          </button>
-          ${renderLocaleMenu(page, context, "header")}
-          <button class="fibel-control-icon-button" type="button" data-theme-toggle aria-label="Toggle theme">
-            <span data-theme-icon>${themeIcon(theme)}</span>
-          </button>
-        </div>
-        <button class="fibel-icon-button ml-auto md:hidden" type="button" data-search-open aria-label="Search documentation">
-          ${searchIcon("h-5 w-5")}
-        </button>
-      </div>
-    </header>
+    ${headerVisible ? renderConfiguredHeader(page, context, theme) : ""}
 
     <div class="mx-auto grid max-w-[120rem] grid-cols-1 lg:grid-cols-[19rem_minmax(0,1fr)]">
-      <div class="fixed inset-x-0 bottom-0 top-16 z-40 hidden bg-zinc-950/20 backdrop-blur-[1px] lg:hidden" data-sidebar-backdrop></div>
-      <aside class="fibel-sidebar fixed bottom-0 left-0 top-16 z-50 w-80 -translate-x-full overflow-y-auto border-r border-zinc-200 bg-white p-5 pt-6 transition-transform dark:border-white/10 dark:bg-zinc-950 lg:sticky lg:top-16 lg:z-20 lg:h-[calc(100vh-4rem)] lg:w-auto lg:translate-x-0 lg:pt-9" data-sidebar>
+      <div class="fixed inset-x-0 bottom-0 ${backdropTop} z-40 hidden bg-zinc-950/20 backdrop-blur-[1px] lg:hidden" data-sidebar-backdrop></div>
+      <aside class="fibel-sidebar fixed bottom-0 left-0 ${sidebarPosition} z-50 w-80 -translate-x-full overflow-y-auto border-r border-zinc-200 bg-white p-5 pt-6 transition-transform dark:border-white/10 dark:bg-zinc-950 lg:sticky lg:z-20 lg:w-auto lg:translate-x-0 lg:pt-9" data-sidebar>
         ${renderNav(nav, page)}
       </aside>
-      <main class="min-w-0 px-5 py-10 sm:px-10 lg:px-20 lg:py-14">
+      ${renderMain(page, context, body)}
+    </div>
+    ${renderFooter(page, context, theme, themeToggle)}
+    ${searchEnabled ? renderSearchDialog(searchUrl, header.searchPlaceholder ?? "Search documentation...") : ""}
+  </div>`;
+}
+
+function renderMain(page: FibelPage, context: FibelContext, body: string) {
+  if (page.layout === "full") {
+    return `<main class="min-w-0 px-5 py-8 sm:px-8 lg:px-12 lg:py-10">
+        <div class="mx-auto w-full max-w-[100rem]">${body}</div>
+      </main>`;
+  }
+
+  return `<main class="min-w-0 px-5 py-10 sm:px-10 lg:px-20 lg:py-14">
         <article class="mx-auto max-w-4xl">
           <div class="mb-9">
             <h1 class="text-[2.6rem] font-semibold leading-tight tracking-[-0.01em] text-zinc-900 dark:text-white md:text-5xl">${escapeHtml(page.meta.title)}</h1>
             <p class="mt-5 max-w-3xl text-[1.15rem] leading-8 text-zinc-600 dark:text-zinc-300">${escapeHtml(page.meta.description)}</p>
             ${renderPageActions(page)}
           </div>
-          <div class="fibel-prose">${page.html}</div>
+          <div class="fibel-prose">${body}</div>
           ${renderPager(page, context.pages.filter((candidate) => candidate.locale.code === page.locale.code && !candidate.meta.hidden))}
         </article>
-      </main>
-    </div>
-    ${renderFooter(page, context, theme)}
-    ${renderSearchDialog(searchUrl)}
-  </div>`;
+      </main>`;
 }
 
 function themeIcon(theme: ThemeMode) {
@@ -130,25 +166,67 @@ function themeIcon(theme: ThemeMode) {
     : '<svg viewBox="0 0 24 24" aria-hidden="true" class="h-4 w-4"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M21 13.2A7.5 7.5 0 0 1 10.8 3 8.5 8.5 0 1 0 21 13.2Z"/></svg>';
 }
 
-function menuIcon() {
-  return '<svg viewBox="0 0 24 24" aria-hidden="true" class="h-5 w-5"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M5 7h14M5 12h14M5 17h14"/></svg>';
-}
-
 function searchIcon(className: string) {
   return `<svg viewBox="0 0 24 24" aria-hidden="true" class="${className}"><path fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35M10.8 18a7.2 7.2 0 1 1 0-14.4 7.2 7.2 0 0 1 0 14.4Z"/></svg>`;
 }
 
-function renderTopNav(page: FibelPage, context: FibelContext) {
-  const links = context.config.headerLinks;
-  if (links.length === 0) return "";
-  return `<nav class="hidden items-center gap-7 text-[15px] text-zinc-700 dark:text-zinc-300 md:flex">
-    ${links
-      .map((link) => {
-        const active = isLocalPath(link.value) && normalizeSlug(link.value) === page.slug;
-        return `<a class="fibel-header-link ${active ? "is-active" : ""}" href="${escapeHtml(resolveNavHref(link.value, page, context))}">${escapeHtml(link.label)}</a>`;
+function renderConfiguredHeader(page: FibelPage, context: FibelContext, theme: ThemeMode) {
+  const config = context.config;
+  const header = config.header;
+  const linkContext: FibelHeaderLinkContext = {
+    locale: page.locale.code,
+    pathname: page.href,
+    basePath: config.routing.basePath,
+  };
+  const links = header.links
+    ? header.links.map((link) => {
+        const href = resolveHeaderHref(link.href, linkContext);
+        return {
+          label: link.label,
+          href,
+          active: link.activeWhen
+            ? pathMatchesPrefix(page.href, link.activeWhen)
+            : isLocalPath(href) && normalizeSlug(href) === normalizeSlug(page.href),
+        };
       })
-      .join("")}
-  </nav>`;
+    : config.headerLinks.map((link) => ({
+        label: link.label,
+        href: resolveNavHref(link.value, page, context),
+        active: isLocalPath(link.value) && normalizeSlug(link.value) === page.slug,
+      }));
+  const locales = context.pages
+    .filter((candidate) => candidate.slug === page.slug)
+    .map((candidate) => ({
+      label: candidate.locale.label,
+      href: candidate.href,
+      current: candidate.locale.code === page.locale.code,
+    }));
+
+  return renderFibelHeader({
+    title: header.title ?? config.title,
+    homeHref: resolveHeaderHref(
+      header.homeHref ?? ((current) => joinUrl(current.basePath, current.locale)),
+      linkContext,
+    ),
+    links,
+    locales,
+    theme,
+    search: header.search !== false,
+    searchLabel: header.searchLabel ?? "Search docs",
+    searchAriaLabel: header.searchLabel ?? "Search documentation",
+    themeToggle: header.themeToggle !== false,
+    mobileNavigation: header.mobileNavigation !== false,
+  });
+}
+
+function resolveHeaderHref(value: FibelHeaderHref, context: FibelHeaderLinkContext) {
+  return typeof value === "function" ? value(context) : value;
+}
+
+function pathMatchesPrefix(pathname: string, prefix: string) {
+  const path = normalizeSlug(pathname);
+  const normalizedPrefix = normalizeSlug(prefix);
+  return path === normalizedPrefix || path.startsWith(`${normalizedPrefix}/`);
 }
 
 function renderNav(nav: NavSection[], page: FibelPage) {
@@ -199,7 +277,12 @@ function sectionChevronIcon() {
   return '<svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m7 5 5 5-5 5"/></svg>';
 }
 
-function renderFooter(page: FibelPage, context: FibelContext, theme: ThemeMode) {
+function renderFooter(
+  page: FibelPage,
+  context: FibelContext,
+  theme: ThemeMode,
+  themeToggle: boolean,
+) {
   const links = context.config.footerLinks;
   const footerItems = context.footerItems;
   if (links.length === 0 && context.config.locales.length < 2 && footerItems.length === 0) return "";
@@ -212,7 +295,7 @@ function renderFooter(page: FibelPage, context: FibelContext, theme: ThemeMode) 
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center md:ml-auto">
         ${footerItems.length > 0 ? `<div class="flex items-center">${footerItems.join("")}</div>` : ""}
         <div class="flex items-center gap-2">
-          <button class="fibel-icon-button md:hidden" type="button" data-theme-toggle aria-label="Toggle theme"><span data-theme-icon>${themeIcon(theme)}</span></button>
+          ${themeToggle ? `<button class="fibel-icon-button md:hidden" type="button" data-theme-toggle aria-label="Toggle theme"><span data-theme-icon>${themeIcon(theme)}</span></button>` : ""}
           ${renderLocaleMenu(page, context, "footer")}
         </div>
       </div>
@@ -293,13 +376,13 @@ function renderPager(page: FibelPage, pages: FibelPage[]) {
   </div>`;
 }
 
-function renderSearchDialog(searchUrl: string) {
+function renderSearchDialog(searchUrl: string, placeholder: string) {
   return `<div class="fixed inset-0 z-[70] hidden bg-slate-950/40 p-4 backdrop-blur-sm" data-search-dialog>
     <div class="mx-auto mt-20 max-w-2xl overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-2xl shadow-zinc-950/20 ring-1 ring-black/5 dark:border-white/10 dark:bg-zinc-900 dark:shadow-black/40 dark:ring-white/10">
       <div class="p-3">
         <div class="flex items-center gap-3 rounded-[1.45rem] bg-zinc-100 px-4 py-2.5 transition-colors focus-within:bg-zinc-200/70 dark:bg-white/[0.07] dark:focus-within:bg-white/10">
           <span class="text-zinc-400">${searchIcon("h-5 w-5")}</span>
-          <input class="min-w-0 flex-1 border-0 bg-transparent py-1 text-base outline-none placeholder:text-slate-400" data-search-input placeholder="Search documentation..." autocomplete="off">
+          <input class="min-w-0 flex-1 border-0 bg-transparent py-1 text-base outline-none placeholder:text-slate-400" data-search-input placeholder="${escapeHtml(placeholder)}" autocomplete="off">
           <kbd class="rounded-full border border-zinc-200 bg-zinc-50 px-1.5 py-0.5 text-[11px] text-zinc-500 dark:border-white/10 dark:bg-white/10 dark:text-zinc-400">Esc</kbd>
         </div>
       </div>

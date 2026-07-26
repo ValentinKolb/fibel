@@ -1,6 +1,6 @@
 # Fibel
 
-Fibel publishes Markdown documentation as a server-rendered website with native language routes, server-side search, raw Markdown pages, and a cookie-based light/dark theme.
+Fibel publishes Markdown and host-rendered application pages in one documentation shell with native language routes, server-side search, raw Markdown sources, and a cookie-based light/dark theme.
 
 It is built for product and developer documentation that should stay readable in the repository, work well as a website, and remain easy for tools such as LLMs to consume.
 
@@ -45,6 +45,8 @@ bun run src/cli.ts dev --port 5173
 ## What Fibel provides
 
 - Documentation pages from `docs/<locale>/**/*.md`
+- Framework-neutral custom pages with searchable Markdown context
+- Optional Solid SSR and island integration through a host-owned `@k2b/ssr` build
 - A standalone Web-standard `fetch` app
 - Server-rendered HTML with page metadata and canonical URLs
 - Server-side search with an interactive spotlight dialog
@@ -119,6 +121,34 @@ export default defineFibel({
 
 `footerLinks` works the same way. Both lists take external URLs as written and resolve local paths against the current locale.
 
+For a shared header across several Fibel instances, use the structured `header` config. Link functions receive the current locale, while `activeWhen` matches the instance prefix:
+
+```ts
+export default defineFibel({
+  title: "Cloud UI",
+  routing: { basePath: "/ui" },
+  header: {
+    title: "Cloud",
+    homeHref: ({ locale }) => `/${locale}`,
+    links: [
+      {
+        label: "Docs",
+        href: ({ locale }) => `/docs/${locale}`,
+        activeWhen: "/docs",
+      },
+      {
+        label: "UI",
+        href: ({ locale }) => `/ui/${locale}`,
+        activeWhen: "/ui",
+      },
+    ],
+    searchLabel: "Search Cloud UI",
+  },
+});
+```
+
+`renderFibelHeader()` from `@k2b/fibel/layout` exposes the same markup for external pages. `layoutPlugin({ header: false })` removes only the built-in header when an outer shell already provides it.
+
 ## Content
 
 Fibel reads Markdown files from the configured content directory. The first `#` heading is treated as the page title and is rendered once by the layout. Headings from `##` to `####` receive stable IDs and copy-link buttons.
@@ -162,6 +192,31 @@ Place files in the configured assets directory. Fibel serves them below the conf
 ```
 
 If the app is mounted under `basePath`, link to assets through that public route.
+
+## Custom application pages
+
+`pages` adds server-rendered application output to the normal Fibel shell. Optional Markdown context remains the source for search, raw `.md` routes, `llms.txt`, and the documentation assistant.
+
+```ts
+export default defineFibel({
+  title: "Cloud UI",
+  pages: [
+    {
+      path: "/panel-header",
+      title: "PanelHeader",
+      description: "A consistent heading and action area.",
+      context: {
+        default: panelHeaderMarkdown,
+        de: panelHeaderMarkdownDe,
+      },
+      render: ({ context }) =>
+        `<section>${context.html}</section>`,
+    },
+  ],
+});
+```
+
+Use `solidPage()` from `@k2b/fibel/solid` when the body contains Solid server components or `@k2b/ssr` islands. The host supplies its existing `html()` renderer and remains responsible for the single SSR plugin, `/_ssr` route, and production build. The [custom pages guide](https://fibel.dev/en/custom-pages) includes complete examples for Solid and multiple Fibel instances.
 
 ## SEO
 
@@ -229,6 +284,8 @@ export default {
 
 For a larger app, mount `fibel.fetch` below the same public route configured as `routing.basePath`.
 
+Several Fibel apps can be mounted in one process. Each instance then has its own navigation, search index, assistant context, and discovery routes while sharing the same header config, theme cookie, provider, rate limiters, and deployment.
+
 ## Docker
 
 The repository includes a Docker image for hosting the default Fibel documentation.
@@ -244,7 +301,7 @@ Tagged releases publish the same image to GitHub Container Registry:
 
 ```sh
 docker run --rm -p 3000:3000 ghcr.io/k2b-dev/fibel:latest
-docker run --rm -p 3000:3000 ghcr.io/k2b-dev/fibel:v0.2.0
+docker run --rm -p 3000:3000 ghcr.io/k2b-dev/fibel:v0.3.0
 ```
 
 ## Plugins
@@ -326,8 +383,8 @@ bun run typecheck
 Publishing is handled by GitHub Actions through npm trusted publishing. Push a version tag to publish that version:
 
 ```sh
-git tag v0.2.0
-git push origin v0.2.0
+git tag v0.3.0
+git push origin v0.3.0
 ```
 
 The workflow runs typecheck, tests, build, package-content checks, sets `package.json` to the tag version, and publishes with provenance:

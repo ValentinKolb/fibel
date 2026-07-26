@@ -64,8 +64,10 @@ export function resolveConfig(config: FibelConfig): ResolvedFibelConfig {
       twitterSite: config.seo?.twitterSite,
       disallow: config.seo?.disallow ?? [],
     },
+    header: config.header ?? {},
     headerLinks: config.headerLinks ?? [],
     footerLinks: config.footerLinks ?? [],
+    pages: config.pages ?? [],
     plugins: config.plugins ?? defaultPlugins(),
   };
 }

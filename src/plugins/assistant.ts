@@ -588,9 +588,10 @@ function renderAssistant(page: FibelPage, context: FibelContext, limits: Assista
   const endpoint = joinUrl(internal, "assistant");
   const script = `${joinUrl(internal, "assistant.js")}?v=${assistantScriptVersion}`;
   const german = page.locale.code.toLowerCase().startsWith("de");
+  const siteTitle = context.config.title;
   const labels = german
     ? {
-        open: "Fibel fragen",
+        open: `${siteTitle} fragen`,
         title: "Dokumentation fragen",
         welcome: "Stelle eine Frage zu dieser Dokumentation. Quellen werden unter der Antwort verlinkt.",
         placeholder: "Wie konfiguriere ich …?",
@@ -604,7 +605,7 @@ function renderAssistant(page: FibelPage, context: FibelContext, limits: Assista
         limited: "Das Nutzungslimit ist erreicht. Bitte versuche es später erneut.",
       }
     : {
-        open: "Ask Fibel",
+        open: `Ask ${siteTitle}`,
         title: "Ask the documentation",
         welcome: "Ask a question about this documentation. Sources appear below the answer.",
         placeholder: "How do I configure …?",

@@ -58,7 +58,10 @@ async function handleRequest(request: Request, context: FibelContext) {
 
   const requestPath = normalizePagePath(url.pathname);
   const page = context.pages.find((candidate) => normalizePagePath(candidate.href) === requestPath);
-  if (page) return text(context.services.renderPage(page, request, context), "text/html; charset=utf-8");
+  if (page) {
+    const rendered = await context.services.renderPage(page, request, context);
+    return rendered instanceof Response ? rendered : text(rendered, "text/html; charset=utf-8");
+  }
 
   return new Response("Not found", { status: 404 });
 }

@@ -108,6 +108,7 @@ dialog?.addEventListener("click", (event) => {
   if (event.target === dialog) closeSearch();
 });
 window.addEventListener("keydown", (event) => {
+  if (!dialog) return;
   const modK = (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k";
   if (event.key === "/" && !["INPUT", "TEXTAREA"].includes(document.activeElement?.tagName || "")) {
     event.preventDefault();

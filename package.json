@@ -1,7 +1,7 @@
 {
   "name": "@k2b/fibel",
-  "version": "0.2.1",
-  "description": "Config-first documentation app for Markdown, i18n, search, and no-flicker themes.",
+  "version": "0.3.0",
+  "description": "Config-first documentation runtime for Markdown, custom SSR pages, search, and AI-ready source routes.",
   "type": "module",
   "main": "src/index.ts",
   "types": "src/index.ts",
@@ -11,7 +11,9 @@
   },
   "exports": {
     ".": "./src/index.ts",
-    "./plugins": "./src/plugins/index.ts"
+    "./layout": "./src/layout.ts",
+    "./plugins": "./src/plugins/index.ts",
+    "./solid": "./src/solid.ts"
   },
   "scripts": {
     "dev": "bun run src/cli.ts dev",
@@ -31,8 +33,22 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@k2b/ssr": "^0.12.0",
     "@types/bun": "latest",
+    "solid-js": "^1.9.14",
     "typescript": "^5.9.3"
+  },
+  "peerDependencies": {
+    "@k2b/ssr": "^0.12.0",
+    "solid-js": "^1.9.0"
+  },
+  "peerDependenciesMeta": {
+    "@k2b/ssr": {
+      "optional": true
+    },
+    "solid-js": {
+      "optional": true
+    }
   },
   "license": "MIT",
   "author": "Valentin Kolb",

@@ -7,7 +7,7 @@ describe("fibel app", () => {
     const app = await createFibelApp(config);
     const response = await app.fetch(new Request("http://localhost/en"));
     expect(response.status).toBe(200);
-    expect(await response.text()).toContain("Fibel publishes Markdown documentation");
+    expect(await response.text()).toContain("Fibel publishes Markdown and host-rendered application pages");
   });
 
   test("searches server-side", async () => {

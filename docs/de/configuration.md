@@ -3,7 +3,7 @@ title: Konfiguration
 navTitle: Konfiguration
 section: Start
 order: 2
-description: Konfiguriere Content-Ordner, Routen, Locales, Assets, Footer-Links, Frontmatter, Theme und Plugins.
+description: Konfiguriere Content-Ordner, Routen, Locales, Assets, Header, eigene Seiten, Frontmatter, Theme und Plugins.
 tags: [config, referenz]
 updated: 2026-06-09
 ---
@@ -113,6 +113,39 @@ export default defineFibel({
 
 Ein Link wird als aktiv markiert, wenn sein Wert dem Slug der aktuellen Seite entspricht. Ist `headerLinks` nicht gesetzt, zeigt der Header keine Navigation.
 
+## Gemeinsamer Header
+
+Die strukturierte `header`-Konfiguration ist für mehrere Fibel-Instanzen gedacht, die wie eine zusammenhängende Website erscheinen:
+
+```ts
+export default defineFibel({
+  title: "Cloud UI",
+  routing: { basePath: "/ui" },
+  header: {
+    title: "Cloud",
+    homeHref: ({ locale }) => `/${locale}`,
+    links: [
+      {
+        label: "Docs",
+        href: ({ locale }) => `/docs/${locale}`,
+        activeWhen: "/docs",
+      },
+      {
+        label: "UI",
+        href: ({ locale }) => `/ui/${locale}`,
+        activeWhen: "/ui",
+      },
+    ],
+    searchLabel: "Cloud UI durchsuchen",
+    searchPlaceholder: "Komponenten durchsuchen...",
+  },
+});
+```
+
+`title` ist die gemeinsame Marke und bleibt unabhängig vom Instanztitel für Metadaten und Assistent. `homeHref` und der `href` eines Links akzeptieren einen String oder eine synchrone Funktion mit `locale`, `pathname` und `basePath`. `activeWhen` markiert den exakten Präfix und seine Unterpfade als aktiv.
+
+`search`, `themeToggle` und `mobileNavigation` sind standardmäßig `true` und lassen sich einzeln deaktivieren. `headerLinks` bleibt die kürzere locale-relative API für Links innerhalb einer einzelnen Fibel-Instanz.
+
 ## Footer-Links
 
 ```ts
@@ -144,6 +177,12 @@ image: /assets/konfiguration.png
 ```
 
 Alle Felder sind optional. `title` ist der Seitentitel; fehlt er, nutzt Fibel die erste `#`-Überschrift und danach den Slug in Titelschreibweise. `navTitle` ist das Label in der Sidebar und entspricht standardmäßig dem Titel. `section` bestimmt die Sidebar-Gruppe und ist standardmäßig `Guide`. `order` sortiert Seiten innerhalb eines Locales und ist standardmäßig `100`. `description` wird für SEO, Suche und das Intro genutzt; fehlt sie, nimmt Fibel den ersten Absatz auf 180 Zeichen gekürzt und fällt danach auf die Seitenbeschreibung zurück. `hidden` entfernt eine Seite aus Navigation, Pagination, der seiteneigenen Suche, `llms.txt` und der Sitemap und markiert sie als `noindex`. Die Seite bleibt unter ihrer URL erreichbar, genau das macht sie für Seiten nützlich, die nur im Footer verlinkt sind. `tags` werden als Chips angezeigt. `updated` zeigt ein Aktualisierungsdatum an und füllt `article:modified_time`. `image` überschreibt das Social-Preview-Bild dieser Seite.
+
+## Eigene Seiten
+
+`pages` registriert von einer Anwendung gerenderte Routen neben Markdown-Dateien. Die Seitenmetadaten folgen denselben Regeln für Navigation, Suche, SEO und Sichtbarkeit. Optionales `context` liefert das Markdown für rohe Routen, Suche und Assistent.
+
+Der [Guide für eigene Seiten](/de/custom-pages) beschreibt den vollständigen Renderer-Vertrag, gemeinsamen und lokalisierten Kontext, Solid-SSR-Integration und mehrere Instanzen.
 
 ## Plugin-Liste
 

@@ -31,6 +31,8 @@ Der Index enthält:
 - Sidebar-Bereich.
 - Markdown-Text der Seite.
 
+Bei eigenen Seiten wird optionales `context`-Markdown statt des gerenderten Komponenten-HTML indexiert. Getrennte Fibel-Instanzen erzeugen dadurch automatisch getrennte Ergebnismengen.
+
 Die Suche ist locale-bewusst. Eine deutsche Anfrage durchsucht deutsche Seiten. Eine englische Anfrage durchsucht englische Seiten.
 
 ## Spotlight-Oberfläche

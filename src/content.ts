@@ -1,6 +1,13 @@
 import { existsSync, readdirSync, readFileSync } from "fs";
 import { join } from "path";
-import type { FibelContext, FibelPage, Heading, PageMeta, ResolvedFibelConfig } from "./types";
+import type {
+  FibelContext,
+  FibelCustomPage,
+  FibelPage,
+  Heading,
+  PageMeta,
+  ResolvedFibelConfig,
+} from "./types";
 import { joinUrl, resolveInside, routeFromFile, slugify, toPosix } from "./utils";
 
 type FrontmatterValue = string | number | boolean | string[];
@@ -23,6 +30,7 @@ export function loadPages(config: ResolvedFibelConfig): FibelPage[] {
       const description = stringValue(data.description) ?? firstParagraph(body) ?? config.description;
       const page: FibelPage = {
         id: `${locale.code}:${toPosix(routeFromFile(file, localeRoot))}`,
+        kind: "markdown",
         locale,
         slug,
         href,
@@ -42,11 +50,45 @@ export function loadPages(config: ResolvedFibelConfig): FibelPage[] {
           updated: stringValue(data.updated),
           image: stringValue(data.image),
         },
+        layout: "article",
       };
       pages.push(page);
     }
   }
 
+  for (const definition of config.pages) {
+    const slug = customPagePath(definition);
+    for (const locale of config.locales) {
+      const body = customPageContext(definition, locale.code);
+      pages.push({
+        id: `custom:${locale.code}:${slug}`,
+        kind: "custom",
+        locale,
+        slug,
+        href: joinUrl(config.routing.basePath, locale.code, slug === "/" ? undefined : slug),
+        sourcePath: `custom:${slug}`,
+        raw: body,
+        body,
+        html: "",
+        headings: extractHeadings(body),
+        meta: {
+          title: definition.title,
+          description: definition.description,
+          navTitle: definition.navTitle ?? definition.title,
+          section: definition.section ?? "Guide",
+          order: definition.order ?? 100,
+          hidden: definition.hidden ?? false,
+          tags: definition.tags ?? [],
+          updated: definition.updated,
+          image: definition.image,
+        },
+        layout: definition.layout ?? "article",
+        render: definition.render,
+      });
+    }
+  }
+
+  assertUniquePageHrefs(pages);
   return pages.sort((a, b) => a.locale.code.localeCompare(b.locale.code) || a.meta.order - b.meta.order || a.href.localeCompare(b.href));
 }
 
@@ -147,6 +189,44 @@ function firstParagraph(markdown: string) {
 function titleFromSlug(slug: string) {
   const last = slug === "/" ? "Overview" : slug.split("/").filter(Boolean).at(-1) ?? "Page";
   return last.replace(/[-_]/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function customPagePath(page: FibelCustomPage) {
+  const path = page.path.trim();
+  if (!path.startsWith("/") || path.startsWith("//") || path.includes("?") || path.includes("#")) {
+    throw new Error(`Custom page path "${page.path}" must be an absolute pathname.`);
+  }
+  if (path !== "/" && path.endsWith("/")) {
+    throw new Error(`Custom page path "${page.path}" must not end with a slash.`);
+  }
+  if (/\/{2,}/.test(path)) {
+    throw new Error(`Custom page path "${page.path}" must not contain repeated slashes.`);
+  }
+  if (/\.(md|markdown)$/i.test(path)) {
+    throw new Error(`Custom page path "${page.path}" must not use a Markdown route suffix.`);
+  }
+  return path;
+}
+
+function customPageContext(page: FibelCustomPage, locale: string) {
+  if (!page.context) return "";
+  if (typeof page.context === "string") return page.context;
+  const context = page.context[locale] ?? page.context.default;
+  if (typeof context !== "string") {
+    throw new Error(`Custom page "${page.path}" context requires a default Markdown string.`);
+  }
+  return context;
+}
+
+function assertUniquePageHrefs(pages: FibelPage[]) {
+  const seen = new Map<string, string>();
+  for (const page of pages) {
+    const existing = seen.get(page.href);
+    if (existing) {
+      throw new Error(`Duplicate page route "${page.href}" from ${existing} and ${page.sourcePath}.`);
+    }
+    seen.set(page.href, page.sourcePath);
+  }
 }
 
 function extractHeadings(markdown: string): Heading[] {

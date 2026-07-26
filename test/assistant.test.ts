@@ -192,7 +192,7 @@ describe("assistant plugin", () => {
     expect(requests).toHaveLength(3);
     expect(requests[0]?.systemPrompt).toContain("Prefer configuration examples for Fibel.");
     expect(requests[0]?.systemPrompt).toContain(
-      "Site summary: Publish Markdown documentation",
+      "Site summary: Publish Markdown and host-rendered application pages",
     );
     expect(requests[0]?.systemPrompt).toContain("Use English (en)");
     expect(requests[0]?.systemPrompt).toContain(
@@ -211,7 +211,7 @@ describe("assistant plugin", () => {
       "For instructions, configuration, APIs, code, exact behavior",
     );
     expect(requests[0]?.systemPrompt).toContain(
-      "site_description=Publish Markdown documentation as a server-rendered website",
+      "site_description=Publish Markdown and host-rendered application pages in one documentation shell",
     );
     expect(requests[0]?.systemPrompt).toContain(
       "current_page_description=Configure content folders",
@@ -261,7 +261,7 @@ describe("assistant plugin", () => {
     expect(received).toEqual(
       expect.objectContaining({
         siteTitle: "Fibel",
-        siteDescription: expect.stringContaining("Publish Markdown documentation"),
+        siteDescription: expect.stringContaining("Publish Markdown and host-rendered application pages"),
         locale: "en",
         language: "English",
         currentPage: "/en/configuration",

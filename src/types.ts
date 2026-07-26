@@ -23,12 +23,79 @@ export type FibelSeoConfig = {
   disallow?: string[];
 };
 
+export type FibelHeaderLinkContext = {
+  locale: string;
+  pathname: string;
+  basePath: string;
+};
+
+export type FibelHeaderHref = string | ((context: FibelHeaderLinkContext) => string);
+
+export type FibelHeaderLinkConfig = {
+  label: string;
+  href: FibelHeaderHref;
+  activeWhen?: string;
+};
+
+export type FibelHeaderConfig = {
+  title?: string;
+  homeHref?: FibelHeaderHref;
+  links?: FibelHeaderLinkConfig[];
+  search?: boolean;
+  searchLabel?: string;
+  searchPlaceholder?: string;
+  themeToggle?: boolean;
+  mobileNavigation?: boolean;
+};
+
 export type NavLink = {
   label: string;
   value: string;
 };
 
 export type FooterLink = NavLink;
+
+export type FibelPageLayout = "article" | "full";
+
+export type FibelCustomPageContext = string | ({ default: string } & Record<string, string>);
+
+export type FibelPageDocument = {
+  body: string;
+  scripts?: string;
+};
+
+export type FibelDocumentRenderer = (document: FibelPageDocument) => string;
+
+export type FibelCustomPageRenderContext = {
+  request: Request;
+  page: FibelPage;
+  context: {
+    markdown: string;
+    html: string;
+  };
+  fibel: FibelContext;
+  renderDocument: FibelDocumentRenderer;
+};
+
+export type FibelCustomPageRenderResult = string | FibelPageDocument | Response;
+
+export type FibelCustomPage = {
+  path: string;
+  title: string;
+  description: string;
+  navTitle?: string;
+  section?: string;
+  order?: number;
+  hidden?: boolean;
+  tags?: string[];
+  updated?: string;
+  image?: string;
+  layout?: FibelPageLayout;
+  context?: FibelCustomPageContext;
+  render: (
+    context: FibelCustomPageRenderContext,
+  ) => FibelCustomPageRenderResult | Promise<FibelCustomPageRenderResult>;
+};
 
 export type FibelConfig = {
   title: string;
@@ -42,8 +109,10 @@ export type FibelConfig = {
   defaultLocale?: string;
   theme?: FibelThemeConfig;
   seo?: FibelSeoConfig;
+  header?: FibelHeaderConfig;
   headerLinks?: NavLink[];
   footerLinks?: NavLink[];
+  pages?: FibelCustomPage[];
   plugins?: FibelPlugin[];
 };
 
@@ -57,8 +126,10 @@ export type ResolvedFibelConfig = Required<
   defaultLocale: string;
   theme: Required<FibelThemeConfig>;
   seo: { ogImage?: string; twitterSite?: string; disallow: string[] };
+  header: FibelHeaderConfig;
   headerLinks: NavLink[];
   footerLinks: NavLink[];
+  pages: FibelCustomPage[];
   plugins: FibelPlugin[];
 };
 
@@ -82,6 +153,7 @@ export type Heading = {
 
 export type FibelPage = {
   id: string;
+  kind: "markdown" | "custom";
   locale: LocaleConfig;
   slug: string;
   href: string;
@@ -91,6 +163,8 @@ export type FibelPage = {
   html: string;
   headings: Heading[];
   meta: PageMeta;
+  layout: FibelPageLayout;
+  render?: FibelCustomPage["render"];
 };
 
 export type NavSection = {
@@ -119,7 +193,11 @@ export type BodyItem = (page: FibelPage, context: FibelContext) => string;
 
 export type FibelServices = {
   renderMarkdown: (markdown: string, page: FibelPage, context: FibelContext) => string;
-  renderPage: (page: FibelPage, request: Request, context: FibelContext) => string;
+  renderPage: (
+    page: FibelPage,
+    request: Request,
+    context: FibelContext,
+  ) => string | Response | Promise<string | Response>;
   getTheme: (request: Request, context: FibelContext) => ThemeMode;
   search: (query: string, locale: string, context: FibelContext) => SearchEntry[];
 };

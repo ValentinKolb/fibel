@@ -75,7 +75,7 @@ Tagged Releases veröffentlichen das Image in der GitHub Container Registry:
 
 ```sh
 docker run --rm -p 3000:3000 ghcr.io/k2b-dev/fibel:latest
-docker run --rm -p 3000:3000 ghcr.io/k2b-dev/fibel:v0.2.0
+docker run --rm -p 3000:3000 ghcr.io/k2b-dev/fibel:v0.3.0
 ```
 
 ## In Hono mounten
@@ -103,6 +103,21 @@ export default defineFibel({
 ```
 
 So erzeugt Fibel Links, interne Routen und Assets relativ zu `/docs`.
+
+## Mehrere Instanzen mounten
+
+Mehrere Fibel-Instanzen können in einem Server und einem Deployment laufen. Getrennte Base Paths halten Navigation, Suchindizes, Assistenten-Kontext, Chat-Sessions und Discovery-Routen unabhängig:
+
+```ts
+const docs = await createFibelApp(docsConfig); // basePath: "/docs"
+const ui = await createFibelApp(uiConfig);     // basePath: "/ui"
+
+export default new Hono()
+  .mount("/docs", docs.fetch)
+  .mount("/ui", ui.fetch);
+```
+
+Die Instanzen können dieselbe Header-Konfiguration, denselben Theme-Cookie, Assistant-Provider und prozessweiten Rate-Limiter verwenden. Der [Guide für eigene Seiten](/de/custom-pages) zeigt die vollständige Header- und Solid-SSR-Konfiguration.
 
 ## In andere Server einbinden
 

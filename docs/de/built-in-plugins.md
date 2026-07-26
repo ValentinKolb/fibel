@@ -30,7 +30,7 @@ Das Standard-Set enthält:
 - `assetsPlugin`: liefert Dateien aus dem konfigurierten Assets-Ordner.
 - `searchPlugin`: baut den Suchindex und stellt den Suchendpunkt bereit. Siehe [Suche](/de/search).
 - `poweredByPlugin`: ergänzt den Hinweis `Powered by fibel.dev` im Footer.
-- `layoutPlugin`: rendert Navigation, Seitenlayout, Page-Actions, Footer, Suchdialog und Client-Script.
+- `layoutPlugin`: rendert Navigation, Seitenlayout, Page-Actions, Footer, Suchdialog und Client-Script. `layoutPlugin({ header: false })` entfernt ausschließlich den integrierten Header.
 
 ## Optionale Plugins
 

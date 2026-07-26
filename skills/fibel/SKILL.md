@@ -41,13 +41,14 @@ fibel.config.ts
   -> resolve config
   -> run plugin setup
   -> load docs/<locale>/**/*.md
+  -> materialize configured custom pages per locale
   -> render Markdown
   -> run plugin afterContent hooks
   -> register plugin routes
   -> serve fetch(request)
 ```
 
-Normal documents are Markdown files. Fibel renders them to HTML strings and wraps them in the configured layout service.
+Normal documents are Markdown files. Fibel renders them to HTML strings and wraps them in the configured layout service. Configured custom pages use the same routing, navigation, search, assistant, SEO, and discovery pipelines while a host callback renders their visible body.
 
 ## Project layout
 
@@ -174,7 +175,7 @@ The default plugin list is:
 - `poweredByPlugin`
 - `layoutPlugin`
 
-Import paths matter. `createFibelApp`, `defineFibel`, `defaultPlugins`, and the exported types come from `@k2b/fibel`. The individual plugins above come from the `@k2b/fibel/plugins` subpath and are not re-exported from the root.
+Import paths matter. `createFibelApp`, `defineFibel`, `defaultPlugins`, and the exported types come from `@k2b/fibel`. The individual plugins above come from `@k2b/fibel/plugins`, the framework-neutral header renderer comes from `@k2b/fibel/layout`, and the optional Solid bridge comes from `@k2b/fibel/solid`.
 
 `imprintPlugin({ url, label })` ships with Fibel but is not in the default set. It adds a footer link to legal information hosted elsewhere. Use it instead of an imprint page when the legal text lives outside the documentation.
 
@@ -304,6 +305,102 @@ export default {
 
 Any host that can call `fetch(request)` can mount Fibel. If mounting under `/docs`, set `routing.basePath` to `/docs` and route matching requests to `fibel.fetch`.
 
+## Custom application pages
+
+Use `pages` when a route needs server-rendered application output but should keep Fibel's header, sidebar, search, assistant, theme, SEO, raw Markdown, and discovery behavior:
+
+```ts
+export default defineFibel({
+  title: "Cloud UI",
+  pages: [
+    {
+      path: "/panel-header",
+      title: "PanelHeader",
+      description: "A consistent heading and action area.",
+      section: "Components",
+      context: {
+        default: panelHeaderMarkdown,
+        de: panelHeaderMarkdownDe,
+      },
+      render: ({ context }) =>
+        `<section>${context.html}</section>`,
+    },
+  ],
+});
+```
+
+Keep these invariants:
+
+- Fibel creates each custom page under every configured locale.
+- `context` is either one shared Markdown string or `{ default, <locale> }`; `default` is the required language-neutral fallback.
+- `context.markdown` feeds search, raw `.md` routes, `llms.txt`, and the assistant's existing `search_docs` and `read_doc` tools.
+- `context.html` is rendered once with the configured Markdown service and can be displayed by the page. Do not extract documentation from component HTML.
+- `layout: "article"` keeps normal article chrome. `layout: "full"` keeps the Fibel shell but gives the renderer a wider body without the article heading and pager.
+- Custom paths are locale-relative absolute paths such as `/panel-header`. They must not contain a locale, query, hash, trailing slash, or `.md` suffix. Collisions with Markdown pages fail at startup.
+
+### Solid SSR and islands
+
+Use `solidPage` only when the host already owns an `@k2b/ssr` pipeline:
+
+```tsx
+import { createConfig } from "@k2b/ssr";
+import {
+  fibelSsrTemplate,
+  solidPage,
+  type FibelSsrTemplateOptions,
+} from "@k2b/fibel/solid";
+
+const { config: ssrConfig, plugin, html } =
+  createConfig<FibelSsrTemplateOptions>({
+    rootDir: import.meta.dir,
+    template: fibelSsrTemplate,
+  });
+
+const page = solidPage({
+  html,
+  path: "/panel-header",
+  title: "PanelHeader",
+  description: "A consistent heading and action area.",
+  context: panelHeaderMarkdown,
+  component: ({ context }) => (
+    <PanelHeaderPage documentation={context.html} />
+  ),
+});
+```
+
+Fibel's Solid entry point is only a render bridge. The host must register `plugin()` in development and production, mount the one `ssrConfig` route at `/_ssr`, and keep island props serializable. Do not add the SSR plugin to `fibel dev` or `fibel build`.
+
+If the host already has an SSR config with another site template, create a second `createConfig({ template: fibelSsrTemplate })` only for its `html` renderer. Continue using the original config and plugin for `/_ssr` and builds. Both configs must use the same `rootDir` and `basePath`; only one plugin is registered.
+
+### Several Fibel instances
+
+Prefer separate instances when `/docs` and `/ui` should have separate navigation, search, assistant context, and chat sessions. Mount their Fetch apps under distinct `routing.basePath` values in one Hono/Bun process. Share the header config, theme cookie, assistant provider, and rate-limiter objects rather than adding search scopes or a Fibel multi-site manager.
+
+Use the structured header config for cross-instance links:
+
+```ts
+import type { FibelHeaderConfig } from "@k2b/fibel";
+
+const header = {
+  title: "Cloud",
+  homeHref: ({ locale }) => `/${locale}`,
+  links: [
+    {
+      label: "Docs",
+      href: ({ locale }) => `/docs/${locale}`,
+      activeWhen: "/docs",
+    },
+    {
+      label: "UI",
+      href: ({ locale }) => `/ui/${locale}`,
+      activeWhen: "/ui",
+    },
+  ],
+} satisfies FibelHeaderConfig;
+```
+
+`renderFibelHeader` from `@k2b/fibel/layout` returns the same canonical markup for an external surface. `layoutPlugin({ header: false })` removes only Fibel's header when an outer shell supplies it. Search/theme/mobile controls are independently optional.
+
 ## Commands
 
 For app projects:
@@ -341,7 +438,7 @@ Tagged releases publish the default documentation image to GHCR:
 
 ```sh
 docker run --rm -p 3000:3000 ghcr.io/k2b-dev/fibel:latest
-docker run --rm -p 3000:3000 ghcr.io/k2b-dev/fibel:v0.2.0
+docker run --rm -p 3000:3000 ghcr.io/k2b-dev/fibel:v0.3.0
 ```
 
 ## Common tasks
@@ -389,6 +486,8 @@ Check:
 ## Guardrails
 
 - Do not add MDX unless the user explicitly asks for it; Fibel's core content model is Markdown.
+- Do not add a knowledge registry or HTML-to-Markdown extraction for custom pages. Their explicit `context` Markdown is the knowledge source.
+- Do not make Fibel own Solid transforms, island discovery, `/_ssr` assets, or another build service. The host owns the single `@k2b/ssr` pipeline.
 - Do not assume Hono is required. Fibel exposes a Fetch handler.
 - Do not call raw Markdown routes an export feature; they are regular routes ending in `.md` or `.markdown`.
 - Keep docs professional and direct. Avoid marketing filler and internal project-history wording.

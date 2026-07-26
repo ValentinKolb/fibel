@@ -1,12 +1,24 @@
 export { createFibelApp } from "./app";
 export { defineFibel, loadConfig, resolveConfig } from "./config";
+export { renderFibelHeader } from "./layout";
 export { defaultPlugins } from "./plugins";
 export type {
   BodyItem,
   FibelApp,
   FibelConfig,
   FibelContext,
+  FibelCustomPage,
+  FibelCustomPageContext,
+  FibelCustomPageRenderContext,
+  FibelCustomPageRenderResult,
+  FibelDocumentRenderer,
+  FibelHeaderConfig,
+  FibelHeaderHref,
+  FibelHeaderLinkConfig,
+  FibelHeaderLinkContext,
   FibelPage,
+  FibelPageDocument,
+  FibelPageLayout,
   FibelPlugin,
   FibelRoute,
   FibelRoutingConfig,
@@ -23,3 +35,8 @@ export type {
   SearchEntry,
   ThemeMode,
 } from "./types";
+export type {
+  FibelHeaderLink,
+  FibelHeaderLocale,
+  RenderFibelHeaderOptions,
+} from "./layout";

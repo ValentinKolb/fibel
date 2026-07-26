@@ -3,7 +3,7 @@ title: Configuration
 navTitle: Configuration
 section: Start
 order: 2
-description: Configure content folders, routes, locales, assets, footer links, frontmatter, theme, and plugins.
+description: Configure content folders, routes, locales, assets, headers, custom pages, frontmatter, theme, and plugins.
 tags: [config, reference]
 updated: 2026-06-09
 ---
@@ -113,6 +113,39 @@ export default defineFibel({
 
 A link is marked as active when its value matches the slug of the current page. When `headerLinks` is not set, the header shows no navigation.
 
+## Shared header
+
+The structured `header` config is intended for several Fibel instances that should appear as one website:
+
+```ts
+export default defineFibel({
+  title: "Cloud UI",
+  routing: { basePath: "/ui" },
+  header: {
+    title: "Cloud",
+    homeHref: ({ locale }) => `/${locale}`,
+    links: [
+      {
+        label: "Docs",
+        href: ({ locale }) => `/docs/${locale}`,
+        activeWhen: "/docs",
+      },
+      {
+        label: "UI",
+        href: ({ locale }) => `/ui/${locale}`,
+        activeWhen: "/ui",
+      },
+    ],
+    searchLabel: "Search Cloud UI",
+    searchPlaceholder: "Search components...",
+  },
+});
+```
+
+`title` is the shared brand and stays independent from the instance title used by metadata and the assistant. `homeHref` and link `href` values accept either a string or a synchronous function receiving `locale`, `pathname`, and `basePath`. `activeWhen` marks a link active for the exact prefix and its descendants.
+
+`search`, `themeToggle`, and `mobileNavigation` default to `true` and can be disabled individually. `headerLinks` remains the shorter locale-relative API for links inside a single Fibel instance.
+
 ## Footer links
 
 ```ts
@@ -144,6 +177,12 @@ image: /assets/configuration.png
 ```
 
 Every field is optional. `title` is the page title; without it Fibel uses the first `#` heading, then a title-cased version of the slug. `navTitle` is the sidebar label and defaults to the title. `section` selects the sidebar group and defaults to `Guide`. `order` sorts pages within a locale and defaults to `100`. `description` is used for SEO, search, and the intro; without it Fibel takes the first paragraph, shortened to 180 characters, and falls back to the site description. `hidden` removes a page from navigation, pagination, the site's own search, `llms.txt`, and the sitemap, and marks it as `noindex`. The page stays reachable at its URL, which is what makes it useful for pages linked only from the footer. `tags` are displayed as chips. `updated` displays an update date and fills `article:modified_time`. `image` overrides the social preview image for this page.
+
+## Custom pages
+
+`pages` registers application-rendered routes alongside Markdown files. Page metadata follows the same navigation, search, SEO, and visibility rules. Optional `context` supplies the Markdown returned by raw routes and read by search and the assistant.
+
+The [custom pages guide](/en/custom-pages) documents the complete renderer contract, shared and localized context, Solid SSR integration, and multiple instances.
 
 ## Plugin list
 

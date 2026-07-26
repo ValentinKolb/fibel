@@ -146,6 +146,8 @@ assistantPlugin({
 
 Pro Request ergänzt das Plugin den vertrauenswürdigen Überblickskontext, die aktuelle Sprache und Seite, eine begrenzte Session-History sowie die von den Tools abgerufene Dokumentation. Versteckte Seiten bleiben ausgeschlossen. Tool-Ergebnisse gelten als nicht vertrauenswürdiger Referenztext und können die Systemanweisungen nicht ersetzen.
 
+Eigene Seiten benötigen kein weiteres Tool und keine Registry. Ihr `context`-Markdown steht über die vorhandenen Such- und Lese-Tools bereit. Wird der Assistent auf einer eigenen Route geöffnet, löst Fibel diese Seite automatisch als aktuelle Seite auf.
+
 ## Markdown-Antworten
 
 Antworten des Assistenten nutzen Fibels bestehenden serverseitigen Markdown- und Syntax-Highlighting-Stack mit einer kompakten Typografie für den Chat. Listen, Links, Tabellen, Zitate, Inline-Code und Codeblöcke werden unterstützt. Rohes Modell-HTML, unsichere Link-Protokolle und Bilder werden nicht gerendert.
