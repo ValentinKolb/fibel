@@ -1,6 +1,6 @@
 {
   "name": "@k2b/fibel",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Config-first documentation app for Markdown, i18n, search, and no-flicker themes.",
   "type": "module",
   "main": "src/index.ts",

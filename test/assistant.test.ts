@@ -375,6 +375,26 @@ describe("assistant plugin", () => {
     expect(requests).toHaveLength(0);
   });
 
+  test("accepts the configured public origin behind a TLS reverse proxy", async () => {
+    const requests: GenerateRequest[] = [];
+    const app = await createFibelApp({
+      ...config,
+      plugins: [...defaultPlugins(), assistantPlugin({ provider: docsProvider(requests) })],
+    });
+
+    const response = await app.fetch(
+      new Request("http://fibel.internal/_fibel/assistant", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Origin: "https://fibel.dev" },
+        body: JSON.stringify({ message: "How do themes work?", locale: "en", page: "/en/configuration" }),
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    await response.text();
+    expect(requests).toHaveLength(3);
+  });
+
   test("allows one active response per session and caps global concurrency", async () => {
     let release: (() => void) | undefined;
     const gate = new Promise<void>((resolve) => {

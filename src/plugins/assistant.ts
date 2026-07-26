@@ -170,7 +170,9 @@ export function assistantPlugin(options: AssistantOptions): FibelPlugin {
             const url = new URL(request.url);
             if (request.method !== "POST") return jsonError(405, "method_not_allowed", "Use POST.");
             const origin = request.headers.get("origin");
-            if (origin && origin !== url.origin) return jsonError(403, "invalid_origin", "Cross-origin requests are not allowed.");
+            if (!isAllowedOrigin(origin, url, context.config.siteUrl)) {
+              return jsonError(403, "invalid_origin", "Cross-origin requests are not allowed.");
+            }
 
             const payload = await readPayload(request, limits.maxInputChars);
             if ("response" in payload) return payload.response;
@@ -321,6 +323,16 @@ export function assistantPlugin(options: AssistantOptions): FibelPlugin {
       ];
     },
   };
+}
+
+function isAllowedOrigin(origin: string | null, requestUrl: URL, siteUrl?: string) {
+  if (!origin || origin === requestUrl.origin) return true;
+  if (!siteUrl) return false;
+  try {
+    return origin === new URL(siteUrl).origin;
+  } catch {
+    return false;
+  }
 }
 
 function documentationTools(context: FibelContext, locale: string, limits: AssistantLimits) {
