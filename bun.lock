@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "fibel",
+      "name": "@k2b/fibel",
       "dependencies": {
         "@k2b/nessi": "^0.10.0",
         "@k2b/stdlib": "^0.17.0",

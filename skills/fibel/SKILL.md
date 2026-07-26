@@ -1,6 +1,6 @@
 ---
 name: fibel
-description: Build, configure, document, debug, or extend Fibel documentation sites. Use this skill whenever the user mentions Fibel, fibel.config.ts, Fibel docs, Markdown documentation sites, raw .md routes for LLMs, Fibel plugins, the Fibel AI assistant or its system prompt, Nessi providers, Fibel themes, Fibel search, Fibel i18n, the fibel package, or mounting a Fibel Fetch app inside another server. This skill helps agents choose the right Fibel API, avoid unsupported assumptions, and verify sites with Bun commands and browser checks.
+description: Build, configure, document, debug, or extend Fibel documentation sites. Use this skill whenever the user mentions Fibel, fibel.config.ts, Fibel docs, Markdown documentation sites, raw .md routes for LLMs, Fibel plugins, the Fibel AI assistant or its system prompt, Nessi providers, Fibel themes, Fibel search, Fibel i18n, the @k2b/fibel package, or mounting a Fibel Fetch app inside another server. This skill helps agents choose the right Fibel API, avoid unsupported assumptions, and verify sites with Bun commands and browser checks.
 ---
 
 # Fibel
@@ -9,7 +9,7 @@ Use this skill when working on a Fibel documentation site or on the Fibel packag
 
 Fibel is a config-first documentation runtime. It reads Markdown files, builds localized navigation and search data, and serves a Web-standard `fetch` app. The default theme is server-rendered, supports light/dark mode through a cookie, exposes raw Markdown routes for tools such as LLMs, and includes a default `Powered by fibel.dev` footer attribution.
 
-Fibel's npm package is `fibel`. Import the root API from `fibel`, plugins from `fibel/plugins`, and run the CLI with `bunx --bun fibel`. The former `@valentinkolb/fibel` package is deprecated as of `v0.2.0`.
+Fibel's npm package is `@k2b/fibel`. Import the root API from `@k2b/fibel`, plugins from `@k2b/fibel/plugins`, and run the CLI with `bunx --bun @k2b/fibel`. The former `@valentinkolb/fibel` package is deprecated as of `v0.2.0`.
 
 ## First checks
 
@@ -71,7 +71,7 @@ Each locale has its own folder. A page at `docs/en/configuration.md` is served a
 Start from `defineFibel`:
 
 ```ts
-import { defineFibel } from "fibel";
+import { defineFibel } from "@k2b/fibel";
 
 export default defineFibel({
   title: "Product Docs",
@@ -174,14 +174,14 @@ The default plugin list is:
 - `poweredByPlugin`
 - `layoutPlugin`
 
-Import paths matter. `createFibelApp`, `defineFibel`, `defaultPlugins`, and the exported types come from `fibel`. The individual plugins above come from the `fibel/plugins` subpath and are not re-exported from the root.
+Import paths matter. `createFibelApp`, `defineFibel`, `defaultPlugins`, and the exported types come from `@k2b/fibel`. The individual plugins above come from the `@k2b/fibel/plugins` subpath and are not re-exported from the root.
 
 `imprintPlugin({ url, label })` ships with Fibel but is not in the default set. It adds a footer link to legal information hosted elsewhere. Use it instead of an imprint page when the legal text lives outside the documentation.
 
 Use `defaultPlugins()` when adding behavior without replacing the standard site:
 
 ```ts
-import { defineFibel, defaultPlugins } from "fibel";
+import { defineFibel, defaultPlugins } from "@k2b/fibel";
 import { projectLinksPlugin } from "./plugins/project-links";
 
 export default defineFibel({
@@ -199,8 +199,8 @@ Replace `plugins` completely only when the project owns rendering, layout, searc
 Prefer `providerFromEnv()` when provider selection belongs to deployment configuration. Keep the plugin conditional when the same project must also run without AI credentials:
 
 ```ts
-import { defaultPlugins, defineFibel } from "fibel";
-import { assistantPlugin, providerFromEnv } from "fibel/plugins";
+import { defaultPlugins, defineFibel } from "@k2b/fibel";
+import { assistantPlugin, providerFromEnv } from "@k2b/fibel/plugins";
 
 const assistant = process.env.FIBEL_AI_MODEL?.trim()
   ? [
@@ -262,7 +262,7 @@ Plugins add head markup through `context.headTags`, a list of `(page, context) =
 Use plugins for small, explicit extensions:
 
 ```ts
-import type { FibelPlugin } from "fibel";
+import type { FibelPlugin } from "@k2b/fibel";
 
 export function requireTagsPlugin(): FibelPlugin {
   return {
@@ -292,7 +292,7 @@ Plugins should not mutate unrelated global state. Keep plugin output determinist
 Fibel returns a Web-standard Fetch app:
 
 ```ts
-import { createFibelApp } from "fibel";
+import { createFibelApp } from "@k2b/fibel";
 import config from "./fibel.config";
 
 const fibel = await createFibelApp(config);
@@ -309,9 +309,9 @@ Any host that can call `fetch(request)` can mount Fibel. If mounting under `/doc
 For app projects:
 
 ```sh
-bunx --bun fibel init
-bunx --bun fibel dev --port 5173 --config fibel.config.ts
-bunx --bun fibel build --config fibel.config.ts
+bunx --bun @k2b/fibel init
+bunx --bun @k2b/fibel dev --port 5173 --config fibel.config.ts
+bunx --bun @k2b/fibel build --config fibel.config.ts
 ```
 
 `fibel dev` watches the config, docs, and assets by default. It rebuilds the in-memory app after changes and reloads connected browser tabs after a successful rebuild. Use `--no-watch` to disable rebuild watching and `--no-reload` to keep browser tabs from reloading automatically.

@@ -19,13 +19,13 @@ Fibel läuft auf Bun und wird in einer einzigen Datei konfiguriert. Inhalte ben�
 ## Schnellstart
 
 ```sh
-bunx --bun fibel init
-bunx --bun fibel dev
+bunx --bun @k2b/fibel init
+bunx --bun @k2b/fibel dev
 ```
 
 `init` erzeugt `fibel.config.ts`, eine erste Seite unter `docs/en/` und ein `assets/`-Verzeichnis. `dev` liefert das Projekt aus und lädt den Browser bei Dateiänderungen neu. Der Entwicklungsserver gibt seine URL beim Start aus.
 
-Fibel ist mit `v0.2.0` von `@valentinkolb/fibel` zum unscoped Paket `fibel` umgezogen. In bestehenden Projekten werden Root-Imports durch `fibel`, Plugin-Imports durch `fibel/plugins` und CLI-Aufrufe durch `bunx --bun fibel` ersetzt. Das bisherige Paket ist deprecated.
+Fibel ist mit `v0.2.0` von `@valentinkolb/fibel` zum Paket `@k2b/fibel` umgezogen. In bestehenden Projekten werden Root-Imports durch `@k2b/fibel`, Plugin-Imports durch `@k2b/fibel/plugins` und CLI-Aufrufe durch `bunx --bun @k2b/fibel` ersetzt. Das bisherige Paket ist deprecated.
 
 In Projekten, an denen Coding-Agents arbeiten, kommt zusätzlich der Fibel-Agent-Skill dazu:
 

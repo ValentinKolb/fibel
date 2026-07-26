@@ -11,9 +11,9 @@ Fibel targets Bun.
 For an app project:
 
 ```sh
-bun add fibel
-bunx --bun fibel init
-bunx --bun fibel dev --port 5173
+bun add @k2b/fibel
+bunx --bun @k2b/fibel init
+bunx --bun @k2b/fibel dev --port 5173
 ```
 
 Open `http://localhost:5173`. The root path redirects to the configured default locale.
@@ -22,7 +22,7 @@ Open `http://localhost:5173`. The root path redirects to the configured default 
 
 ## Package migration
 
-Fibel moved from `@valentinkolb/fibel` to the unscoped `fibel` package in `v0.2.0`. Replace root imports with `fibel`, plugin imports with `fibel/plugins`, and CLI commands with `bunx --bun fibel`. The previous package is deprecated and receives no further releases.
+Fibel moved from `@valentinkolb/fibel` to `@k2b/fibel` in `v0.2.0`. Replace root imports with `@k2b/fibel`, plugin imports with `@k2b/fibel/plugins`, and CLI commands with `bunx --bun @k2b/fibel`. The previous package is deprecated and receives no further releases.
 
 ## Agent skill
 
@@ -82,7 +82,7 @@ Each locale has its own folder below `docs/`. A file at `docs/en/configuration.m
 Create `fibel.config.ts` at the project root:
 
 ```ts
-import { defineFibel } from "fibel";
+import { defineFibel } from "@k2b/fibel";
 
 export default defineFibel({
   title: "Product Docs",
@@ -217,7 +217,7 @@ This avoids a visible switch from one theme to the other after hydration.
 Fibel exposes a Web-standard Fetch app. Hosts do not need a specific framework.
 
 ```ts
-import { createFibelApp } from "fibel";
+import { createFibelApp } from "@k2b/fibel";
 import config from "./fibel.config";
 
 const fibel = await createFibelApp(config);
@@ -252,7 +252,7 @@ docker run --rm -p 3000:3000 ghcr.io/k2b-dev/fibel:v0.2.0
 Plugins can replace services, validate content, add routes, or derive metadata from the loaded pages.
 
 ```ts
-import { defineFibel, defaultPlugins, type FibelPlugin } from "fibel";
+import { defineFibel, defaultPlugins, type FibelPlugin } from "@k2b/fibel";
 
 function requireTagsPlugin(): FibelPlugin {
   return {
@@ -274,14 +274,14 @@ export default defineFibel({
 });
 ```
 
-The built-in plugin set includes Markdown rendering, theme handling, i18n checks, SEO metadata and routes, `llms.txt` routes, asset routes, search, powered-by attribution, and layout rendering. Individual plugins are exported from `fibel/plugins`.
+The built-in plugin set includes Markdown rendering, theme handling, i18n checks, SEO metadata and routes, `llms.txt` routes, asset routes, search, powered-by attribution, and layout rendering. Individual plugins are exported from `@k2b/fibel/plugins`.
 
 ### Documentation assistant
 
 The optional assistant plugin uses `@k2b/nessi` to answer from visible documentation pages. Its default `@k2b/sync/browser` rate limiters and sessions live in the Fibel process, so a single-server deployment needs no Redis or database.
 
 ```ts
-import { assistantPlugin, providerFromEnv } from "fibel/plugins";
+import { assistantPlugin, providerFromEnv } from "@k2b/fibel/plugins";
 
 assistantPlugin({
   provider: providerFromEnv(),
@@ -300,9 +300,9 @@ The defaults limit each session to 5 requests per minute, the process to 100 req
 ## Commands
 
 ```sh
-bunx --bun fibel init
-bunx --bun fibel dev --port 5173 --config fibel.config.ts
-bunx --bun fibel build --config fibel.config.ts
+bunx --bun @k2b/fibel init
+bunx --bun @k2b/fibel dev --port 5173 --config fibel.config.ts
+bunx --bun @k2b/fibel build --config fibel.config.ts
 ```
 
 `fibel dev` rebuilds on local documentation changes and reloads connected browser tabs after the rebuild succeeds. Disable either behavior with `--no-watch` or `--no-reload`. `fibel serve` is an alias for `fibel dev` and starts the same watching development server.

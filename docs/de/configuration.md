@@ -15,7 +15,7 @@ updated: 2026-06-09
 ## Minimale Config
 
 ```ts
-import { defineFibel } from "fibel";
+import { defineFibel } from "@k2b/fibel";
 
 export default defineFibel({
   title: "Meine Docs",
@@ -150,7 +150,7 @@ Alle Felder sind optional. `title` ist der Seitentitel; fehlt er, nutzt Fibel di
 Wenn `plugins` nicht gesetzt ist, lädt Fibel das Default-Plugin-Set.
 
 ```ts
-import { defineFibel, defaultPlugins } from "fibel";
+import { defineFibel, defaultPlugins } from "@k2b/fibel";
 import { projectPlugin } from "./plugins/project-plugin";
 
 export default defineFibel({

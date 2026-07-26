@@ -17,7 +17,7 @@ Fibel exposes a `fetch` handler. The documentation can run as its own server or 
 Use the development command while editing content and configuration.
 
 ```sh
-bunx --bun fibel dev --port 5173
+bunx --bun @k2b/fibel dev --port 5173
 ```
 
 The command loads `fibel.config.ts`, builds the theme CSS, creates the documentation app, and starts a local server.
@@ -25,8 +25,8 @@ The command loads `fibel.config.ts`, builds the theme CSS, creates the documenta
 The development server watches the config file, docs folder, and assets folder. When a change is detected, Fibel rebuilds the app in memory and reloads connected browser tabs after the rebuild succeeds.
 
 ```sh
-bunx --bun fibel dev --no-watch
-bunx --bun fibel dev --no-reload
+bunx --bun @k2b/fibel dev --no-watch
+bunx --bun @k2b/fibel dev --no-reload
 ```
 
 If a rebuild fails, the server keeps serving the last working app and prints the error in the terminal.
@@ -36,7 +36,7 @@ The watcher covers content, assets, and the config file only. Editing a project 
 ## Build for deployment
 
 ```sh
-bunx --bun fibel build
+bunx --bun @k2b/fibel build
 ```
 
 The build creates a runtime entry and generated documentation files. Requests still pass through Fibel. This keeps the theme cookie, search, Markdown routes, and mounted paths consistent.
@@ -83,7 +83,7 @@ docker run --rm -p 3000:3000 ghcr.io/k2b-dev/fibel:v0.2.0
 ```ts
 import { Hono } from "hono";
 import config from "./fibel.config";
-import { createFibelApp } from "fibel";
+import { createFibelApp } from "@k2b/fibel";
 
 const docs = await createFibelApp(config);
 const app = new Hono();

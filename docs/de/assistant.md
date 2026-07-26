@@ -19,8 +19,8 @@ Provider-Zugangsdaten bleiben auf dem Server. Die Dokumentation wird bei Bedarf 
 `providerFromEnv()` eignet sich, wenn das Deployment Provider und Modell bestimmen soll:
 
 ```ts
-import { defaultPlugins, defineFibel } from "fibel";
-import { assistantPlugin, providerFromEnv } from "fibel/plugins";
+import { defaultPlugins, defineFibel } from "@k2b/fibel";
+import { assistantPlugin, providerFromEnv } from "@k2b/fibel/plugins";
 
 export default defineFibel({
   title: "Product Docs",

@@ -19,13 +19,13 @@ Fibel runs on Bun and is configured in a single file. Content requires no build 
 ## Quick start
 
 ```sh
-bunx --bun fibel init
-bunx --bun fibel dev
+bunx --bun @k2b/fibel init
+bunx --bun @k2b/fibel dev
 ```
 
 `init` creates `fibel.config.ts`, a first page under `docs/en/`, and an `assets/` directory. `dev` serves the project and reloads the browser when a file changes. The development server prints its URL on startup.
 
-Fibel moved from `@valentinkolb/fibel` to the unscoped `fibel` package in `v0.2.0`. Existing projects need to replace root imports with `fibel`, plugin imports with `fibel/plugins`, and CLI commands with `bunx --bun fibel`. The previous package is deprecated.
+Fibel moved from `@valentinkolb/fibel` to `@k2b/fibel` in `v0.2.0`. Existing projects need to replace root imports with `@k2b/fibel`, plugin imports with `@k2b/fibel/plugins`, and CLI commands with `bunx --bun @k2b/fibel`. The previous package is deprecated.
 
 Projects worked on by coding agents should also install the Fibel agent skill:
 
