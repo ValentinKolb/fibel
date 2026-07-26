@@ -1,6 +1,6 @@
 {
-  "name": "@valentinkolb/fibel",
-  "version": "0.0.1",
+  "name": "fibel",
+  "version": "0.2.0",
   "description": "Config-first documentation app for Markdown, i18n, search, and no-flicker themes.",
   "type": "module",
   "main": "src/index.ts",
@@ -42,10 +42,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ValentinKolb/fibel.git"
+    "url": "git+https://github.com/k2b-dev/fibel.git"
   },
   "bugs": {
-    "url": "https://github.com/ValentinKolb/fibel/issues"
+    "url": "https://github.com/k2b-dev/fibel/issues"
   },
   "publishConfig": {
     "access": "public"

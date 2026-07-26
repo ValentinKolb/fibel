@@ -15,7 +15,7 @@ Plugins erweitern Fibel an klaren Stellen: vor dem Laden der Inhalte, nach dem R
 ## Plugin-Form
 
 ```ts
-import type { FibelPlugin } from "@valentinkolb/fibel";
+import type { FibelPlugin } from "fibel";
 
 export function projectPlugin(): FibelPlugin {
   return {
@@ -40,7 +40,7 @@ export function projectPlugin(): FibelPlugin {
 Dieses Beispiel ergänzt vor jedem Markdown-Dokument einen Hinweis und nutzt danach den bestehenden Markdown-Renderer.
 
 ```ts
-import type { FibelPlugin } from "@valentinkolb/fibel";
+import type { FibelPlugin } from "fibel";
 
 export function markdownNoticePlugin(): FibelPlugin {
   return {
@@ -64,7 +64,7 @@ Dieses Muster eignet sich für einheitliche Hinweise, Projekt-Banner oder kleine
 Validierungs-Plugins brechen den Start ab, wenn Inhalte nicht den Projektregeln entsprechen.
 
 ```ts
-import type { FibelPlugin } from "@valentinkolb/fibel";
+import type { FibelPlugin } from "fibel";
 
 export function requireTagsPlugin(): FibelPlugin {
   return {
@@ -87,7 +87,7 @@ Sinnvolle Prüfungen sind fehlende Beschreibungen, ungültige Tags, unvollständ
 Routen erhalten den aktuellen Request und den Fibel-Context. Dieses Beispiel liefert eine kleine JSON-Übersicht aller Seiten.
 
 ```ts
-import type { FibelPlugin } from "@valentinkolb/fibel";
+import type { FibelPlugin } from "fibel";
 
 export function docsManifestPlugin(): FibelPlugin {
   return {
@@ -122,7 +122,7 @@ Eigene Routenpfade sollten nicht mit internen Routen oder Seitenpfaden kollidier
 `context.headTags` sammelt Funktionen, die Markup in den `<head>` jeder Seite rendern. Jede Funktion bekommt die aktuelle Seite und den Context, Tags können also pro Seite und pro Sprache unterschiedlich ausfallen.
 
 ```ts
-import type { FibelPlugin } from "@valentinkolb/fibel";
+import type { FibelPlugin } from "fibel";
 
 export function analyticsPlugin(siteId: string): FibelPlugin {
   return {
@@ -145,7 +145,7 @@ Ein leerer Rückgabewert überspringt die jeweilige Seite. Das eingebaute SEO-Pl
 Die meisten Projekte hängen eigene Plugins an das Standard-Set an.
 
 ```ts
-import { defineFibel, defaultPlugins } from "@valentinkolb/fibel";
+import { defineFibel, defaultPlugins } from "fibel";
 import { docsManifestPlugin } from "./plugins/docs-manifest";
 import { requireTagsPlugin } from "./plugins/require-tags";
 
@@ -179,7 +179,7 @@ type FibelContext = {
 
 Der Context ist die gemeinsame Arbeitsfläche der Plugins. Er enthält Konfiguration, geladene Seiten, Navigation, Footer- und Body-Einträge, Head-Tags, Suchdaten, registrierte Routen und austauschbare Services.
 
-Alle auf dieser Seite gezeigten Typen sind als Type-Import aus `@valentinkolb/fibel` verfügbar.
+Alle auf dieser Seite gezeigten Typen sind als Type-Import aus `fibel` verfügbar.
 
 ## Service-Referenz
 

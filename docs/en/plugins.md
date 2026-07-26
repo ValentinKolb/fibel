@@ -15,7 +15,7 @@ Plugins extend Fibel at defined points: before content is loaded, after pages ar
 ## Plugin shape
 
 ```ts
-import type { FibelPlugin } from "@valentinkolb/fibel";
+import type { FibelPlugin } from "fibel";
 
 export function projectPlugin(): FibelPlugin {
   return {
@@ -40,7 +40,7 @@ export function projectPlugin(): FibelPlugin {
 This example adds a notice before every Markdown document and then calls the existing Markdown renderer.
 
 ```ts
-import type { FibelPlugin } from "@valentinkolb/fibel";
+import type { FibelPlugin } from "fibel";
 
 export function markdownNoticePlugin(): FibelPlugin {
   return {
@@ -64,7 +64,7 @@ Use this pattern for shared notices, project banners, or small content adjustmen
 Validation plugins fail startup when content does not match project rules.
 
 ```ts
-import type { FibelPlugin } from "@valentinkolb/fibel";
+import type { FibelPlugin } from "fibel";
 
 export function requireTagsPlugin(): FibelPlugin {
   return {
@@ -87,7 +87,7 @@ Useful checks include missing descriptions, invalid tags, incomplete translation
 Routes receive the current request and the Fibel context. This example serves a small JSON manifest of all pages.
 
 ```ts
-import type { FibelPlugin } from "@valentinkolb/fibel";
+import type { FibelPlugin } from "fibel";
 
 export function docsManifestPlugin(): FibelPlugin {
   return {
@@ -122,7 +122,7 @@ Choose custom route paths so they do not collide with internal routes or page pa
 `context.headTags` collects functions that render markup into the `<head>` of every page. Each function receives the current page and the context, so tags can differ per page and per locale.
 
 ```ts
-import type { FibelPlugin } from "@valentinkolb/fibel";
+import type { FibelPlugin } from "fibel";
 
 export function analyticsPlugin(siteId: string): FibelPlugin {
   return {
@@ -145,7 +145,7 @@ Return an empty string to skip a page. The built-in SEO plugin uses this hook fo
 Most projects append their plugins to the default set.
 
 ```ts
-import { defineFibel, defaultPlugins } from "@valentinkolb/fibel";
+import { defineFibel, defaultPlugins } from "fibel";
 import { docsManifestPlugin } from "./plugins/docs-manifest";
 import { requireTagsPlugin } from "./plugins/require-tags";
 
@@ -179,7 +179,7 @@ type FibelContext = {
 
 The context is the shared workspace for plugins. It contains configuration, loaded pages, navigation, footer and body items, head tags, search data, registered routes, and replaceable services.
 
-Every type shown on this page is exported from `@valentinkolb/fibel` as a type import.
+Every type shown on this page is exported from `fibel` as a type import.
 
 ## Service reference
 

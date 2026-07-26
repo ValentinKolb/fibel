@@ -15,7 +15,7 @@ Fibel assembles its default behavior from normal plugins. Projects can use that 
 ## Default set
 
 ```ts
-import { defaultPlugins } from "@valentinkolb/fibel";
+import { defaultPlugins } from "fibel";
 
 const plugins = defaultPlugins();
 ```
@@ -41,8 +41,8 @@ Fibel ships plugins that are not part of the default set because they need confi
 `imprintPlugin` adds a footer link to legal information hosted somewhere else. Use it when the imprint belongs to the company or person behind several sites and should not be maintained as a documentation page.
 
 ```ts
-import { defineFibel, defaultPlugins } from "@valentinkolb/fibel";
-import { imprintPlugin } from "@valentinkolb/fibel/plugins";
+import { defineFibel, defaultPlugins } from "fibel";
+import { imprintPlugin } from "fibel/plugins";
 
 export default defineFibel({
   title: "Product Docs",
@@ -57,7 +57,7 @@ The URL is used as written, so it can point at any external page. `label` defaul
 Append project plugins to the default set when the built-in behavior should remain active.
 
 ```ts
-import { defineFibel, defaultPlugins } from "@valentinkolb/fibel";
+import { defineFibel, defaultPlugins } from "fibel";
 import { projectLinksPlugin } from "./plugins/project-links";
 
 export default defineFibel({
@@ -73,8 +73,8 @@ This is the right starting point for most projects. The [Plugin API](/en/plugins
 Replace the plugin list when a project owns rendering, layout, search, or routes itself.
 
 ```ts
-import { defineFibel } from "@valentinkolb/fibel";
-import { searchPlugin, themePlugin } from "@valentinkolb/fibel/plugins";
+import { defineFibel } from "fibel";
+import { searchPlugin, themePlugin } from "fibel/plugins";
 
 export default defineFibel({
   title: "Product Docs",

@@ -34,14 +34,14 @@ describe("fibel app", () => {
       headerLinks: [
         { label: "Overview", value: "/" },
         { label: "Guide", value: "/runtime" },
-        { label: "Source", value: "https://github.com/ValentinKolb/fibel" },
+        { label: "Source", value: "https://github.com/k2b-dev/fibel" },
       ],
     });
 
     const german = await (await app.fetch(new Request("http://localhost/de/runtime"))).text();
     expect(german).toContain('href="/de/runtime"');
     expect(german).toContain('href="/de"');
-    expect(german).toContain('href="https://github.com/ValentinKolb/fibel"');
+    expect(german).toContain('href="https://github.com/k2b-dev/fibel"');
     expect(german).toContain('fibel-header-link is-active" href="/de/runtime"');
 
     const english = await (await app.fetch(new Request("http://localhost/en"))).text();
@@ -54,13 +54,13 @@ describe("fibel app", () => {
       ...config,
       footerLinks: [
         { label: "Imprint", value: "/imprint" },
-        { label: "Source", value: "https://github.com/ValentinKolb/fibel" },
+        { label: "Source", value: "https://github.com/k2b-dev/fibel" },
       ],
     });
 
     const german = await (await app.fetch(new Request("http://localhost/de/runtime"))).text();
     expect(german).toContain('href="/de/imprint"');
-    expect(german).toContain('href="https://github.com/ValentinKolb/fibel"');
+    expect(german).toContain('href="https://github.com/k2b-dev/fibel"');
 
     const english = await (await app.fetch(new Request("http://localhost/en/runtime"))).text();
     expect(english).toContain('href="/en/imprint"');

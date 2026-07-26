@@ -5,7 +5,7 @@ section: Start
 order: 1
 description: Fibel publishes Markdown documentation as a server-rendered website with search, multilingual routing, and Markdown source pages for tools.
 tags: [overview, markdown, docs]
-updated: 2026-07-25
+updated: 2026-07-26
 ---
 
 # Fibel
@@ -19,16 +19,18 @@ Fibel runs on Bun and is configured in a single file. Content requires no build 
 ## Quick start
 
 ```sh
-bunx --bun @valentinkolb/fibel init
-bunx --bun @valentinkolb/fibel dev
+bunx --bun fibel init
+bunx --bun fibel dev
 ```
 
 `init` creates `fibel.config.ts`, a first page under `docs/en/`, and an `assets/` directory. `dev` serves the project and reloads the browser when a file changes. The development server prints its URL on startup.
 
+Fibel moved from `@valentinkolb/fibel` to the unscoped `fibel` package in `v0.2.0`. Existing projects need to replace root imports with `fibel`, plugin imports with `fibel/plugins`, and CLI commands with `bunx --bun fibel`. The previous package is deprecated.
+
 Projects worked on by coding agents should also install the Fibel agent skill:
 
 ```sh
-bunx skills add ValentinKolb/fibel
+bunx skills add k2b-dev/fibel
 ```
 
 It provides the current conventions for configuration, Markdown pages, raw `.md` routes, plugins, hosting, and verification, so agents work from the documented API rather than guessing.

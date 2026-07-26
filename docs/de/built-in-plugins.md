@@ -15,7 +15,7 @@ Fibel setzt seine Standardfunktionen aus normalen Plugins zusammen. Projekte kö
 ## Standard-Set
 
 ```ts
-import { defaultPlugins } from "@valentinkolb/fibel";
+import { defaultPlugins } from "fibel";
 
 const plugins = defaultPlugins();
 ```
@@ -41,8 +41,8 @@ Fibel liefert Plugins mit, die nicht im Standard-Set stecken, weil sie Konfigura
 `imprintPlugin` ergänzt einen Footer-Link auf rechtliche Angaben, die an anderer Stelle liegen. Das Plugin eignet sich, wenn das Impressum zur Firma oder Person hinter mehreren Seiten gehört und nicht als Dokumentationsseite gepflegt werden soll.
 
 ```ts
-import { defineFibel, defaultPlugins } from "@valentinkolb/fibel";
-import { imprintPlugin } from "@valentinkolb/fibel/plugins";
+import { defineFibel, defaultPlugins } from "fibel";
+import { imprintPlugin } from "fibel/plugins";
 
 export default defineFibel({
   title: "Meine Docs",
@@ -57,7 +57,7 @@ Die URL wird unverändert verwendet und kann auf eine beliebige externe Seite ze
 Eigene Plugins werden an das Standard-Set angehängt, wenn die integrierten Funktionen erhalten bleiben sollen.
 
 ```ts
-import { defineFibel, defaultPlugins } from "@valentinkolb/fibel";
+import { defineFibel, defaultPlugins } from "fibel";
 import { projectLinksPlugin } from "./plugins/project-links";
 
 export default defineFibel({
@@ -73,8 +73,8 @@ Diese Variante ist für die meisten Projekte der richtige Startpunkt. Die [Plugi
 Die Plugin-Liste wird vollständig ersetzt, wenn ein Projekt Rendering, Layout, Suche oder Routen selbst steuern soll.
 
 ```ts
-import { defineFibel } from "@valentinkolb/fibel";
-import { searchPlugin, themePlugin } from "@valentinkolb/fibel/plugins";
+import { defineFibel } from "fibel";
+import { searchPlugin, themePlugin } from "fibel/plugins";
 
 export default defineFibel({
   title: "Product Docs",

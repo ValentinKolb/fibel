@@ -19,8 +19,8 @@ Provider credentials stay on the server. Documentation is loaded on demand inste
 Use `providerFromEnv()` when provider selection belongs in deployment configuration:
 
 ```ts
-import { defaultPlugins, defineFibel } from "@valentinkolb/fibel";
-import { assistantPlugin, providerFromEnv } from "@valentinkolb/fibel/plugins";
+import { defaultPlugins, defineFibel } from "fibel";
+import { assistantPlugin, providerFromEnv } from "fibel/plugins";
 
 export default defineFibel({
   title: "Product Docs",

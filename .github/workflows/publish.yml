@@ -78,7 +78,7 @@ jobs:
         id: docker-meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/valentinkolb/fibel
+          images: ghcr.io/k2b-dev/fibel
           flavor: latest=false
           tags: |
             type=ref,event=tag

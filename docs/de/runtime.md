@@ -17,7 +17,7 @@ Fibel stellt einen `fetch`-Handler bereit. Dadurch kann die Dokumentation direkt
 Der Development-Befehl dient der Arbeit an Inhalten und Konfiguration.
 
 ```sh
-bunx --bun @valentinkolb/fibel dev --port 5173
+bunx --bun fibel dev --port 5173
 ```
 
 Der Befehl lädt `fibel.config.ts`, baut das Theme-CSS, erstellt die Dokumentations-App und startet einen lokalen Server.
@@ -25,8 +25,8 @@ Der Befehl lädt `fibel.config.ts`, baut das Theme-CSS, erstellt die Dokumentati
 Der Entwicklungsserver beobachtet die Config-Datei, den Docs-Ordner und den Assets-Ordner. Wenn sich eine Datei ändert, baut Fibel die App im Speicher neu und lädt verbundene Browser-Tabs nach erfolgreichem Rebuild neu.
 
 ```sh
-bunx --bun @valentinkolb/fibel dev --no-watch
-bunx --bun @valentinkolb/fibel dev --no-reload
+bunx --bun fibel dev --no-watch
+bunx --bun fibel dev --no-reload
 ```
 
 Wenn ein Rebuild fehlschlägt, liefert der Server weiter die letzte funktionierende App aus und schreibt den Fehler ins Terminal.
@@ -36,7 +36,7 @@ Der Watcher erfasst nur Content, Assets und die Config-Datei. Änderungen an ein
 ## Für Deployment bauen
 
 ```sh
-bunx --bun @valentinkolb/fibel build
+bunx --bun fibel build
 ```
 
 Der Build erzeugt einen Runtime-Einstieg und die generierten Dateien für die Dokumentation. Requests laufen weiterhin durch Fibel. Dadurch funktionieren Theme-Cookie, Suche, Markdown-Routen und gemountete Pfade konsistent.
@@ -48,7 +48,7 @@ Der empfohlene Weg ist das Container-Image hinter Traefik.
 ```yaml
 services:
   docs:
-    image: ghcr.io/valentinkolb/fibel:latest
+    image: ghcr.io/k2b-dev/fibel:latest
     labels:
       - traefik.enable=true
       - traefik.http.routers.docs.rule=Host(`docs.example.com`)
@@ -74,8 +74,8 @@ Das Image nutzt einen Bun-Multi-Stage-Build. Development-Dependencies werden nur
 Tagged Releases veröffentlichen das Image in der GitHub Container Registry:
 
 ```sh
-docker run --rm -p 3000:3000 ghcr.io/valentinkolb/fibel:latest
-docker run --rm -p 3000:3000 ghcr.io/valentinkolb/fibel:v0.0.8
+docker run --rm -p 3000:3000 ghcr.io/k2b-dev/fibel:latest
+docker run --rm -p 3000:3000 ghcr.io/k2b-dev/fibel:v0.2.0
 ```
 
 ## In Hono mounten
@@ -83,7 +83,7 @@ docker run --rm -p 3000:3000 ghcr.io/valentinkolb/fibel:v0.0.8
 ```ts
 import { Hono } from "hono";
 import config from "./fibel.config";
-import { createFibelApp } from "@valentinkolb/fibel";
+import { createFibelApp } from "fibel";
 
 const docs = await createFibelApp(config);
 const app = new Hono();

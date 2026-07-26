@@ -34,7 +34,7 @@ export default defineFibel({
   seo: {
     ogImage: "/assets/social.png",
   },
-  footerLinks: [{ label: "GitHub", value: "https://github.com/ValentinKolb/fibel" }],
+  footerLinks: [{ label: "GitHub", value: "https://github.com/k2b-dev/fibel" }],
   plugins: [
     ...defaultPlugins(),
     imprintPlugin({ url: "https://impressum.valentin-kolb.com", label: "Impressum" }),
