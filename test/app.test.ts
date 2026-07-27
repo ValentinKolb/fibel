@@ -1,8 +1,12 @@
-import { describe, expect, test } from "bun:test";
+import { beforeAll, describe, expect, test } from "bun:test";
 import { createFibelApp, defaultPlugins } from "../src";
+import { resolveConfig } from "../src/config";
+import { buildStyles } from "../src/styles";
 import config from "../fibel.config";
 
 describe("fibel app", () => {
+  beforeAll(() => buildStyles(resolveConfig(config).root, true));
+
   test("renders a localized page", async () => {
     const app = await createFibelApp(config);
     const response = await app.fetch(new Request("http://localhost/en"));
