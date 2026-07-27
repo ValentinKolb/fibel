@@ -441,7 +441,7 @@ Tagged releases publish the default documentation image to GHCR:
 
 ```sh
 docker run --rm -p 3000:3000 ghcr.io/k2b-dev/fibel:latest
-docker run --rm -p 3000:3000 ghcr.io/k2b-dev/fibel:v0.4.0
+docker run --rm -p 3000:3000 ghcr.io/k2b-dev/fibel:v0.4.1
 ```
 
 ## Common tasks
