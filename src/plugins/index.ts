@@ -5,6 +5,7 @@ import { imprintPlugin } from "./imprint";
 import { layoutPlugin } from "./layout";
 import { llmsPlugin } from "./llms";
 import { markdownPlugin } from "./markdown";
+import { mcpPlugin } from "./mcp";
 import { poweredByPlugin } from "./powered-by";
 import { searchPlugin } from "./search";
 import { seoPlugin } from "./seo";
@@ -12,7 +13,7 @@ import { themePlugin } from "./theme";
 import type { FibelPlugin } from "../types";
 
 export { providerFromEnv } from "./assistant-provider";
-export { assistantPlugin, assetsPlugin, i18nPlugin, imprintPlugin, layoutPlugin, llmsPlugin, markdownPlugin, poweredByPlugin, searchPlugin, seoPlugin, themePlugin };
+export { assistantPlugin, assetsPlugin, i18nPlugin, imprintPlugin, layoutPlugin, llmsPlugin, markdownPlugin, mcpPlugin, poweredByPlugin, searchPlugin, seoPlugin, themePlugin };
 export type {
   AssistantLimits,
   AssistantOptions,
@@ -24,6 +25,7 @@ export type {
 export type { AssistantProviderEnv, AssistantProviderName } from "./assistant-provider";
 export type { ImprintOptions } from "./imprint";
 export type { LayoutOptions } from "./layout";
+export type { McpOptions } from "./mcp";
 
 export function defaultPlugins(): FibelPlugin[] {
   return [markdownPlugin(), themePlugin(), i18nPlugin(), seoPlugin(), llmsPlugin(), assetsPlugin(), searchPlugin(), poweredByPlugin(), layoutPlugin()];

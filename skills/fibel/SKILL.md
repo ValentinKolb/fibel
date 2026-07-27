@@ -1,6 +1,6 @@
 ---
 name: fibel
-description: Build, configure, document, debug, or extend Fibel documentation sites. Use this skill whenever the user mentions Fibel, fibel.config.ts, Fibel docs, Markdown documentation sites, raw .md routes for LLMs, Fibel plugins, the Fibel AI assistant or its system prompt, Nessi providers, Fibel themes, Fibel search, Fibel i18n, the @k2b/fibel package, or mounting a Fibel Fetch app inside another server. This skill helps agents choose the right Fibel API, avoid unsupported assumptions, and verify sites with Bun commands and browser checks.
+description: Build, configure, document, debug, or extend Fibel documentation sites. Use this skill whenever the user mentions Fibel, fibel.config.ts, Fibel docs, Markdown documentation sites, raw .md routes for LLMs, Fibel plugins, the Fibel AI assistant or MCP endpoint, Nessi providers, Fibel themes, Fibel search, Fibel i18n, the @k2b/fibel package, or mounting a Fibel Fetch app inside another server. This skill helps agents choose the right Fibel API, avoid unsupported assumptions, and verify sites with Bun commands and browser checks.
 ---
 
 # Fibel
@@ -180,7 +180,7 @@ The default plugin list is:
 
 Import paths matter. `createFibelApp`, `defineFibel`, `defaultPlugins`, and the exported types come from `@k2b/fibel`. The individual plugins above come from `@k2b/fibel/plugins`, the framework-neutral header renderer comes from `@k2b/fibel/layout`, and the optional Solid bridge comes from `@k2b/fibel/solid`.
 
-`imprintPlugin({ url, label })` ships with Fibel but is not in the default set. It adds a footer link to legal information hosted elsewhere. Use it instead of an imprint page when the legal text lives outside the documentation.
+`assistantPlugin`, `mcpPlugin`, and `imprintPlugin` ship with Fibel but are not in the default set. `mcpPlugin()` exposes visible Markdown to coding agents through a public read-only endpoint and adds setup instructions to the default footer. `imprintPlugin({ url, label })` adds a footer link to legal information hosted elsewhere.
 
 Use `defaultPlugins()` when adding behavior without replacing the standard site:
 
@@ -250,6 +250,28 @@ Keep it short and stable:
 If a model repeatedly calls tools instead of answering, simplify the operator guidance before increasing `maxTurns`. Extra turns increase latency and cost and can hide an unclear prompt.
 
 Assistant answers are rendered with Fibel's server-side Markdown and highlighting stack using compact chat typography. Raw model HTML, unsafe link protocols, and images are not rendered.
+
+## MCP for coding agents
+
+Append `mcpPlugin()` after `defaultPlugins()` when public documentation should be available to coding agents without model-provider calls or credentials:
+
+```ts
+import { defaultPlugins, defineFibel } from "@k2b/fibel";
+import { mcpPlugin } from "@k2b/fibel/plugins";
+
+export default defineFibel({
+  title: "Product Docs",
+  plugins: [...defaultPlugins(), mcpPlugin()],
+});
+```
+
+The Streamable HTTP endpoint is `${basePath}${internalPath}/mcp`. The plugin exposes only `search_docs({ query, locale? })` and `read_doc({ href })`. Both are read-only, use Fibel's existing search and page context, and exclude pages with `hidden: true`. Custom pages contribute their explicit `context` Markdown; the plugin never derives knowledge from rendered HTML.
+
+The default layout shows an **MCP** footer item with generic setup instructions. Its client script derives the absolute endpoint from the current browser origin plus Fibel routing. Do not introduce an `appUrl` config value for this; `siteUrl` remains the optional canonical URL for SEO and discovery.
+
+The endpoint implements no authentication and is appropriate only for public documentation. Fixed request, document, concurrency, and per-process rate limits are built in. `McpOptions.rateLimiter` accepts a shared `@k2b/sync` limiter when several replicas need one limit.
+
+Several Fibel instances remain separate MCP servers. Configure their endpoint URLs under distinct client names such as `product-docs` and `product-ui`; do not add a cross-instance registry or `site` tool argument unless a product explicitly needs unified search.
 
 ## Discovery routes
 
@@ -336,7 +358,7 @@ Keep these invariants:
 
 - Fibel creates each custom page under every configured locale.
 - `context` is either one shared Markdown string or `{ default, <locale> }`; `default` is the required language-neutral fallback.
-- `context.markdown` feeds search, raw `.md` routes, `llms.txt`, and the assistant's existing `search_docs` and `read_doc` tools.
+- `context.markdown` feeds search, raw `.md` routes, `llms.txt`, and the assistant and MCP `search_docs` and `read_doc` tools.
 - `context.html` is rendered once with the configured Markdown service and can be displayed by the page. Do not extract documentation from component HTML.
 - `layout: "article"` keeps normal article chrome. `layout: "full"` keeps the Fibel shell but gives the renderer a wider body without the article heading and pager.
 - Custom paths are locale-relative absolute paths such as `/panel-header`. They must not contain a locale, query, hash, trailing slash, or `.md` suffix. Collisions with Markdown pages fail at startup.
@@ -377,7 +399,7 @@ If the host already has an SSR config with another site template, create a secon
 
 ### Several Fibel instances
 
-Prefer separate instances when `/docs` and `/ui` should have separate navigation, search, assistant context, and chat sessions. Mount their Fetch apps under distinct `routing.basePath` values in one Hono/Bun process. Share the header config, theme cookie, assistant provider, and rate-limiter objects rather than adding search scopes or a Fibel multi-site manager.
+Prefer separate instances when `/docs` and `/ui` should have separate navigation, search, assistant context, MCP tools, and chat sessions. Mount their Fetch apps under distinct `routing.basePath` values in one Hono/Bun process. Share the header config, theme cookie, assistant provider, and rate-limiter objects rather than adding search scopes or a Fibel multi-site manager.
 
 Use the structured header config for cross-instance links:
 

@@ -295,7 +295,7 @@ function renderFooter(
         ${links.map((link) => `<a class="fibel-footer-link" href="${escapeHtml(resolveNavHref(link.value, page, context))}">${escapeHtml(link.label)}</a>`).join("")}
       </div>
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center md:ml-auto">
-        ${footerItems.length > 0 ? `<div class="flex items-center">${footerItems.join("")}</div>` : ""}
+        ${footerItems.length > 0 ? `<div class="flex items-center gap-4">${footerItems.join("")}</div>` : ""}
         <div class="flex items-center gap-2">
           ${themeToggle ? `<button class="fibel-icon-button md:hidden" type="button" data-theme-toggle aria-label="Toggle theme"><span data-theme-icon>${themeIcon(theme)}</span></button>` : ""}
           ${renderLocaleMenu(page, context, "footer")}

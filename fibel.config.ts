@@ -1,5 +1,5 @@
 import { defaultPlugins, defineFibel } from "./src";
-import { assistantPlugin, imprintPlugin, providerFromEnv } from "./src/plugins";
+import { assistantPlugin, imprintPlugin, mcpPlugin, providerFromEnv } from "./src/plugins";
 
 const assistant = process.env.FIBEL_AI_MODEL?.trim()
   ? [
@@ -38,6 +38,7 @@ export default defineFibel({
   plugins: [
     ...defaultPlugins(),
     imprintPlugin({ url: "https://impressum.valentin-kolb.com", label: "Impressum" }),
+    mcpPlugin(),
     ...assistant,
   ],
 });

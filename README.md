@@ -32,7 +32,7 @@ Fibel ships a Codex agent skill for documentation work. Install it in agent envi
 bunx skills add k2b-dev/fibel
 ```
 
-The skill tells agents how to configure Fibel, write Markdown pages, use raw `.md` routes, extend plugins, mount the Fetch app, and verify changes.
+The skill tells agents how to configure Fibel, write Markdown pages, use raw `.md` routes, expose documentation through MCP, extend plugins, mount the Fetch app, and verify changes.
 
 When working from this repository:
 
@@ -58,6 +58,7 @@ bun run src/cli.ts dev --port 5173
 - SEO routes for `robots.txt`, `sitemap.xml`, `favicon.ico`, and `favicon.svg`
 - Language alternates, social cards, and structured data on every page
 - `llms.txt` and `llms-full.txt` routes for language models
+- An optional public MCP endpoint for coding agents
 - A Tailwind-based default theme
 - A small plugin API for replacing or extending built-in behavior
 
@@ -252,6 +253,22 @@ Fibel publishes an `llms.txt` index next to the raw Markdown routes.
 
 The index lists each page grouped by sidebar section and links to the raw `.md` route with its description. Hidden pages are excluded.
 
+## MCP for coding agents
+
+The optional MCP plugin exposes the same visible Markdown knowledge to coding agents through two read-only tools. It runs inside the existing Fetch app and adds an **MCP** setup item to the default footer.
+
+```ts
+import { defaultPlugins, defineFibel } from "@k2b/fibel";
+import { mcpPlugin } from "@k2b/fibel/plugins";
+
+export default defineFibel({
+  title: "Product Docs",
+  plugins: [...defaultPlugins(), mcpPlugin()],
+});
+```
+
+The endpoint is `${basePath}${internalPath}/mcp`, for example `/docs/_fibel/mcp`. It has no authentication and is intended for public documentation. Multiple Fibel instances remain separate MCP servers, so `/docs` and `/ui` keep independent search scopes. The [MCP guide](https://fibel.dev/en/mcp) covers setup, limits, and shared rate limiting.
+
 ## Search
 
 Fibel builds a search index from page title, description, section, and Markdown body. The default theme includes a spotlight search dialog that opens with `/` or `Mod+K`.
@@ -285,7 +302,7 @@ export default {
 
 For a larger app, mount `fibel.fetch` below the same public route configured as `routing.basePath`.
 
-Several Fibel apps can be mounted in one process. Each instance then has its own navigation, search index, assistant context, and discovery routes while sharing the same header config, theme cookie, provider, rate limiters, and deployment.
+Several Fibel apps can be mounted in one process. Each instance then has its own navigation, search index, assistant context, MCP endpoint, and discovery routes while sharing the same header config, theme cookie, provider, rate limiters, and deployment.
 
 ## Docker
 

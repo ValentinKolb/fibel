@@ -3,9 +3,9 @@ title: Built-in plugins
 navTitle: Overview
 section: Built-in plugins
 order: 25
-description: Fibel ships with a default plugin set for Markdown, theme handling, i18n, SEO, assets, search, powered-by attribution, and layout.
+description: Fibel ships with default plugins for Markdown, themes, i18n, SEO, assets, search, attribution, and layout, plus optional assistant and MCP integrations.
 tags: [plugins, built-in]
-updated: 2026-06-09
+updated: 2026-07-27
 ---
 
 # Built-in plugins
@@ -37,6 +37,8 @@ The default set includes:
 Fibel ships plugins that are not part of the default set because they need configuration.
 
 `assistantPlugin` adds a bounded documentation chat powered by `@k2b/nessi`. It uses in-memory rate limits by default and keeps provider credentials on the server. See [Documentation assistant](/en/assistant).
+
+`mcpPlugin` exposes visible documentation to coding agents through a public, read-only Streamable HTTP endpoint. It also adds setup instructions to the footer. See [MCP for coding agents](/en/mcp).
 
 `imprintPlugin` adds a footer link to legal information hosted somewhere else. Use it when the imprint belongs to the company or person behind several sites and should not be maintained as a documentation page.
 

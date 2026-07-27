@@ -3,9 +3,9 @@ title: Integrierte Plugins
 navTitle: Überblick
 section: Integrierte Plugins
 order: 25
-description: Fibel liefert ein Standard-Plugin-Set für Markdown, Theme, i18n, SEO, Assets, Suche, Powered-by-Hinweis und Layout.
+description: Fibel liefert Standard-Plugins für Markdown, Theme, i18n, SEO, Assets, Suche, Attribution und Layout sowie optionale Assistant- und MCP-Integrationen.
 tags: [plugins, integriert]
-updated: 2026-06-09
+updated: 2026-07-27
 ---
 
 # Integrierte Plugins
@@ -37,6 +37,8 @@ Das Standard-Set enthält:
 Fibel liefert Plugins mit, die nicht im Standard-Set stecken, weil sie Konfiguration brauchen.
 
 `assistantPlugin` ergänzt einen begrenzten Dokumentationschat mit `@k2b/nessi`. Das Plugin nutzt standardmäßig In-Memory-Rate-Limits und behält Provider-Zugangsdaten auf dem Server. Siehe [Dokumentationsassistent](/de/assistant).
+
+`mcpPlugin` stellt sichtbare Dokumentation über einen öffentlichen, schreibgeschützten Streamable-HTTP-Endpunkt für Coding-Agenten bereit. Zusätzlich erscheinen Einrichtungsinformationen im Footer. Siehe [MCP für Coding-Agenten](/de/mcp).
 
 `imprintPlugin` ergänzt einen Footer-Link auf rechtliche Angaben, die an anderer Stelle liegen. Das Plugin eignet sich, wenn das Impressum zur Firma oder Person hinter mehreren Seiten gehört und nicht als Dokumentationsseite gepflegt werden soll.
 
