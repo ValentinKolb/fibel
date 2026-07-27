@@ -50,7 +50,7 @@ export function renderFibelHeader(options: RenderFibelHeaderOptions) {
         </button>`
             : ""
         }
-        <a class="absolute left-1/2 flex min-w-0 -translate-x-1/2 items-center text-2xl font-medium leading-[1.3] tracking-tight md:static md:translate-x-0 md:text-[2rem]" style="color:#d69e2e" href="${escapeHtml(homeHref)}">
+        <a class="fibel-brand absolute left-1/2 flex min-w-0 -translate-x-1/2 items-center text-2xl font-medium leading-[1.3] tracking-tight md:static md:translate-x-0 md:text-[2rem]" href="${escapeHtml(homeHref)}">
           <span class="max-w-[calc(100vw-9.5rem)] truncate lowercase md:max-w-none">${escapeHtml(title)}</span><span class="ml-0.5 opacity-80">|</span>
         </a>
         ${renderLinks(links)}
@@ -111,13 +111,13 @@ function renderLocaleMenu(locales: FibelHeaderLocale[]) {
       ${locales
         .map(
           (locale) =>
-            `<a class="flex items-center justify-between gap-3 rounded-xl px-3 py-2 text-sm outline-none transition ${
+            `<a class="fibel-locale-option ${locale.current ? "is-current" : ""} flex items-center justify-between gap-3 rounded-xl px-3 py-2 text-sm outline-none transition ${
               locale.current
-                ? "text-[#b7791f] dark:text-[#f6c453]"
+                ? ""
                 : "text-zinc-700 hover:bg-zinc-100 focus:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-white/10 dark:focus:bg-white/10"
             }" href="${escapeHtml(locale.href)}" role="option" aria-selected="${Boolean(locale.current)}" tabindex="-1"><span>${escapeHtml(locale.label)}</span>${
               locale.current
-                ? `<span class="text-[#d69e2e] dark:text-[#f6c453]">${checkIcon("h-4 w-4")}</span>`
+                ? `<span class="fibel-locale-check">${checkIcon("h-4 w-4")}</span>`
                 : ""
             }</a>`,
         )

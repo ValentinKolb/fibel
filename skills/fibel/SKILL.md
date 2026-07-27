@@ -143,6 +143,8 @@ Supported frontmatter:
 - `updated`: Date chip below the page title, also used as `article:modified_time` and sitemap `lastmod`.
 - `image`: Social preview image for this page, overriding `seo.ogImage`.
 
+Before changing Fibel presentation or Markdown rendering, read `references/theme-and-markdown.md` for the public accent-token and table-wrapper contracts.
+
 ## Documentation style for Fibel sites
 
 When writing documentation for a Fibel site, use a professional product/developer documentation style.

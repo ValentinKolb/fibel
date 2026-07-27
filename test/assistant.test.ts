@@ -127,7 +127,11 @@ describe("assistant plugin", () => {
 
     const styles = await app.fetch(new Request("http://localhost/_fibel/assistant.css"));
     expect(styles.status).toBe(200);
-    expect(await styles.text()).toContain(".fibel-assistant-scroll-locked");
+    const assistantCss = await styles.text();
+    expect(assistantCss).toContain(".fibel-assistant-scroll-locked");
+    expect(assistantCss).toContain("var(--fibel-focus-ring)");
+    expect(assistantCss).toContain(".fibel-table-scroll");
+    expect(assistantCss).not.toMatch(/table\s*\{\s*display:\s*block/);
     expect((await app.fetch(new Request("http://localhost/assistant.js"))).status).toBe(404);
 
     const mounted = await createFibelApp({
@@ -278,12 +282,13 @@ describe("assistant plugin", () => {
 
   test("renders compact assistant Markdown without trusting model HTML or unsafe links", () => {
     const html = renderAssistantMarkdown(
-      "# Small\n\nUse **bold** and [docs](/en), not [unsafe](javascript:alert(1)).\n\n<script>alert(1)</script>",
+      "# Small\n\nUse **bold** and [docs](/en), not [unsafe](javascript:alert(1)).\n\n| Name | Value |\n| --- | --- |\n| Theme | Dark |\n\n<script>alert(1)</script>",
     );
 
     expect(html).toContain("<h1>Small</h1>");
     expect(html).toContain("<strong>bold</strong>");
     expect(html).toContain('<a href="/en">docs</a>');
+    expect(html).toContain('<div class="fibel-table-scroll"><table>');
     expect(html).not.toContain('href="javascript:');
     expect(html).toContain("&lt;script&gt;alert(1)&lt;/script&gt;");
     expect(html).not.toContain("<script>");

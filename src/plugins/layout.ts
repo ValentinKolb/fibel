@@ -242,7 +242,7 @@ function renderNav(nav: NavSection[], page: FibelPage) {
             ${section.pages
               .map((item) => {
                 const active = item.id === page.id;
-                return `<a class="block border-l-2 py-1.5 pl-4 text-[0.98rem] leading-6 ${active ? "border-[#d69e2e] font-semibold text-zinc-950 dark:border-[#f6c453] dark:text-white" : "border-transparent text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white"}" href="${item.href}">${escapeHtml(item.meta.navTitle)}</a>`;
+                return `<a class="fibel-sidebar-link ${active ? "is-active font-semibold text-zinc-950 dark:text-white" : "border-transparent text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white"} block border-l-2 py-1.5 pl-4 text-[0.98rem] leading-6" href="${item.href}">${escapeHtml(item.meta.navTitle)}</a>`;
               })
               .join("")}
           </div>
@@ -266,7 +266,7 @@ function renderLocaleMenu(page: FibelPage, context: FibelContext, placement: "he
       ${sameSlug
         .map((candidate) => {
           const active = candidate.locale.code === page.locale.code;
-          return `<a class="flex items-center justify-between gap-3 rounded-xl px-3 py-2 text-sm outline-none transition ${active ? "text-[#b7791f] dark:text-[#f6c453]" : "text-zinc-700 hover:bg-zinc-100 focus:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-white/10 dark:focus:bg-white/10"}" href="${candidate.href}" role="option" aria-selected="${active}" tabindex="-1"><span>${escapeHtml(candidate.locale.label)}</span>${active ? `<span class="text-[#d69e2e] dark:text-[#f6c453]">${checkIcon("h-4 w-4")}</span>` : ""}</a>`;
+          return `<a class="fibel-locale-option ${active ? "is-current" : "text-zinc-700 hover:bg-zinc-100 focus:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-white/10 dark:focus:bg-white/10"} flex items-center justify-between gap-3 rounded-xl px-3 py-2 text-sm outline-none transition" href="${candidate.href}" role="option" aria-selected="${active}" tabindex="-1"><span>${escapeHtml(candidate.locale.label)}</span>${active ? `<span class="fibel-locale-check">${checkIcon("h-4 w-4")}</span>` : ""}</a>`;
         })
         .join("")}
     </div>
@@ -290,7 +290,7 @@ function renderFooter(
     <div class="mx-auto flex max-w-[120rem] flex-col gap-4 px-5 py-7 text-sm text-zinc-500 dark:text-zinc-400 md:flex-row md:items-center md:justify-between lg:px-8">
       <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
         <span>© ${new Date().getFullYear()} ${escapeHtml(context.config.title)}</span>
-        ${links.map((link) => `<a class="hover:text-[#b7791f] dark:hover:text-[#f6c453]" href="${escapeHtml(resolveNavHref(link.value, page, context))}">${escapeHtml(link.label)}</a>`).join("")}
+        ${links.map((link) => `<a class="fibel-footer-link" href="${escapeHtml(resolveNavHref(link.value, page, context))}">${escapeHtml(link.label)}</a>`).join("")}
       </div>
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center md:ml-auto">
         ${footerItems.length > 0 ? `<div class="flex items-center">${footerItems.join("")}</div>` : ""}
@@ -371,8 +371,8 @@ function renderPager(page: FibelPage, pages: FibelPage[]) {
   const prev = index > 0 ? ordered[index - 1] : undefined;
   const next = index >= 0 && index < ordered.length - 1 ? ordered[index + 1] : undefined;
   return `<div class="mt-16 grid gap-4 border-t border-zinc-200 pt-7 dark:border-white/10 sm:grid-cols-2">
-    ${prev ? `<a class="group rounded-lg border border-zinc-200 bg-white p-5 transition hover:border-[#d69e2e]/60 hover:shadow-[0_8px_28px_rgb(0_0_0_/_0.08)] dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-[#f6c453]/55" href="${prev.href}"><span class="text-xs text-zinc-500 dark:text-zinc-400">Previous</span><strong class="mt-1 block text-zinc-900 group-hover:text-[#b7791f] dark:text-white dark:group-hover:text-[#f6c453]">${escapeHtml(prev.meta.navTitle)}</strong></a>` : "<div></div>"}
-    ${next ? `<a class="group rounded-lg border border-zinc-200 bg-white p-5 text-right transition hover:border-[#d69e2e]/60 hover:shadow-[0_8px_28px_rgb(0_0_0_/_0.08)] dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-[#f6c453]/55" href="${next.href}"><span class="text-xs text-zinc-500 dark:text-zinc-400">Next</span><strong class="mt-1 block text-zinc-900 group-hover:text-[#b7791f] dark:text-white dark:group-hover:text-[#f6c453]">${escapeHtml(next.meta.navTitle)}</strong></a>` : "<div></div>"}
+    ${prev ? `<a class="fibel-pager-link group rounded-lg border border-zinc-200 bg-white p-5 transition hover:shadow-[0_8px_28px_rgb(0_0_0_/_0.08)] dark:border-white/10 dark:bg-white/[0.03]" href="${prev.href}"><span class="text-xs text-zinc-500 dark:text-zinc-400">Previous</span><strong class="fibel-pager-title mt-1 block text-zinc-900 dark:text-white">${escapeHtml(prev.meta.navTitle)}</strong></a>` : "<div></div>"}
+    ${next ? `<a class="fibel-pager-link group rounded-lg border border-zinc-200 bg-white p-5 text-right transition hover:shadow-[0_8px_28px_rgb(0_0_0_/_0.08)] dark:border-white/10 dark:bg-white/[0.03]" href="${next.href}"><span class="text-xs text-zinc-500 dark:text-zinc-400">Next</span><strong class="fibel-pager-title mt-1 block text-zinc-900 dark:text-white">${escapeHtml(next.meta.navTitle)}</strong></a>` : "<div></div>"}
   </div>`;
 }
 

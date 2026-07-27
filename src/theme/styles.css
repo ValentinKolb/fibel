@@ -7,7 +7,21 @@
 
 :root {
   --fibel-nav-h: 4rem;
+  --fibel-accent: #d69e2e;
+  --fibel-accent-strong: #b7791f;
+  --fibel-accent-foreground: #8a5a12;
+  --fibel-accent-foreground-strong: #6f470d;
+  --fibel-accent-surface: #fffaf0;
+  --fibel-focus-ring: var(--fibel-accent);
   font-family: "Aptos", "Segoe UI", "Helvetica Neue", ui-sans-serif, system-ui, sans-serif;
+}
+
+.dark {
+  --fibel-accent: #f6c453;
+  --fibel-accent-strong: #f6c453;
+  --fibel-accent-foreground: #f6c453;
+  --fibel-accent-foreground-strong: #f6c453;
+  --fibel-accent-surface: rgb(246 196 83 / 0.08);
 }
 
 @layer base {
@@ -72,7 +86,38 @@
   }
 
   .fibel-header-link.is-active {
-    @apply border-[#d69e2e] text-zinc-950 dark:border-[#f6c453] dark:text-white;
+    @apply text-zinc-950 dark:text-white;
+    border-color: var(--fibel-accent);
+  }
+
+  .fibel-brand,
+  .fibel-locale-check {
+    color: var(--fibel-accent);
+  }
+
+  .fibel-locale-option.is-current,
+  .search-result-section {
+    color: var(--fibel-accent-strong);
+  }
+
+  .fibel-sidebar-link.is-active {
+    border-color: var(--fibel-accent);
+  }
+
+  .fibel-footer-link:hover {
+    color: var(--fibel-accent-strong);
+  }
+
+  .fibel-pager-link:hover {
+    border-color: color-mix(in srgb, var(--fibel-accent) 60%, transparent);
+  }
+
+  .dark .fibel-pager-link:hover {
+    border-color: color-mix(in srgb, var(--fibel-accent) 55%, transparent);
+  }
+
+  .fibel-pager-link:hover .fibel-pager-title {
+    color: var(--fibel-accent-strong);
   }
 
   .fibel-prose {
@@ -100,7 +145,15 @@
   }
 
   .fibel-prose .heading-copy {
-    @apply ml-auto inline-grid h-8 w-8 shrink-0 place-items-center rounded-full border border-transparent text-zinc-400 opacity-0 transition hover:border-zinc-200 hover:bg-zinc-100 hover:text-[#b7791f] focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-[#d69e2e] dark:hover:border-white/10 dark:hover:bg-white/10 dark:hover:text-[#f6c453] dark:focus:ring-[#f6c453];
+    @apply ml-auto inline-grid h-8 w-8 shrink-0 place-items-center rounded-full border border-transparent text-zinc-400 opacity-0 transition hover:border-zinc-200 hover:bg-zinc-100 focus:opacity-100 focus:outline-none dark:hover:border-white/10 dark:hover:bg-white/10;
+  }
+
+  .fibel-prose .heading-copy:hover {
+    color: var(--fibel-accent-strong);
+  }
+
+  .fibel-prose .heading-copy:focus {
+    box-shadow: 0 0 0 2px var(--fibel-focus-ring);
   }
 
   .fibel-prose .heading-anchor:hover .heading-copy,
@@ -118,7 +171,13 @@
   }
 
   .fibel-prose a {
-    @apply font-medium text-[#b7791f] underline decoration-[#d69e2e]/35 underline-offset-4 hover:decoration-[#b7791f] dark:text-[#f6c453] dark:decoration-[#f6c453]/35;
+    @apply font-medium underline underline-offset-4;
+    color: var(--fibel-accent-strong);
+    text-decoration-color: color-mix(in srgb, var(--fibel-accent) 35%, transparent);
+  }
+
+  .fibel-prose a:hover {
+    text-decoration-color: var(--fibel-accent-strong);
   }
 
   .fibel-prose ul {
@@ -205,8 +264,12 @@
     @apply text-sky-200;
   }
 
-  .fibel-prose table {
-    @apply block w-full overflow-x-auto rounded-lg border border-slate-200 text-sm dark:border-white/10;
+  .fibel-prose .fibel-table-scroll {
+    @apply w-full overflow-x-auto rounded-lg border border-slate-200 dark:border-white/10;
+  }
+
+  .fibel-prose .fibel-table-scroll table {
+    @apply w-full min-w-max border-collapse text-sm;
   }
 
   .fibel-prose th {
@@ -231,11 +294,31 @@
   }
 
   .page-chip-accent {
-    @apply border-[#d69e2e]/35 bg-[#d69e2e]/10 text-[#8a5a12] dark:border-[#f6c453]/25 dark:bg-[#f6c453]/10 dark:text-[#f6c453];
+    border-color: color-mix(in srgb, var(--fibel-accent) 35%, transparent);
+    background: var(--fibel-accent-surface);
+    color: var(--fibel-accent-foreground);
+  }
+
+  .dark .page-chip-accent {
+    border-color: color-mix(in srgb, var(--fibel-accent) 25%, transparent);
   }
 
   .page-chip-button {
-    @apply hover:border-[#d69e2e]/50 hover:bg-[#d69e2e]/10 hover:text-[#8a5a12] focus:outline-none focus:ring-2 focus:ring-[#d69e2e] dark:hover:border-[#f6c453]/35 dark:hover:bg-[#f6c453]/10 dark:hover:text-[#f6c453] dark:focus:ring-[#f6c453];
+    @apply focus:outline-none;
+  }
+
+  .page-chip-button:hover {
+    border-color: color-mix(in srgb, var(--fibel-accent) 50%, transparent);
+    background: var(--fibel-accent-surface);
+    color: var(--fibel-accent-foreground);
+  }
+
+  .dark .page-chip-button:hover {
+    border-color: color-mix(in srgb, var(--fibel-accent) 35%, transparent);
+  }
+
+  .page-chip-button:focus {
+    box-shadow: 0 0 0 2px var(--fibel-focus-ring);
   }
 
   .page-chip-button[data-copied="true"] {
@@ -243,7 +326,21 @@
   }
 
   .page-chip-action {
-    @apply inline-grid h-8 w-8 place-items-center rounded-full border border-zinc-200 bg-zinc-50 text-zinc-600 transition hover:border-[#d69e2e]/50 hover:bg-[#d69e2e]/10 hover:text-[#8a5a12] focus:outline-none focus:ring-2 focus:ring-[#d69e2e] dark:border-white/10 dark:bg-white/[0.04] dark:text-zinc-300 dark:hover:border-[#f6c453]/35 dark:hover:bg-[#f6c453]/10 dark:hover:text-[#f6c453] dark:focus:ring-[#f6c453];
+    @apply inline-grid h-8 w-8 place-items-center rounded-full border border-zinc-200 bg-zinc-50 text-zinc-600 transition focus:outline-none dark:border-white/10 dark:bg-white/[0.04] dark:text-zinc-300;
+  }
+
+  .page-chip-action:hover {
+    border-color: color-mix(in srgb, var(--fibel-accent) 50%, transparent);
+    background: var(--fibel-accent-surface);
+    color: var(--fibel-accent-foreground);
+  }
+
+  .dark .page-chip-action:hover {
+    border-color: color-mix(in srgb, var(--fibel-accent) 35%, transparent);
+  }
+
+  .page-chip-action:focus {
+    box-shadow: 0 0 0 2px var(--fibel-focus-ring);
   }
 
   .page-chip-action[data-copied="true"] {
@@ -255,7 +352,11 @@
   }
 
   .fibel-powered-by a {
-    @apply font-medium text-zinc-600 transition hover:text-[#b7791f] dark:text-zinc-300 dark:hover:text-[#f6c453];
+    @apply font-medium text-zinc-600 transition dark:text-zinc-300;
+  }
+
+  .fibel-powered-by a:hover {
+    color: var(--fibel-accent-strong);
   }
 }
 

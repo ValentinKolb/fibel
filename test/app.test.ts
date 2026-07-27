@@ -66,6 +66,39 @@ describe("fibel app", () => {
     expect(english).toContain('href="/en/imprint"');
   });
 
+  test("publishes semantic accent tokens across the shared UI", async () => {
+    const app = await createFibelApp(config);
+    const html = await (await app.fetch(new Request("http://localhost/en/theme"))).text();
+    const styles = await (await app.fetch(new Request("http://localhost/_fibel/styles.css"))).text();
+    const client = await (await app.fetch(new Request("http://localhost/_fibel/client.js"))).text();
+
+    expect(styles).toContain("--fibel-accent:#d69e2e");
+    expect(styles).toContain("--fibel-accent-strong:#b7791f");
+    expect(styles).toContain("--fibel-accent-foreground:#8a5a12");
+    expect(styles).toContain("--fibel-accent-surface:#fffaf0");
+    expect(styles).toContain("--fibel-focus-ring:var(--fibel-accent)");
+    expect(styles).toContain("color:var(--fibel-accent-strong)");
+    expect(styles).toMatch(/\.page-chip-accent\{[^}]*background:var\(--fibel-accent-surface\)/);
+    expect(html).toContain("fibel-brand");
+    expect(html).toContain("fibel-sidebar-link is-active");
+    expect(html).toContain("fibel-pager-link");
+    expect(client).toContain("search-result-section");
+    expect(`${html}${client}`).not.toContain("text-[#b7791f]");
+    expect(`${html}${client}`).not.toContain("border-[#d69e2e]");
+  });
+
+  test("wraps Markdown tables without changing table display semantics", async () => {
+    const app = await createFibelApp(config);
+    const html = await (await app.fetch(new Request("http://localhost/en/theme"))).text();
+    const styles = await (await app.fetch(new Request("http://localhost/_fibel/styles.css"))).text();
+
+    expect(html).toContain('<div class="fibel-table-scroll"><table>');
+    expect(styles).toMatch(/\.fibel-prose \.fibel-table-scroll\{[^}]*overflow-x:auto/);
+    expect(styles).toMatch(/\.fibel-prose \.fibel-table-scroll table\{[^}]*width:100%/);
+    expect(styles).toMatch(/\.fibel-prose \.fibel-table-scroll table\{[^}]*min-width:max-content/);
+    expect(styles).not.toContain(".fibel-prose table{display:block");
+  });
+
   test("adds an external imprint link through a plugin", async () => {
     const { imprintPlugin } = await import("../src/plugins");
     const app = await createFibelApp({

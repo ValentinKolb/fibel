@@ -151,7 +151,7 @@ input?.addEventListener("input", () => {
     const data = await response.json();
     const items = data.results || [];
     results.innerHTML = items.length
-      ? items.map((item, index) => '<a class="search-result block rounded-lg px-3 py-3 outline-none hover:bg-zinc-100 dark:hover:bg-white/10" href="' + item.href + '" data-search-result role="option" aria-selected="' + (index === 0 ? "true" : "false") + '"><span class="text-xs font-medium text-[#b7791f] dark:text-[#f6c453]">' + escapeText(item.section) + '</span><strong class="mt-1 block text-zinc-950 dark:text-white">' + escapeText(item.title) + '</strong><span class="mt-1 block text-sm text-zinc-500 dark:text-zinc-400">' + escapeText(item.description) + '</span></a>').join("")
+      ? items.map((item, index) => '<a class="search-result block rounded-lg px-3 py-3 outline-none hover:bg-zinc-100 dark:hover:bg-white/10" href="' + item.href + '" data-search-result role="option" aria-selected="' + (index === 0 ? "true" : "false") + '"><span class="search-result-section text-xs font-medium">' + escapeText(item.section) + '</span><strong class="mt-1 block text-zinc-950 dark:text-white">' + escapeText(item.title) + '</strong><span class="mt-1 block text-sm text-zinc-500 dark:text-zinc-400">' + escapeText(item.description) + '</span></a>').join("")
       : '<p class="px-3 py-8 text-center text-sm text-slate-500 dark:text-slate-400">No matches.</p>';
     searchItems = Array.from(results.querySelectorAll("[data-search-result]"));
     selectedSearchIndex = searchItems.length > 0 ? 0 : -1;

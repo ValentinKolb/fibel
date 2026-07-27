@@ -1,4 +1,4 @@
-import { Marked, type Tokens } from "marked";
+import { Marked, type Renderer, type Tokens } from "marked";
 import { highlight } from "@k2b/stdlib";
 import type { FibelPlugin } from "../types";
 import { escapeHtml, slugify } from "../utils";
@@ -36,6 +36,9 @@ function renderMarkdown(markdown: string) {
       codespan(token: Tokens.Codespan) {
         return `<code>${escapeHtml(token.text)}</code>`;
       },
+      table(token: Tokens.Table) {
+        return renderTable.call(this, token);
+      },
     },
   });
 
@@ -70,6 +73,9 @@ export function renderAssistantMarkdown(markdown: string) {
       image(token: Tokens.Image) {
         return escapeHtml(token.text);
       },
+      table(token: Tokens.Table) {
+        return renderTable.call(this, token);
+      },
     },
   });
 
@@ -86,6 +92,21 @@ function renderCode(token: Tokens.Code) {
   const highlighted = highlightCode(token.text, language);
   const copyPayload = encodeCopyPayload(token.text);
   return `<div class="code-frame" data-language="${escapeHtml(label)}"><div class="code-toolbar"><span class="code-language">${escapeHtml(label)}</span><button class="code-copy" type="button" data-copy-code="${copyPayload}" aria-label="Copy ${escapeHtml(label)} code"><span class="code-copy-icon" aria-hidden="true">${copyIcon()}</span></button></div><pre><code>${highlighted}</code></pre></div>`;
+}
+
+function renderTable(this: Renderer, token: Tokens.Table) {
+  const header = this.tablerow({
+    text: token.header.map((cell) => this.tablecell(cell)).join(""),
+  });
+  const rows = token.rows
+    .map((row) =>
+      this.tablerow({
+        text: row.map((cell) => this.tablecell(cell)).join(""),
+      }),
+    )
+    .join("");
+  const body = rows ? `<tbody>${rows}</tbody>` : "";
+  return `<div class="fibel-table-scroll"><table><thead>${header}</thead>${body}</table></div>\n`;
 }
 
 function safeAssistantHref(href: string) {
