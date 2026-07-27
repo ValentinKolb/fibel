@@ -18,6 +18,7 @@ export type FibelThemeConfig = {
 };
 
 export type FibelSeoConfig = {
+  favicon?: string;
   ogImage?: string;
   twitterSite?: string;
   disallow?: string[];
@@ -125,7 +126,7 @@ export type ResolvedFibelConfig = Required<
   locales: LocaleConfig[];
   defaultLocale: string;
   theme: Required<FibelThemeConfig>;
-  seo: { ogImage?: string; twitterSite?: string; disallow: string[] };
+  seo: { favicon?: string; ogImage?: string; twitterSite?: string; disallow: string[] };
   header: FibelHeaderConfig;
   headerLinks: NavLink[];
   footerLinks: NavLink[];

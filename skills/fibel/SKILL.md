@@ -89,6 +89,7 @@ export default defineFibel({
     assetsPath: "/assets",
   },
   seo: {
+    favicon: "/assets/logo.svg",
     ogImage: "/assets/social.png",
     twitterSite: "@example",
     disallow: ["/en/internal"],
@@ -107,7 +108,7 @@ Keep these invariants:
 - `content` defaults to `docs`, `assets` defaults to `assets`, and both resolve relative to `root`, which defaults to the current working directory.
 - When `locales` is omitted it is inferred from the folder names under the content directory, and `defaultLocale` falls back to the first entry.
 - The dev server watches content, assets, and the config file only. Changing plugin or other TypeScript code needs a restart.
-- `seo` is optional. `ogImage` is the default social preview image and is resolved under `basePath`, `twitterSite` is the handle credited on cards, and `disallow` adds paths to `robots.txt`. Set `siteUrl` in any published project, otherwise these outputs stay relative and crawlers reject the sitemap.
+- `seo` is optional. `favicon` is a public URL written as configured and falls back to Fibel's internal SVG. `ogImage` is the default social preview image and is resolved under `basePath`, `twitterSite` is the handle credited on cards, and `disallow` adds paths to `robots.txt`. Set `siteUrl` in any published project, otherwise these outputs stay relative and crawlers reject the sitemap.
 - Local header and footer links are resolved against the locale of the current page. Write them as page slugs without a locale segment.
 - External URLs are left as-is in both link lists.
 
@@ -252,7 +253,7 @@ Assistant answers are rendered with Fibel's server-side Markdown and highlightin
 
 ## Discovery routes
 
-`seoPlugin` serves `robots.txt`, `sitemap.xml`, and the favicon, and pushes language alternates, social card tags, and JSON-LD into the head of every page. `llmsPlugin` serves `llms.txt` and `llms-full.txt`, per locale and for the default locale at the root.
+`seoPlugin` serves `robots.txt`, `sitemap.xml`, and the built-in fallback favicon, and pushes language alternates, social card tags, and JSON-LD into the head of every page. Set `seo.favicon` to a public URL when the host should supply its own icon; Fibel writes that URL as configured, which lets several mounted instances share one host-level asset. `llmsPlugin` serves `llms.txt` and `llms-full.txt`, per locale and for the default locale at the root.
 
 Set `siteUrl` in any project that will be published. Without it these routes emit relative URLs, which crawlers reject.
 

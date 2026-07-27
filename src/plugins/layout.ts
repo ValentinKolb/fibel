@@ -61,7 +61,9 @@ function renderDocument(
   const config = context.config;
   const stylesheet = joinUrl(config.routing.basePath, config.routing.internalPath, "styles.css");
   const client = joinUrl(config.routing.basePath, config.routing.internalPath, "client.js");
-  const favicon = joinUrl(config.routing.basePath, config.routing.internalPath, "favicon.svg");
+  const favicon =
+    config.seo.favicon ??
+    joinUrl(config.routing.basePath, config.routing.internalPath, "favicon.svg");
   const searchUrl = joinUrl(config.routing.basePath, config.routing.internalPath, "search");
   const canonical = config.siteUrl ? `${config.siteUrl}${page.href}` : page.href;
   const title = page.meta.title === config.title ? page.meta.title : `${page.meta.title} - ${config.title}`;
@@ -81,7 +83,7 @@ function renderDocument(
     <meta property="og:title" content="${escapeHtml(page.meta.title)}">
     <meta property="og:description" content="${escapeHtml(page.meta.description)}">
     <meta property="og:url" content="${escapeHtml(canonical)}">
-    <link rel="icon" type="image/svg+xml" href="${favicon}">
+    <link rel="icon" href="${escapeHtml(favicon)}">
     <link rel="stylesheet" href="${stylesheet}">${renderHeadTags(page, context)}
   </head>
   <body class="min-h-screen bg-white text-zinc-950 antialiased dark:bg-zinc-950 dark:text-zinc-100">

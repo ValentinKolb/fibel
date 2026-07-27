@@ -60,6 +60,7 @@ export function resolveConfig(config: FibelConfig): ResolvedFibelConfig {
       cookieName: config.theme?.cookieName ?? "fibel_theme",
     },
     seo: {
+      favicon: config.seo?.favicon,
       ogImage: config.seo?.ogImage,
       twitterSite: config.seo?.twitterSite,
       disallow: config.seo?.disallow ?? [],

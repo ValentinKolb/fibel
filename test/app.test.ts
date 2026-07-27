@@ -167,6 +167,32 @@ describe("fibel app", () => {
     expect(head).toContain('<meta name="twitter:site" content="@fibel">');
   });
 
+  test("uses a configured favicon and keeps the built-in fallback route", async () => {
+    const app = await createFibelApp({
+      ...config,
+      routing: { ...config.routing, basePath: "/docs" },
+      seo: { ...config.seo, favicon: "/assets/cloud-logo.svg" },
+    });
+    const head = (await (await app.fetch(new Request("http://localhost/docs/en"))).text()).split("</head>")[0] ?? "";
+
+    expect(head).toContain('<link rel="icon" href="/assets/cloud-logo.svg">');
+    expect(head).not.toContain('href="/docs/_fibel/favicon.svg"');
+
+    const fallback = await app.fetch(new Request("http://localhost/docs/_fibel/favicon.svg"));
+    expect(fallback.status).toBe(200);
+    expect(fallback.headers.get("content-type")).toContain("image/svg+xml");
+  });
+
+  test("uses the built-in favicon by default", async () => {
+    const app = await createFibelApp({
+      ...config,
+      routing: { ...config.routing, basePath: "/docs" },
+    });
+    const head = (await (await app.fetch(new Request("http://localhost/docs/en"))).text()).split("</head>")[0] ?? "";
+
+    expect(head).toContain('<link rel="icon" href="/docs/_fibel/favicon.svg">');
+  });
+
   test("builds a sitemap with absolute urls, lastmod, and alternates", async () => {
     const app = await createFibelApp(config);
     const sitemap = await (await app.fetch(new Request("http://localhost/sitemap.xml"))).text();

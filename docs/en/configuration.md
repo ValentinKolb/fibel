@@ -83,6 +83,7 @@ export default defineFibel({
   title: "My Docs",
   siteUrl: "https://docs.example.com",
   seo: {
+    favicon: "/assets/logo.svg",
     ogImage: "/assets/social.png",
     twitterSite: "@example",
     disallow: ["/en/internal"],
@@ -92,7 +93,7 @@ export default defineFibel({
 
 Set `siteUrl` for search engines. It turns canonical URLs, language alternates, and sitemap entries into absolute URLs. Without it Fibel falls back to relative paths and the sitemap is not valid for crawlers.
 
-`ogImage` is the social preview image used when a page does not define its own. Local paths are resolved under the base path and turned into absolute URLs. `twitterSite` is the handle credited on cards. `disallow` adds paths to `robots.txt`.
+`favicon` is a public URL written into the document head as configured. Without it Fibel uses the built-in icon under its internal path. `ogImage` is the social preview image used when a page does not define its own. Local image paths are resolved under the base path and turned into absolute URLs. `twitterSite` is the handle credited on cards. `disallow` adds paths to `robots.txt`.
 
 Pages marked `hidden` are excluded from the sitemap and get a `noindex` meta tag.
 

@@ -46,6 +46,19 @@ The sitemap lists every visible page with an absolute URL, its `updated` date as
 
 Pages with `hidden: true` are left out of the sitemap and rendered with a `noindex` meta tag.
 
+## Favicon
+
+```ts
+export default defineFibel({
+  title: "My Docs",
+  seo: {
+    favicon: "/assets/logo.svg",
+  },
+});
+```
+
+`favicon` is the public URL used by the document's icon link. Fibel writes it as configured, so a host-level path such as `/assets/logo.svg` can be shared by several mounted Fibel instances. Without this option, the built-in Fibel SVG remains available under the instance's internal path.
+
 ## Social cards
 
 ```ts

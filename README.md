@@ -227,6 +227,7 @@ export default defineFibel({
   title: "Product Docs",
   siteUrl: "https://docs.example.com",
   seo: {
+    favicon: "/assets/logo.svg",
     ogImage: "/assets/social.png",
     twitterSite: "@example",
     disallow: ["/en/internal"],
@@ -234,7 +235,7 @@ export default defineFibel({
 });
 ```
 
-Pages marked `hidden` are left out of the sitemap and rendered with `noindex`. Social cards use `seo.ogImage` unless a page sets `image` in its frontmatter.
+`seo.favicon` replaces the built-in Fibel favicon with a public URL, written into the document head as configured. Without it, Fibel keeps serving its default icon. Pages marked `hidden` are left out of the sitemap and rendered with `noindex`. Social cards use `seo.ogImage` unless a page sets `image` in its frontmatter.
 
 Every indexable page also carries JSON-LD with a `TechArticle`. Content pages add a `BreadcrumbList` built from the sidebar section; locale index pages add a `WebSite` entry instead.
 

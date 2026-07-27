@@ -46,6 +46,19 @@ Die Sitemap listet jede sichtbare Seite mit absoluter URL, dem `updated`-Datum a
 
 Seiten mit `hidden: true` fehlen in der Sitemap und werden mit einem `noindex`-Meta-Tag ausgeliefert.
 
+## Favicon
+
+```ts
+export default defineFibel({
+  title: "Meine Docs",
+  seo: {
+    favicon: "/assets/logo.svg",
+  },
+});
+```
+
+`favicon` ist die öffentliche URL für den Icon-Link des Dokuments. Fibel schreibt sie unverändert, sodass mehrere gemountete Fibel-Instanzen einen Host-Pfad wie `/assets/logo.svg` teilen können. Ohne diese Option bleibt das eingebaute Fibel-SVG unter dem internen Pfad der jeweiligen Instanz verfügbar.
+
 ## Social Cards
 
 ```ts
