@@ -301,7 +301,7 @@ Tagged releases publish the same image to GitHub Container Registry:
 
 ```sh
 docker run --rm -p 3000:3000 ghcr.io/k2b-dev/fibel:latest
-docker run --rm -p 3000:3000 ghcr.io/k2b-dev/fibel:v0.3.0
+docker run --rm -p 3000:3000 ghcr.io/k2b-dev/fibel:v0.4.0
 ```
 
 ## Plugins
@@ -383,8 +383,8 @@ bun run typecheck
 Publishing is handled by GitHub Actions through npm trusted publishing. Push a version tag to publish that version:
 
 ```sh
-git tag v0.3.0
-git push origin v0.3.0
+git tag v0.4.0
+git push origin v0.4.0
 ```
 
 The workflow runs typecheck, tests, build, package-content checks, sets `package.json` to the tag version, and publishes with provenance:
