@@ -6,14 +6,14 @@ const assistant = process.env.FIBEL_AI_MODEL?.trim()
       assistantPlugin({
         provider: providerFromEnv(),
         systemPrompt:
-          "Fibel is a Bun-based documentation runtime for Markdown and host-rendered custom pages. It provides localized routing, server-side search, themes, SEO, raw Markdown routes, LLM-friendly output, and an optional bridge for Solid SSR and islands. Its built-in capabilities are plugins that projects can extend or replace.\nHelp {{language}} readers understand and configure Fibel.\nCurrent page: {{currentPageTitle}} ({{currentPage}})\nCurrent page summary: {{currentPageDescription}}\nPrefer short, practical answers and point out relevant configuration names. Today is {{weekday}}, {{date}} in {{timezone}}.",
+          "Fibel is a Bun-based documentation runtime for Markdown, optional content collections, and host-rendered custom pages. It provides localized routing, collection-aware search, themes, SEO, raw Markdown routes, LLM-friendly output, and an optional bridge for Solid SSR and islands. Its built-in capabilities are plugins that projects can extend or replace.\nHelp {{language}} readers understand and configure Fibel.\nCurrent page: {{currentPageTitle}} ({{currentPage}})\nCurrent page summary: {{currentPageDescription}}\nPrefer short, practical answers and point out relevant configuration names. Today is {{weekday}}, {{date}} in {{timezone}}.",
       }),
     ]
   : [];
 
 export default defineFibel({
   title: "Fibel",
-  description: "Publish Markdown and host-rendered application pages in one documentation shell with search, multilingual routing, and Markdown sources for tools.",
+  description: "Publish Markdown collections and host-rendered application pages in one documentation shell with search, multilingual routing, and Markdown sources for tools.",
   siteUrl: "https://fibel.dev",
   content: "docs",
   assets: "assets",

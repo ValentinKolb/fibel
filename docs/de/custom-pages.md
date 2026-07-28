@@ -142,9 +142,15 @@ export const fibelHtml = fibelSsr.html;
 
 Beide Renderer verweisen auf denselben `/_ssr`-Pfad. Nur `siteSsr.plugin()` wird registriert; es findet alle Islands unter dem gemeinsamen `rootDir`.
 
-## Dokumentationsbereiche getrennt halten
+## Seiten einer Collection zuordnen
 
-Getrennte Fibel-Instanzen eignen sich, wenn Leser getrennte Navigation, Suchergebnisse und Assistenten-Konversationen erwarten. Sie können trotzdem in einem Hono-Prozess und einem Deployment laufen:
+Bei einer Fibel-Instanz mit `collections` ordnet `collection` eine benutzerdefinierte oder Solid-Seite deren Routen, Sidebar, Such-Scope, Assistant-Kontext, MCP-Ergebnissen und Discovery-Ausgaben zu. Ohne Angabe gilt `defaultCollection`.
+
+Mit `collection: "ui"` liegt das vorherige `solidPage`-Beispiel unter `/en/ui/panel-header`, wenn die Collection `ui` ihren standardmäßigen Pfad `/ui` verwendet. Der Leitfaden zu [Inhaltssammlungen](/de/collections) beschreibt die vollständige Konfiguration und den URL-Vertrag.
+
+## Getrennte Instanzen wählen
+
+Getrennte Fibel-Instanzen eignen sich, wenn unabhängige Suchindizes, Assistenten-Konversationen, Plugins, MCP-Endpunkte oder Betriebsgrenzen erforderlich sind. Sie können trotzdem in einem Hono-Prozess und einem Deployment laufen:
 
 ```ts
 import { Hono } from "hono";

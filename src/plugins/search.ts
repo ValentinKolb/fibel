@@ -11,6 +11,8 @@ export function searchPlugin(): FibelPlugin {
         .map((page) => ({
           id: page.id,
           locale: page.locale.code,
+          collection: page.collection?.id,
+          collectionLabel: page.collection?.label,
           title: page.meta.title,
           description: page.meta.description,
           href: page.href,
@@ -29,7 +31,26 @@ export function searchPlugin(): FibelPlugin {
             const url = new URL(request.url);
             const query = url.searchParams.get("q") ?? "";
             const locale = url.searchParams.get("locale") ?? context.config.defaultLocale;
-            return json({ query, locale, results: context.services.search(query, locale, context) });
+            const collection = url.searchParams.get("collection") || undefined;
+            if (
+              collection &&
+              !context.config.collections.some(
+                (candidate) => candidate.id === collection,
+              )
+            ) {
+              return json({ error: `Unknown collection "${collection}".` }, 400);
+            }
+            return json({
+              query,
+              locale,
+              collection,
+              results: context.services.search(
+                query,
+                locale,
+                context,
+                collection,
+              ),
+            });
           },
         },
       ];
@@ -37,9 +58,18 @@ export function searchPlugin(): FibelPlugin {
   };
 }
 
-function search(query: string, locale: string, context: FibelContext): SearchEntry[] {
+function search(
+  query: string,
+  locale: string,
+  context: FibelContext,
+  collection?: string,
+): SearchEntry[] {
   const trimmed = query.trim();
-  const entries = context.searchIndex.filter((entry) => entry.locale === locale);
+  const entries = context.searchIndex.filter(
+    (entry) =>
+      entry.locale === locale &&
+      (!collection || entry.collection === collection),
+  );
   if (!trimmed) return entries.slice(0, 8);
   return fuzzy
     .filter(trimmed, entries, {

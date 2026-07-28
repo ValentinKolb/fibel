@@ -1,6 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from "fs";
 import { join } from "path";
 import type {
+  FibelCollection,
   FibelContext,
   FibelCustomPage,
   FibelPage,
@@ -8,64 +9,40 @@ import type {
   PageMeta,
   ResolvedFibelConfig,
 } from "./types";
-import { joinUrl, resolveInside, routeFromFile, slugify, toPosix } from "./utils";
+import { navKey, pageRoute } from "./collections";
+import { resolveInside, routeFromFile, slugify, toPosix } from "./utils";
 
 type FrontmatterValue = string | number | boolean | string[];
 type Frontmatter = Record<string, FrontmatterValue>;
 
 export function loadPages(config: ResolvedFibelConfig): FibelPage[] {
-  const docsRoot = resolveInside(config.root, config.content);
   const pages: FibelPage[] = [];
 
-  for (const locale of config.locales) {
-    const localeRoot = join(docsRoot, locale.code);
-    if (!existsSync(localeRoot)) continue;
-
-    for (const file of walkMarkdown(localeRoot)) {
-      const raw = readFileSync(file, "utf8");
-      const { data, body } = parseFrontmatter(raw);
-      const slug = routeFromFile(file, localeRoot);
-      const href = joinUrl(config.routing.basePath, locale.code, slug === "/" ? undefined : slug);
-      const title = stringValue(data.title) ?? firstHeading(body) ?? titleFromSlug(slug);
-      const description = stringValue(data.description) ?? firstParagraph(body) ?? config.description;
-      const page: FibelPage = {
-        id: `${locale.code}:${toPosix(routeFromFile(file, localeRoot))}`,
-        kind: "markdown",
-        locale,
-        slug,
-        href,
-        sourcePath: file,
-        raw,
-        body,
-        html: "",
-        headings: extractHeadings(body),
-        meta: {
-          title,
-          description,
-          navTitle: stringValue(data.navTitle) ?? title,
-          section: stringValue(data.section) ?? "Guide",
-          order: numberValue(data.order) ?? 100,
-          hidden: booleanValue(data.hidden) ?? false,
-          tags: stringArrayValue(data.tags),
-          updated: stringValue(data.updated),
-          image: stringValue(data.image),
-        },
-        layout: "article",
-      };
-      pages.push(page);
+  if (config.collections.length > 0) {
+    for (const collection of config.collections) {
+      loadMarkdownPages(config, collection, pages);
     }
+  } else {
+    loadMarkdownPages(config, undefined, pages);
   }
 
   for (const definition of config.pages) {
     const slug = customPagePath(definition);
+    const collection = config.collections.find(
+      (candidate) =>
+        candidate.id === (definition.collection ?? config.defaultCollection),
+    );
     for (const locale of config.locales) {
       const body = customPageContext(definition, locale.code);
       pages.push({
-        id: `custom:${locale.code}:${slug}`,
+        id: collection
+          ? `custom:${collection.id}:${locale.code}:${slug}`
+          : `custom:${locale.code}:${slug}`,
         kind: "custom",
+        collection,
         locale,
         slug,
-        href: joinUrl(config.routing.basePath, locale.code, slug === "/" ? undefined : slug),
+        href: pageRoute(config.routing.basePath, locale.code, slug, collection),
         sourcePath: `custom:${slug}`,
         raw: body,
         body,
@@ -103,8 +80,9 @@ export function buildNav(pages: FibelPage[]) {
   const byLocale = new Map<string, Map<string, FibelPage[]>>();
   for (const page of pages) {
     if (page.meta.hidden) continue;
-    const localeMap = byLocale.get(page.locale.code) ?? new Map<string, FibelPage[]>();
-    byLocale.set(page.locale.code, localeMap);
+    const key = navKey(page.locale.code, page.collection?.id);
+    const localeMap = byLocale.get(key) ?? new Map<string, FibelPage[]>();
+    byLocale.set(key, localeMap);
     const sectionPages = localeMap.get(page.meta.section) ?? [];
     localeMap.set(page.meta.section, sectionPages);
     sectionPages.push(page);
@@ -121,6 +99,66 @@ export function buildNav(pages: FibelPage[]) {
     );
   }
   return nav;
+}
+
+function loadMarkdownPages(
+  config: ResolvedFibelConfig,
+  collection: FibelCollection | undefined,
+  pages: FibelPage[],
+) {
+  const docsRoot = resolveInside(
+    config.root,
+    collection?.content ?? config.content,
+  );
+  for (const locale of config.locales) {
+    const localeRoot = join(docsRoot, locale.code);
+    if (!existsSync(localeRoot)) continue;
+
+    for (const file of walkMarkdown(localeRoot)) {
+      const raw = readFileSync(file, "utf8");
+      const { data, body } = parseFrontmatter(raw);
+      const slug = routeFromFile(file, localeRoot);
+      const title =
+        stringValue(data.title) ?? firstHeading(body) ?? titleFromSlug(slug);
+      const description =
+        stringValue(data.description) ??
+        firstParagraph(body) ??
+        collection?.description ??
+        config.description;
+      pages.push({
+        id: collection
+          ? `${collection.id}:${locale.code}:${toPosix(slug)}`
+          : `${locale.code}:${toPosix(slug)}`,
+        kind: "markdown",
+        collection,
+        locale,
+        slug,
+        href: pageRoute(
+          config.routing.basePath,
+          locale.code,
+          slug,
+          collection,
+        ),
+        sourcePath: file,
+        raw,
+        body,
+        html: "",
+        headings: extractHeadings(body),
+        meta: {
+          title,
+          description,
+          navTitle: stringValue(data.navTitle) ?? title,
+          section: stringValue(data.section) ?? "Guide",
+          order: numberValue(data.order) ?? 100,
+          hidden: booleanValue(data.hidden) ?? false,
+          tags: stringArrayValue(data.tags),
+          updated: stringValue(data.updated),
+          image: stringValue(data.image),
+        },
+        layout: "article",
+      });
+    }
+  }
 }
 
 function walkMarkdown(dir: string): string[] {

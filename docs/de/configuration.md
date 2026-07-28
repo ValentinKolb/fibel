@@ -42,6 +42,33 @@ Beide Schlüssel sind optional. `content` steht standardmäßig auf `docs` und z
 
 Links in Markdown-Dateien bleiben stabil und relativ zur Dokumentation. Das erleichtert den Betrieb unter einem Base Path.
 
+## Collections
+
+`collections` ersetzt den übergeordneten `content`-Ordner, wenn mehrere Dokumentationsbereiche eine Fibel-Instanz gemeinsam verwenden:
+
+```ts
+export default defineFibel({
+  title: "Cloud",
+  collections: [
+    {
+      id: "docs",
+      label: "Docs",
+      description: "Produktdokumentation.",
+      content: "content/docs",
+    },
+    {
+      id: "ui",
+      label: "UI",
+      description: "Komponentenreferenz.",
+      content: "content/ui",
+    },
+  ],
+  defaultCollection: "docs",
+});
+```
+
+`path` ändert optional den öffentlichen Pfad einer Collection und verwendet ansonsten deren ID. Benutzerdefinierte Seiten wählen ihre Collection über `collection`; ohne Angabe gilt `defaultCollection`. Der [Collection-Leitfaden](/de/collections) beschreibt URL-Aufbau, Locale-Weiterleitungen, Such-Scopes, Solid-Seiten, Assistent, MCP und Discovery-Routen.
+
 ## Routing
 
 ```ts
@@ -55,7 +82,7 @@ export default defineFibel({
 });
 ```
 
-`basePath` ist der öffentliche Pfad der Dokumentation und wird gesetzt, wenn Fibel unter einer Sub-Route läuft. `internalPath` ist für generierte Dateien und interne Endpunkte reserviert. `assetsPath` ist der öffentliche Pfad für den Assets-Ordner.
+`basePath` ist der öffentliche Pfad der Dokumentation und wird gesetzt, wenn Fibel unter einer Sub-Route läuft. `internalPath` ist für generierte Dateien und interne Endpunkte reserviert. `assetsPath` ist der öffentliche Pfad für den Assets-Ordner. Collection-Routen folgen `{basePath}/{locale}/{collectionPath}/{pageSlug}`.
 
 ## Locales
 
@@ -110,7 +137,7 @@ export default defineFibel({
 });
 ```
 
-`headerLinks` füllt die Navigation neben dem Seitentitel. Lokale Werte werden gegen das Locale der aktuellen Seite aufgelöst. `/runtime` verweist also für englische Leser auf `/en/runtime` und für deutsche auf `/de/runtime`. Schreibe den Wert als Slug ohne Locale-Segment.
+`headerLinks` füllt die Navigation neben dem Seitentitel. Lokale Werte werden gegen Locale und aktuelle Collection der Seite aufgelöst. `/runtime` verweist in einer bisherigen englischen Site auf `/en/runtime` und innerhalb einer gemounteten `ui`-Collection auf `/docs/en/ui/runtime`. Der Wert wird als Slug ohne Locale- oder Collection-Segment angegeben.
 
 Ein Link wird als aktiv markiert, wenn sein Wert dem Slug der aktuellen Seite entspricht. Ist `headerLinks` nicht gesetzt, zeigt der Header keine Navigation.
 
@@ -143,7 +170,7 @@ export default defineFibel({
 });
 ```
 
-`title` ist die gemeinsame Marke und bleibt unabhängig vom Instanztitel für Metadaten und Assistent. `homeHref` und der `href` eines Links akzeptieren einen String oder eine synchrone Funktion mit `locale`, `pathname` und `basePath`. `activeWhen` markiert den exakten Präfix und seine Unterpfade als aktiv.
+`title` ist die gemeinsame Marke und bleibt unabhängig vom Instanztitel für Metadaten und Assistent. `homeHref` und der `href` eines Links akzeptieren einen String oder eine synchrone Funktion mit `locale`, `pathname`, `basePath` und der optionalen Collection-ID `collection`. `activeWhen` markiert den exakten Präfix und seine Unterpfade als aktiv.
 
 `search`, `themeToggle` und `mobileNavigation` sind standardmäßig `true` und lassen sich einzeln deaktivieren. `headerLinks` bleibt die kürzere locale-relative API für Links innerhalb einer einzelnen Fibel-Instanz.
 
@@ -159,7 +186,7 @@ export default defineFibel({
 });
 ```
 
-Jeder Link besteht aus `label` und `value`. Lokale Werte werden wie Header-Links gegen das Locale der aktuellen Seite aufgelöst. `/imprint` zeigt also für englische Leser auf `/en/imprint` und für deutsche auf `/de/imprint`. Absolute `https:`, `mailto:`, `tel:` und Hash-Links werden unverändert verwendet.
+Jeder Link besteht aus `label` und `value`. Lokale Werte werden wie Header-Links gegen Locale und aktuelle Collection der Seite aufgelöst. Absolute `https:`, `mailto:`, `tel:` und Hash-Links werden unverändert verwendet.
 
 ## Frontmatter
 
@@ -181,7 +208,7 @@ Alle Felder sind optional. `title` ist der Seitentitel; fehlt er, nutzt Fibel di
 
 ## Eigene Seiten
 
-`pages` registriert von einer Anwendung gerenderte Routen neben Markdown-Dateien. Die Seitenmetadaten folgen denselben Regeln für Navigation, Suche, SEO und Sichtbarkeit. Optionales `context` liefert das Markdown für rohe Routen, Suche und Assistent.
+`pages` registriert von einer Anwendung gerenderte Routen neben Markdown-Dateien. Die Seitenmetadaten folgen denselben Regeln für Navigation, Suche, SEO und Sichtbarkeit. Optionales `context` liefert das Markdown für rohe Routen, Suche und Assistent. Im Collection-Modus wählt `collection` den zugehörigen Bereich; ohne Angabe gilt `defaultCollection`.
 
 Der [Guide für eigene Seiten](/de/custom-pages) beschreibt den vollständigen Renderer-Vertrag, gemeinsamen und lokalisierten Kontext, Solid-SSR-Integration und mehrere Instanzen.
 

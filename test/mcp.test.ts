@@ -156,6 +156,67 @@ describe("MCP plugin", () => {
     expect(page.body.result?.content?.[0]?.text).toContain("Use the `tone` property");
   });
 
+  test("describes and searches configured collections", async () => {
+    const app = await createFibelApp(
+      mcpConfig({
+        content: undefined,
+        collections: [
+          {
+            id: "docs",
+            label: "Docs",
+            description: "Fibel guides.",
+            content: "docs",
+          },
+          {
+            id: "ui",
+            label: "UI",
+            description: "Fibel component reference.",
+            content: "docs",
+          },
+        ],
+        defaultCollection: "docs",
+      }),
+    );
+
+    const listed = await mcpRequest(app, "/_fibel/mcp", "tools/list");
+    expect(listed.body.result?.tools?.map((tool) => tool.name)).toEqual([
+      "list_collections",
+      "search_docs",
+      "read_doc",
+    ]);
+
+    const collections = await mcpRequest(
+      app,
+      "/_fibel/mcp",
+      "tools/call",
+      {
+        name: "list_collections",
+        arguments: {},
+      },
+    );
+    expect(collections.body.result?.content?.[0]?.text).toContain(
+      "UI (ui): Fibel component reference.",
+    );
+
+    const search = await mcpRequest(app, "/_fibel/mcp", "tools/call", {
+      name: "search_docs",
+      arguments: { query: "theme", locale: "en", collection: "ui" },
+    });
+    expect(search.body.result?.content?.[0]?.text).toContain("/en/ui/theme");
+    expect(search.body.result?.content?.[0]?.text).not.toContain(
+      "/en/docs/theme",
+    );
+    expect(search.body.result?.content?.[0]?.text).toContain(
+      "Collection: UI (ui)",
+    );
+
+    const invalid = await mcpRequest(app, "/_fibel/mcp", "tools/call", {
+      name: "search_docs",
+      arguments: { query: "theme", collection: "missing" },
+    });
+    expect(invalid.body.result?.isError).toBe(true);
+  });
+
   test("does not expose hidden pages or arbitrary paths", async () => {
     const app = await createFibelApp(mcpConfig());
     const hidden = await mcpRequest(app, "/_fibel/mcp", "tools/call", {

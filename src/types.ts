@@ -6,6 +6,22 @@ export type LocaleConfig = {
   dir?: "ltr" | "rtl";
 };
 
+export type FibelCollectionConfig = {
+  id: string;
+  label: string;
+  description?: string;
+  content: string;
+  path?: string;
+};
+
+export type FibelCollection = {
+  id: string;
+  label: string;
+  description: string;
+  content: string;
+  path: string;
+};
+
 export type FibelRoutingConfig = {
   basePath?: string;
   internalPath?: string;
@@ -28,6 +44,7 @@ export type FibelHeaderLinkContext = {
   locale: string;
   pathname: string;
   basePath: string;
+  collection?: string;
 };
 
 export type FibelHeaderHref = string | ((context: FibelHeaderLinkContext) => string);
@@ -82,6 +99,7 @@ export type FibelCustomPageRenderResult = string | FibelPageDocument | Response;
 
 export type FibelCustomPage = {
   path: string;
+  collection?: string;
   title: string;
   description: string;
   navTitle?: string;
@@ -104,6 +122,8 @@ export type FibelConfig = {
   siteUrl?: string;
   root?: string;
   content?: string;
+  collections?: FibelCollectionConfig[];
+  defaultCollection?: string;
   assets?: string;
   routing?: FibelRoutingConfig;
   locales?: LocaleConfig[];
@@ -122,6 +142,8 @@ export type ResolvedFibelConfig = Required<
 > & {
   description: string;
   siteUrl?: string;
+  collections: FibelCollection[];
+  defaultCollection?: string;
   routing: Required<FibelRoutingConfig>;
   locales: LocaleConfig[];
   defaultLocale: string;
@@ -155,6 +177,7 @@ export type Heading = {
 export type FibelPage = {
   id: string;
   kind: "markdown" | "custom";
+  collection?: FibelCollection;
   locale: LocaleConfig;
   slug: string;
   href: string;
@@ -176,6 +199,8 @@ export type NavSection = {
 export type SearchEntry = {
   id: string;
   locale: string;
+  collection?: string;
+  collectionLabel?: string;
   title: string;
   description: string;
   href: string;
@@ -200,7 +225,12 @@ export type FibelServices = {
     context: FibelContext,
   ) => string | Response | Promise<string | Response>;
   getTheme: (request: Request, context: FibelContext) => ThemeMode;
-  search: (query: string, locale: string, context: FibelContext) => SearchEntry[];
+  search: (
+    query: string,
+    locale: string,
+    context: FibelContext,
+    collection?: string,
+  ) => SearchEntry[];
 };
 
 export type FibelContext = {

@@ -156,9 +156,15 @@ function startPolling(getApp: () => FibelApp, configPath: string, onChange: () =
 
 function snapshot(config: FibelConfig, configPath: string) {
   const root = resolve(config.root ?? process.cwd());
-  const content = config.content ?? "docs";
   const assets = config.assets ?? "assets";
-  return [configPath, resolve(root, content), resolve(root, assets)].flatMap((path) => snapshotPath(resolve(path))).sort().join("\n");
+  return [
+    configPath,
+    ...contentPaths(config).map((content) => resolve(root, content)),
+    resolve(root, assets),
+  ]
+    .flatMap((path) => snapshotPath(resolve(path)))
+    .sort()
+    .join("\n");
 }
 
 function snapshotPath(path: string): string[] {
@@ -176,5 +182,13 @@ function snapshotPath(path: string): string[] {
 
 function watchLabel(config: FibelConfig, configPath: string) {
   const root = resolve(config.root ?? process.cwd());
-  return [configPath, config.content ?? "docs", config.assets ?? "assets"].map((path) => (path.startsWith("/") ? path : resolve(root, path))).join(", ");
+  return [configPath, ...contentPaths(config), config.assets ?? "assets"]
+    .map((path) => (path.startsWith("/") ? path : resolve(root, path)))
+    .join(", ");
+}
+
+function contentPaths(config: FibelConfig) {
+  return config.collections?.length
+    ? config.collections.map((collection) => collection.content)
+    : [config.content ?? "docs"];
 }

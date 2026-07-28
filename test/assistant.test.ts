@@ -10,7 +10,10 @@ import {
 } from "../src/plugins";
 import { renderAssistantMarkdown } from "../src/plugins/markdown";
 
-function docsProvider(requests: GenerateRequest[]): Provider {
+function docsProvider(
+  requests: GenerateRequest[],
+  options: { href?: string; searchCollection?: string } = {},
+): Provider {
   return {
     name: "test",
     family: "openai-compatible",
@@ -38,7 +41,17 @@ function docsProvider(requests: GenerateRequest[]): Provider {
           type: "block_end",
           blockId: "tool-1",
           index: 0,
-          block: { type: "tool_call", id: "call-1", name: "search_docs", args: { query: "theme" } },
+          block: {
+            type: "tool_call",
+            id: "call-1",
+            name: "search_docs",
+            args: {
+              query: "theme",
+              ...(options.searchCollection
+                ? { collection: options.searchCollection }
+                : {}),
+            },
+          },
         };
         yield { type: "usage", usage: { input: 10, output: 2, total: 12 }, finishReason: "tool_use" };
         return;
@@ -56,7 +69,12 @@ function docsProvider(requests: GenerateRequest[]): Provider {
           type: "block_end",
           blockId: "tool-2",
           index: 0,
-          block: { type: "tool_call", id: "call-2", name: "read_doc", args: { href: "/en/theme" } },
+          block: {
+            type: "tool_call",
+            id: "call-2",
+            name: "read_doc",
+            args: { href: options.href ?? "/en/theme" },
+          },
         };
         yield { type: "usage", usage: { input: 12, output: 3, total: 15 }, finishReason: "tool_use" };
         return;
@@ -114,6 +132,9 @@ describe("assistant plugin", () => {
     expect(html).toMatch(/data-fibel-assistant-input[^>]+autofocus/);
     expect(html).toContain('data-fibel-assistant-send aria-label="Send"');
     expect(html).toContain('data-fibel-assistant-expand');
+    expect(html).toContain('<span>Ask Fibel</span>');
+    expect(html).toContain('class="fibel-assistant-launcher__icon"');
+    expect(html).not.toContain('d="M4 5.5A2.5');
     expect(html).not.toContain("Answers from visible pages");
 
     const internal = await app.fetch(new Request("http://localhost/_fibel/assistant.js"));
@@ -142,6 +163,35 @@ describe("assistant plugin", () => {
     const mountedHtml = await (await mounted.fetch(new Request("http://localhost/docs/en"))).text();
     expect(mountedHtml).toContain('data-endpoint="/docs/_fibel/assistant"');
     expect((await mounted.fetch(new Request("http://localhost/docs/_fibel/assistant.js"))).status).toBe(200);
+  });
+
+  test("supports an escaped custom launcher label and falls back for blank labels", async () => {
+    const custom = await createFibelApp({
+      ...config,
+      plugins: [
+        ...defaultPlugins(),
+        assistantPlugin({
+          provider: docsProvider([]),
+          launcherLabel: "Ask Cloud <Beta>",
+        }),
+      ],
+    });
+    const customHtml = await (await custom.fetch(new Request("http://localhost/en"))).text();
+    expect(customHtml).toContain("<span>Ask Cloud &lt;Beta&gt;</span>");
+    expect(customHtml).not.toContain("<span>Ask Cloud <Beta></span>");
+
+    const blank = await createFibelApp({
+      ...config,
+      plugins: [
+        ...defaultPlugins(),
+        assistantPlugin({
+          provider: docsProvider([]),
+          launcherLabel: "   ",
+        }),
+      ],
+    });
+    const blankHtml = await (await blank.fetch(new Request("http://localhost/en"))).text();
+    expect(blankHtml).toContain("<span>Ask Fibel</span>");
   });
 
   test("streams a bounded tool loop with documentation sources", async () => {
@@ -196,7 +246,7 @@ describe("assistant plugin", () => {
     expect(requests).toHaveLength(3);
     expect(requests[0]?.systemPrompt).toContain("Prefer configuration examples for Fibel.");
     expect(requests[0]?.systemPrompt).toContain(
-      "Site summary: Publish Markdown and host-rendered application pages",
+      "Site summary: Publish Markdown collections and host-rendered application pages",
     );
     expect(requests[0]?.systemPrompt).toContain("Use English (en)");
     expect(requests[0]?.systemPrompt).toContain(
@@ -215,7 +265,7 @@ describe("assistant plugin", () => {
       "For instructions, configuration, APIs, code, exact behavior",
     );
     expect(requests[0]?.systemPrompt).toContain(
-      "site_description=Publish Markdown and host-rendered application pages in one documentation shell",
+      "site_description=Publish Markdown collections and host-rendered application pages in one documentation shell",
     );
     expect(requests[0]?.systemPrompt).toContain(
       "current_page_description=Configure content folders",
@@ -265,7 +315,7 @@ describe("assistant plugin", () => {
     expect(received).toEqual(
       expect.objectContaining({
         siteTitle: "Fibel",
-        siteDescription: expect.stringContaining("Publish Markdown and host-rendered application pages"),
+        siteDescription: expect.stringContaining("Publish Markdown collections and host-rendered application pages"),
         locale: "en",
         language: "English",
         currentPage: "/en/configuration",
@@ -278,6 +328,66 @@ describe("assistant plugin", () => {
     expect(received?.weekday).toBeTruthy();
     expect(received?.timezone).toBeTruthy();
     expect(requests[0]?.systemPrompt).toContain("Guide English readers on /en/configuration for Fibel.");
+  });
+
+  test("uses the current collection as assistant search context", async () => {
+    const requests: GenerateRequest[] = [];
+    const app = await createFibelApp({
+      ...config,
+      content: undefined,
+      collections: [
+        {
+          id: "docs",
+          label: "Docs",
+          description: "Fibel guides.",
+          content: "docs",
+        },
+        {
+          id: "ui",
+          label: "UI",
+          description: "Fibel component reference.",
+          content: "docs",
+        },
+      ],
+      defaultCollection: "docs",
+      plugins: [
+        ...defaultPlugins(),
+        assistantPlugin({
+          provider: docsProvider(requests, { href: "/en/ui/theme" }),
+          systemPrompt:
+            "Collection: {{currentCollectionLabel}} ({{currentCollection}}) — {{currentCollectionDescription}}",
+        }),
+      ],
+    });
+
+    const response = await app.fetch(
+      new Request("http://localhost/_fibel/assistant", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Origin: "http://localhost",
+        },
+        body: JSON.stringify({
+          message: "How do themes work?",
+          locale: "en",
+          page: "/en/ui/configuration",
+        }),
+      }),
+    );
+    expect(response.status).toBe(200);
+    await response.text();
+
+    expect(requests[0]?.systemPrompt).toContain(
+      "Collection: UI (ui) — Fibel component reference.",
+    );
+    expect(requests[0]?.systemPrompt).toContain("current_collection=ui");
+    expect(requests[0]?.systemPrompt).toContain(
+      'Search the current "UI" collection first.',
+    );
+    expect(JSON.stringify(requests[1]?.messages)).toContain('"collection":"ui"');
+    expect(JSON.stringify(requests[1]?.messages)).not.toContain("/en/docs/theme");
+    expect(JSON.stringify(requests[2]?.messages)).toContain("/en/ui/theme");
+    expect(requests[0]?.tools?.[0]?.description).toContain('pass "all"');
   });
 
   test("renders compact assistant Markdown without trusting model HTML or unsafe links", () => {

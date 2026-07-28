@@ -45,6 +45,7 @@ bun run src/cli.ts dev --port 5173
 ## What Fibel provides
 
 - Documentation pages from `docs/<locale>/**/*.md`
+- Optional content collections with separate Markdown roots and navigation
 - Framework-neutral custom pages with searchable Markdown context
 - Optional Solid SSR and island integration through a host-owned `@k2b/ssr` build
 - A standalone Web-standard `fetch` app
@@ -79,6 +80,40 @@ bun run src/cli.ts dev --port 5173
 ```
 
 Each locale has its own folder below `docs/`. A file at `docs/en/configuration.md` is served as `/en/configuration`. The same source is also available as `/en/configuration.md` and `/en/configuration.markdown`.
+
+## Collections
+
+Related documentation areas can share one Fibel instance, search, assistant, MCP endpoint, and deployment while retaining separate Markdown roots and sidebars:
+
+```ts
+export default defineFibel({
+  title: "Cloud",
+  routing: { basePath: "/docs" },
+  locales: [
+    { code: "en", label: "English" },
+    { code: "de", label: "Deutsch" },
+  ],
+  collections: [
+    {
+      id: "docs",
+      label: "Docs",
+      description: "Product documentation.",
+      content: "content/docs",
+    },
+    {
+      id: "ui",
+      label: "UI",
+      description: "Component reference.",
+      content: "content/ui",
+    },
+  ],
+  defaultCollection: "docs",
+});
+```
+
+Canonical URLs use `{basePath}/{locale}/{collection}/{page}`, for example `/docs/en/ui/button`. `/docs/ui/button` redirects temporarily to the saved, requested, or default locale. Search starts in the current collection and can switch to **Everything**. Assistant and MCP tools can also select a collection.
+
+Sites without `collections` keep the existing content directory and URL format.
 
 ## Configuration
 
@@ -118,7 +153,7 @@ export default defineFibel({
 
 `basePath` is the public mount path. With the config above, pages live under `/docs`, the search endpoint lives under `/docs/_fibel/search`, and assets live under `/docs/assets/...`.
 
-`headerLinks` fills the navigation next to the site title. Local values are resolved against the current locale, so `/runtime` points to `/en/runtime` on an English page and to `/de/runtime` on a German one. A link is marked as active when its value matches the slug of the current page. The header navigation is empty when `headerLinks` is not set.
+`headerLinks` fills the navigation next to the site title. Local values are resolved against the current locale and collection. A link is marked as active when its value matches the slug of the current page. The header navigation is empty when `headerLinks` is not set.
 
 `footerLinks` works the same way. Both lists take external URLs as written and resolve local paths against the current locale.
 
@@ -360,9 +395,12 @@ import { assistantPlugin, providerFromEnv } from "@k2b/fibel/plugins";
 
 assistantPlugin({
   provider: providerFromEnv(),
+  launcherLabel: "Ask Product",
   systemPrompt: "Help readers configure Product. Keep answers concise.",
 });
 ```
+
+`launcherLabel` overrides the localized launcher text. Fibel keeps the localized default when it is omitted.
 
 ```sh
 FIBEL_AI_PROVIDER=openrouter

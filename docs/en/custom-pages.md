@@ -142,9 +142,15 @@ export const fibelHtml = fibelSsr.html;
 
 Both renderers point at the same `/_ssr` path. Only `siteSsr.plugin()` is registered, and it discovers all islands below the shared `rootDir`.
 
-## Keep documentation areas separate
+## Assign pages to a collection
 
-Use separate Fibel instances when readers expect separate navigation, search results, and assistant conversations. They can still run in one Hono process and one deployment:
+When one Fibel instance defines `collections`, `collection` places a custom or Solid page in that area's routes, sidebar, search scope, assistant context, MCP results, and discovery output. An omitted value uses `defaultCollection`.
+
+Add `collection: "ui"` to the earlier `solidPage` example to serve it at `/en/ui/panel-header` when the `ui` collection uses its default `/ui` path. See [content collections](/en/collections) for the complete config and URL contract.
+
+## Choose separate instances
+
+Use separate Fibel instances when readers expect independent search indexes, assistant conversations, plugins, MCP endpoints, or operational limits. They can still run in one Hono process and one deployment:
 
 ```ts
 import { Hono } from "hono";

@@ -35,10 +35,12 @@ Bei vorhandenem Standard-Layout ergänzt das Plugin außerdem den Eintrag **MCP*
 
 ## Verfügbare Tools
 
-Der Server stellt zwei schreibgeschützte Tools bereit:
+Jeder Server stellt bereit:
 
-- `search_docs({ query, locale? })` durchsucht sichtbare Seiten. Ohne Locale gilt `defaultLocale`.
+- `search_docs({ query, locale?, collection? })` durchsucht sichtbare Seiten. Ohne Locale gilt `defaultLocale`; ohne Collection gilt die gesamte Instanz.
 - `read_doc({ href })` liefert den Markdown-Inhalt einer exakten sichtbaren Seite aus dem Suchergebnis.
+
+Bei konfigurierten Collections ergänzt der Server `list_collections()`. Das Tool liefert ID, Label und Beschreibung jeder Collection, damit ein Agent vor der Suche einen Scope wählen kann.
 
 Die Tools verwenden die vorhandene Fibel-Suche und den Seitenkontext. Markdown-Dateien und das explizite `context`-Markdown von [Custom Pages](/de/custom-pages) stehen damit zur Verfügung, ohne gerendertes HTML zu indexieren.
 
@@ -50,7 +52,15 @@ Die angezeigte URL wird im Coding-Agent als entfernter Streamable-HTTP-MCP-Serve
 
 Nach der Verbindung kann der Agent `search_docs` und `read_doc` erkennen und bei Fragen mit Dokumentationsbezug aufrufen. Da sich die Konfigurationsformate der Clients unterscheiden, zeigt der Footer-Dialog den Endpunkt statt einer clientspezifischen Konfigurationsdatei.
 
-## Mehrere Fibel-Instanzen
+## Collections oder mehrere Fibel-Instanzen
+
+Eine Fibel-Instanz mit Collections verwendet einen MCP-Endpunkt für alle Bereiche:
+
+```txt
+cloud  https://product.example/docs/_fibel/mcp
+```
+
+Der Agent kann Collections auflisten und `search_docs` beispielsweise auf `docs` oder `ui` begrenzen. Das eignet sich für zusammengehörige Bereiche mit gemeinsamer Suche, gemeinsamem Assistenten, MCP-Server und Deployment.
 
 Unabhängig eingebundene Fibel-Websites bleiben getrennte MCP-Server:
 
@@ -59,7 +69,7 @@ product-docs  https://product.example/docs/_fibel/mcp
 product-ui    https://product.example/ui/_fibel/mcp
 ```
 
-Jeder Endpunkt verwendet ausschließlich den Kontext seiner Fibel-Instanz. Navigation, Locales, sichtbare Seiten, Custom-Page-Kontext und Suchergebnisse bleiben getrennt. Das passt zu Websites, bei denen `/docs` und `/ui` unabhängig durchsucht werden sollen, und vermeidet eine gemeinsame Registry oder einen Scope-Parameter.
+Jeder Endpunkt verwendet ausschließlich den Kontext seiner Fibel-Instanz. Navigation, Locales, sichtbare Seiten, Custom-Page-Kontext und Suchergebnisse bleiben getrennt. Das eignet sich für Bereiche mit unabhängiger Suche, getrennten Assistant-Sitzungen, Plugins oder Betriebsgrenzen.
 
 ## Grenzen des öffentlichen Endpunkts
 

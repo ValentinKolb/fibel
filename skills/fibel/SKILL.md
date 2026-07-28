@@ -40,8 +40,8 @@ Fibel follows this flow:
 fibel.config.ts
   -> resolve config
   -> run plugin setup
-  -> load docs/<locale>/**/*.md
-  -> materialize configured custom pages per locale
+  -> load content or each collection's <locale>/**/*.md
+  -> materialize configured custom pages per locale and collection
   -> render Markdown
   -> run plugin afterContent hooks
   -> register plugin routes
@@ -49,6 +49,8 @@ fibel.config.ts
 ```
 
 Normal documents are Markdown files. Fibel renders them to HTML strings and wraps them in the configured layout service. Configured custom pages use the same routing, navigation, search, assistant, SEO, and discovery pipelines while a host callback renders their visible body.
+
+Optional collections group related Markdown roots and custom pages inside one Fibel instance. They share plugins and deployment while keeping separate sidebars and selectable search scopes.
 
 ## Project layout
 
@@ -106,11 +108,43 @@ Keep these invariants:
 - `routing.internalPath` is for framework endpoints such as search and CSS.
 - `routing.assetsPath` is for files from the configured assets directory.
 - `content` defaults to `docs`, `assets` defaults to `assets`, and both resolve relative to `root`, which defaults to the current working directory.
+- `collections` replaces the single content root with `{ id, label, description?, content, path? }` entries. `path` defaults to `/<id>` and `defaultCollection` defaults to the first collection.
+- Collection IDs and path segments are lowercase slugs. Collection paths cannot overlap or begin with a configured locale, `routing.internalPath`, or `routing.assetsPath`.
+- Canonical collection routes are `{basePath}/{locale}/{collectionPath}/{pageSlug}`. Locale-neutral collection routes redirect with `302` using the saved locale, `Accept-Language`, then `defaultLocale`.
+- Configurations without collections keep their existing content root, URLs, search UI, MCP tools, and discovery routes.
 - When `locales` is omitted it is inferred from the folder names under the content directory, and `defaultLocale` falls back to the first entry.
 - The dev server watches content, assets, and the config file only. Changing plugin or other TypeScript code needs a restart.
 - `seo` is optional. `favicon` is a public URL written as configured and falls back to Fibel's internal SVG. `ogImage` is the default social preview image and is resolved under `basePath`, `twitterSite` is the handle credited on cards, and `disallow` adds paths to `robots.txt`. Set `siteUrl` in any published project, otherwise these outputs stay relative and crawlers reject the sitemap.
-- Local header and footer links are resolved against the locale of the current page. Write them as page slugs without a locale segment.
+- Local header and footer links are resolved against the locale and current collection of the page. Write them as page slugs without locale or collection segments.
 - External URLs are left as-is in both link lists.
+
+### Collections
+
+Use collections when `/docs` and `/ui` are related areas that should share one search, assistant, MCP endpoint, plugin set, and deployment:
+
+```ts
+export default defineFibel({
+  title: "Cloud",
+  routing: { basePath: "/docs" },
+  collections: [
+    {
+      id: "docs",
+      label: "Docs",
+      description: "Product documentation.",
+      content: "content/docs",
+    },
+    {
+      id: "ui",
+      label: "UI",
+      description: "Component reference.",
+      content: "content/ui",
+    },
+  ],
+  defaultCollection: "docs",
+});
+```
+
+Each collection content root contains the normal locale directories. The default layout shows only the active collection's sidebar and adds collection links above it. Search defaults to the active collection and offers **Everything** plus each configured collection.
 
 ## Markdown content
 
@@ -210,6 +244,7 @@ const assistant = process.env.FIBEL_AI_MODEL?.trim()
   ? [
       assistantPlugin({
         provider: providerFromEnv(),
+        launcherLabel: "Ask Product",
         systemPrompt:
           "Help readers configure Product. Use Product terminology and prefer short, practical answers.",
       }),
@@ -223,6 +258,8 @@ export default defineFibel({
 ```
 
 `providerFromEnv()` reads `FIBEL_AI_PROVIDER`, required `FIBEL_AI_MODEL`, optional `FIBEL_AI_BASE_URL`, and the selected provider's native key variable. Supported providers are `openrouter`, `openai`, `anthropic`, `gemini`, `mistral`, and `ollama`.
+
+Set `launcherLabel` only when the localized `Ask <site title>` / `<site title> fragen` default should be replaced. The label is plain text; Fibel escapes it and renders the built-in sparkles icon separately.
 
 Keep deployment decisions proportional:
 
@@ -238,7 +275,7 @@ Keep deployment decisions proportional:
 Keep it short and stable:
 
 - Put product terminology, audience, supported deployment assumptions, and answer style in `systemPrompt`.
-- Use `{{siteTitle}}`, `{{siteDescription}}`, `{{locale}}`, `{{language}}`, `{{currentPage}}`, `{{currentPageTitle}}`, `{{currentPageDescription}}`, `{{date}}`, `{{time}}`, `{{weekday}}`, or `{{timezone}}` when stable guidance needs request context. Date and time use the server timezone.
+- Use `{{siteTitle}}`, `{{siteDescription}}`, `{{locale}}`, `{{language}}`, `{{currentCollection}}`, `{{currentCollectionLabel}}`, `{{currentCollectionDescription}}`, `{{currentPage}}`, `{{currentPageTitle}}`, `{{currentPageDescription}}`, `{{date}}`, `{{time}}`, `{{weekday}}`, or `{{timezone}}` when stable guidance needs request context. Date and time use the server timezone.
 - Use the synchronous `systemPrompt: (context) => string` form when TypeScript composition is clearer than templates. Keep the returned guidance deterministic and fast.
 - Keep a short stable product brief in `systemPrompt` when the site description alone does not cover common overview questions. Simple overview answers should use trusted prompt context; detailed, procedural, configuration, API, code, and exact-behavior claims should use search followed by reading one result.
 - Keep the documentation itself in Markdown. The search and read tools retrieve current visible pages, so pasting documentation into the prompt wastes context and becomes stale.
@@ -265,13 +302,13 @@ export default defineFibel({
 });
 ```
 
-The Streamable HTTP endpoint is `${basePath}${internalPath}/mcp`. The plugin exposes only `search_docs({ query, locale? })` and `read_doc({ href })`. Both are read-only, use Fibel's existing search and page context, and exclude pages with `hidden: true`. Custom pages contribute their explicit `context` Markdown; the plugin never derives knowledge from rendered HTML.
+The Streamable HTTP endpoint is `${basePath}${internalPath}/mcp`. Every server exposes `search_docs({ query, locale?, collection? })` and `read_doc({ href })`. Collection-enabled sites also expose `list_collections()`. All tools are read-only, use Fibel's existing search and page context, and exclude pages with `hidden: true`. Custom pages contribute their explicit `context` Markdown; the plugin never derives knowledge from rendered HTML.
 
 The default layout shows an **MCP** footer item with generic setup instructions. Its client script derives the absolute endpoint from the current browser origin plus Fibel routing. Do not introduce an `appUrl` config value for this; `siteUrl` remains the optional canonical URL for SEO and discovery.
 
 The endpoint implements no authentication and is appropriate only for public documentation. Fixed request, document, concurrency, and per-process rate limits are built in. `McpOptions.rateLimiter` accepts a shared `@k2b/sync` limiter when several replicas need one limit.
 
-Several Fibel instances remain separate MCP servers. Configure their endpoint URLs under distinct client names such as `product-docs` and `product-ui`; do not add a cross-instance registry or `site` tool argument unless a product explicitly needs unified search.
+Collections share one MCP endpoint and let agents discover and select a scope. Several Fibel instances remain separate MCP servers. Configure their endpoint URLs under distinct client names such as `product-docs` and `product-ui`.
 
 ## Discovery routes
 
@@ -357,6 +394,7 @@ export default defineFibel({
 Keep these invariants:
 
 - Fibel creates each custom page under every configured locale.
+- In collection mode, `collection` selects the owning collection and defaults to `defaultCollection`.
 - `context` is either one shared Markdown string or `{ default, <locale> }`; `default` is the required language-neutral fallback.
 - `context.markdown` feeds search, raw `.md` routes, `llms.txt`, and the assistant and MCP `search_docs` and `read_doc` tools.
 - `context.html` is rendered once with the configured Markdown service and can be displayed by the page. Do not extract documentation from component HTML.
@@ -397,9 +435,11 @@ Fibel's Solid entry point is only a render bridge. The host must register `plugi
 
 If the host already has an SSR config with another site template, create a second `createConfig({ template: fibelSsrTemplate })` only for its `html` renderer. Continue using the original config and plugin for `/_ssr` and builds. Both configs must use the same `rootDir` and `basePath`; only one plugin is registered.
 
-### Several Fibel instances
+### Collections or several Fibel instances
 
-Prefer separate instances when `/docs` and `/ui` should have separate navigation, search, assistant context, MCP tools, and chat sessions. Mount their Fetch apps under distinct `routing.basePath` values in one Hono/Bun process. Share the header config, theme cookie, assistant provider, and rate-limiter objects rather than adding search scopes or a Fibel multi-site manager.
+Prefer one instance with collections when `/docs` and `/ui` should share search, assistant context, MCP, plugins, and deployment while keeping separate Markdown roots and sidebars. Set `collection` on custom or `solidPage` definitions; omitted values use `defaultCollection`.
+
+Prefer separate instances when the areas need independent search indexes, assistant sessions, MCP endpoints, plugins, or operational limits. Mount their Fetch apps under distinct `routing.basePath` values in one Hono/Bun process. Share the header config, theme cookie, assistant provider, and rate-limiter objects where appropriate.
 
 Use the structured header config for cross-instance links:
 
@@ -487,6 +527,7 @@ Check:
 
 - The file extension is `.md`.
 - The file is inside `docs/<locale>/`.
+- In collection mode, the file is inside `<collection.content>/<locale>/` and the requested URL includes the collection path after the locale.
 - The locale exists in `locales` or can be inferred from the docs folders.
 - `defaultLocale` is valid.
 - The requested URL includes `routing.basePath` when configured.
@@ -498,6 +539,7 @@ Check:
 - The page is loaded into `context.pages`.
 - The page is not `hidden`. Hidden pages are excluded from the search index entirely, not just from navigation.
 - The query is sent to `${basePath}${internalPath}/search`.
+- In collection mode, pass `collection=<id>` to narrow results or omit it to search everything. The browser defaults to the current collection.
 - The page title, description, section, and Markdown body contain searchable text.
 
 ### Debug theme flicker

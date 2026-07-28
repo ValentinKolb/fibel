@@ -28,11 +28,14 @@ export default defineFibel({
     ...defaultPlugins(),
     assistantPlugin({
       provider: providerFromEnv(),
+      launcherLabel: "Ask Product",
       systemPrompt: "Help readers configure Product. Prefer short, practical answers.",
     }),
   ],
 });
 ```
+
+`launcherLabel` replaces the localized launcher text (`Ask Product Docs` or `Product Docs fragen`). When omitted or blank, Fibel keeps that localized default. The launcher uses Fibel's built-in sparkles icon.
 
 Set a model and the native key for the selected provider:
 
@@ -120,7 +123,7 @@ The server package uses Redis through Bun. Also provide `createSessionStore` whe
 
 ## Control context
 
-`systemPrompt` is trusted operator guidance. Keep a short product brief and stable product rules there, not the full documentation. Fibel also supplies the resolved site description and current page description as trusted overview context. The assistant can answer simple identity, high-level capability, and current-page overview questions from this context without a tool call. Detailed instructions, configuration, API, code, and exact behavior still require search followed by reading one result.
+`systemPrompt` is trusted operator guidance. Keep a short product brief and stable product rules there, not the full documentation. Fibel also supplies the resolved site description, current collection, and current page description as trusted overview context. The assistant can answer simple identity, high-level capability, collection, and current-page overview questions from this context without a tool call. Detailed instructions, configuration, API, code, and exact behavior still require search followed by reading one result.
 
 For simple request context, use template variables:
 
@@ -128,11 +131,11 @@ For simple request context, use template variables:
 assistantPlugin({
   provider: providerFromEnv(),
   systemPrompt:
-    "Help {{language}} readers with {{siteTitle}}.\nSite summary: {{siteDescription}}\nCurrent page: {{currentPageTitle}} ({{currentPage}})\nCurrent page summary: {{currentPageDescription}}\nToday is {{weekday}}, {{date}}.",
+    "Help {{language}} readers with {{siteTitle}}.\nSite summary: {{siteDescription}}\nCollection: {{currentCollectionLabel}} ({{currentCollection}})\nCollection summary: {{currentCollectionDescription}}\nCurrent page: {{currentPageTitle}} ({{currentPage}})\nCurrent page summary: {{currentPageDescription}}\nToday is {{weekday}}, {{date}}.",
 });
 ```
 
-The available variables are `{{siteTitle}}`, `{{siteDescription}}`, `{{locale}}`, `{{language}}`, `{{currentPage}}`, `{{currentPageTitle}}`, `{{currentPageDescription}}`, `{{date}}`, `{{time}}`, `{{weekday}}`, and `{{timezone}}`. Date and time use the server's timezone.
+The available variables are `{{siteTitle}}`, `{{siteDescription}}`, `{{locale}}`, `{{language}}`, `{{currentCollection}}`, `{{currentCollectionLabel}}`, `{{currentCollectionDescription}}`, `{{currentPage}}`, `{{currentPageTitle}}`, `{{currentPageDescription}}`, `{{date}}`, `{{time}}`, `{{weekday}}`, and `{{timezone}}`. Date and time use the server's timezone.
 
 Use a synchronous function when composing the guidance in TypeScript is clearer:
 
@@ -147,6 +150,8 @@ assistantPlugin({
 For each request, the plugin adds the trusted overview context, current language and page, a bounded session history, and documentation retrieved by the tools. Hidden pages are excluded. Tool results are treated as untrusted reference text and cannot replace the system instructions.
 
 Custom pages need no additional tool or registry. Their `context` Markdown is available through the existing search and read tools, and opening the assistant on a custom route resolves that page as the current page automatically.
+
+On collection pages, `search_docs` searches the current collection by default. The model can pass another collection ID or `all` when a question crosses collection boundaries. `read_doc` still requires one exact canonical href returned by search.
 
 ## Markdown answers
 

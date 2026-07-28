@@ -92,8 +92,11 @@ document.addEventListener("click", closeLocaleMenus);
 const dialog = document.querySelector("[data-search-dialog]");
 const input = document.querySelector("[data-search-input]");
 const results = document.querySelector("[data-search-results]");
+const searchScopes = Array.from(document.querySelectorAll("[data-search-scope]"));
 let searchItems = [];
 let selectedSearchIndex = -1;
+let activeCollection = state.collection || "";
+let searchSequence = 0;
 const openSearch = () => {
   dialog?.classList.remove("hidden");
   input?.focus();
@@ -137,26 +140,58 @@ const selectSearchIndex = (nextIndex) => {
   });
 };
 
-input?.addEventListener("input", () => {
+const emptySearchMessage = () => !state.collections?.length
+  ? "Type to search the current language."
+  : activeCollection
+    ? "Type to search this collection."
+    : "Type to search all collections.";
+
+const runSearch = async () => {
+  const q = input.value.trim();
+  const sequence = ++searchSequence;
+  if (!q) {
+    results.innerHTML = '<p class="px-3 py-8 text-center text-sm text-slate-500 dark:text-slate-400">' + emptySearchMessage() + '</p>';
+    selectedSearchIndex = -1;
+    return;
+  }
+  let url = state.searchUrl + "?locale=" + encodeURIComponent(state.locale) + "&q=" + encodeURIComponent(q);
+  if (activeCollection) url += "&collection=" + encodeURIComponent(activeCollection);
+  const response = await fetch(url);
+  const data = await response.json();
+  if (sequence !== searchSequence) return;
+  const items = data.results || [];
+  results.innerHTML = items.length
+    ? items.map((item, index) => {
+        const section = !activeCollection && item.collectionLabel
+          ? item.collectionLabel + " · " + item.section
+          : item.section;
+        return '<a class="search-result block rounded-lg px-3 py-3 outline-none hover:bg-zinc-100 dark:hover:bg-white/10" href="' + item.href + '" data-search-result role="option" aria-selected="' + (index === 0 ? "true" : "false") + '"><span class="search-result-section text-xs font-medium">' + escapeText(section) + '</span><strong class="mt-1 block text-zinc-950 dark:text-white">' + escapeText(item.title) + '</strong><span class="mt-1 block text-sm text-zinc-500 dark:text-zinc-400">' + escapeText(item.description) + '</span></a>';
+      }).join("")
+    : '<p class="px-3 py-8 text-center text-sm text-slate-500 dark:text-slate-400">No matches.</p>';
+  searchItems = Array.from(results.querySelectorAll("[data-search-result]"));
+  selectedSearchIndex = searchItems.length > 0 ? 0 : -1;
+  if (selectedSearchIndex === 0) searchItems[0].classList.add("is-active");
+};
+
+const scheduleSearch = () => {
   clearTimeout(searchTimer);
-  searchTimer = setTimeout(async () => {
-    const q = input.value.trim();
-    if (!q) {
-      results.innerHTML = '<p class="px-3 py-8 text-center text-sm text-slate-500 dark:text-slate-400">Type to search the current language.</p>';
-      selectedSearchIndex = -1;
-      return;
-    }
-    const url = state.searchUrl + "?locale=" + encodeURIComponent(state.locale) + "&q=" + encodeURIComponent(q);
-    const response = await fetch(url);
-    const data = await response.json();
-    const items = data.results || [];
-    results.innerHTML = items.length
-      ? items.map((item, index) => '<a class="search-result block rounded-lg px-3 py-3 outline-none hover:bg-zinc-100 dark:hover:bg-white/10" href="' + item.href + '" data-search-result role="option" aria-selected="' + (index === 0 ? "true" : "false") + '"><span class="search-result-section text-xs font-medium">' + escapeText(item.section) + '</span><strong class="mt-1 block text-zinc-950 dark:text-white">' + escapeText(item.title) + '</strong><span class="mt-1 block text-sm text-zinc-500 dark:text-zinc-400">' + escapeText(item.description) + '</span></a>').join("")
-      : '<p class="px-3 py-8 text-center text-sm text-slate-500 dark:text-slate-400">No matches.</p>';
-    searchItems = Array.from(results.querySelectorAll("[data-search-result]"));
-    selectedSearchIndex = searchItems.length > 0 ? 0 : -1;
-    if (selectedSearchIndex === 0) searchItems[0].classList.add("is-active");
-  }, 120);
+  searchTimer = setTimeout(runSearch, 120);
+};
+
+input?.addEventListener("input", scheduleSearch);
+
+searchScopes.forEach((button) => {
+  button.addEventListener("click", () => {
+    clearTimeout(searchTimer);
+    activeCollection = button.getAttribute("data-search-scope") || "";
+    searchScopes.forEach((candidate) => {
+      const active = candidate === button;
+      candidate.classList.toggle("is-active", active);
+      candidate.setAttribute("aria-pressed", active ? "true" : "false");
+    });
+    runSearch();
+    input?.focus();
+  });
 });
 
 input?.addEventListener("keydown", (event) => {

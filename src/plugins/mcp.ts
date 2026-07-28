@@ -126,35 +126,74 @@ function createMcpServer(context: FibelContext) {
     },
     {
       instructions:
-        `Search the current public ${context.config.title} documentation with search_docs, then read exact pages with read_doc. ` +
+        `${context.config.title}: ${context.config.description} ` +
+        `Search the current public documentation with search_docs, then read exact pages with read_doc. ` +
+        (context.config.collections.length > 0
+          ? "Use list_collections when the relevant collection is unclear. "
+          : "") +
         "Base documentation claims on the returned Markdown. Hidden pages and the host file system are not available.",
     },
   );
+
+  if (context.config.collections.length > 0) {
+    server.registerTool(
+      "list_collections",
+      {
+        title: `List ${context.config.title} documentation collections`,
+        description:
+          "List the public documentation collections that can be searched.",
+        inputSchema: {},
+        annotations: readOnlyAnnotations,
+      },
+      async () => ({
+        content: [
+          {
+            type: "text" as const,
+            text: [
+              `${context.config.title}: ${context.config.description}`,
+              "",
+              ...context.config.collections.map(
+                (collection) =>
+                  `- ${collection.label} (${collection.id}): ${collection.description}`,
+              ),
+            ].join("\n"),
+          },
+        ],
+      }),
+    );
+  }
 
   server.registerTool(
     "search_docs",
     {
       title: `Search ${context.config.title} documentation`,
       description:
-        "Search visible documentation pages. Use the optional locale when the question targets a specific language; otherwise the site's default locale is used.",
+        "Search visible documentation pages. Use the optional locale when the question targets a specific language; otherwise the site's default locale is used. Use the optional collection id to narrow results; omit it to search all collections.",
       inputSchema: {
         query: z.string().trim().min(1).max(200),
         locale: z.string().trim().min(1).max(32).optional(),
+        collection: z.string().trim().min(1).max(64).optional(),
       },
       annotations: readOnlyAnnotations,
     },
-    async ({ query, locale }) => {
+    async ({ query, locale, collection }) => {
       const resolvedLocale = resolveLocale(locale, context);
-      const results = context.services.search(query, resolvedLocale, context).slice(0, maxSearchResults);
+      const resolvedCollection = resolveCollection(collection, context);
+      const results = context.services
+        .search(query, resolvedLocale, context, resolvedCollection)
+        .slice(0, maxSearchResults);
       const text =
         results.length === 0
-          ? `No visible ${context.config.title} documentation matched "${query}" in ${resolvedLocale}.`
+          ? `No visible ${context.config.title} documentation matched "${query}" in ${resolvedLocale}${resolvedCollection ? ` and collection ${resolvedCollection}` : ""}.`
           : [
               `Found ${results.length} visible documentation page${results.length === 1 ? "" : "s"} in ${resolvedLocale}:`,
               ...results.flatMap((entry) => [
                 "",
                 `- ${entry.title}`,
                 `  ${entry.href}`,
+                ...(entry.collectionLabel
+                  ? [`  Collection: ${entry.collectionLabel} (${entry.collection})`]
+                  : []),
                 `  ${entry.description}`,
               ]),
             ].join("\n");
@@ -197,6 +236,21 @@ function resolveLocale(input: string | undefined, context: FibelContext) {
     throw new Error(`Unknown documentation locale "${locale}".`);
   }
   return locale;
+}
+
+function resolveCollection(
+  input: string | undefined,
+  context: FibelContext,
+) {
+  if (!input) return undefined;
+  if (
+    !context.config.collections.some(
+      (collection) => collection.id === input,
+    )
+  ) {
+    throw new Error(`Unknown documentation collection "${input}".`);
+  }
+  return input;
 }
 
 function truncateDocument(page: FibelPage) {

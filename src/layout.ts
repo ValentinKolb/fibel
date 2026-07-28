@@ -44,7 +44,7 @@ export function renderFibelHeader(options: RenderFibelHeaderOptions) {
       <div class="relative mx-auto grid h-16 max-w-[120rem] grid-cols-[auto_1fr_auto] items-center gap-3 px-4 md:flex md:gap-5 md:px-5 lg:px-8">
         ${
           mobileNavigation
-            ? `<button class="fibel-icon-button md:hidden" type="button" data-nav-toggle aria-label="Open navigation" aria-expanded="false">
+            ? `<button class="fibel-icon-button lg:hidden" type="button" data-nav-toggle aria-label="Open navigation" aria-expanded="false">
           <span class="sr-only">Open navigation</span>
           ${menuIcon()}
         </button>`

@@ -22,6 +22,14 @@ The search endpoint is served under the internal path.
 
 When Fibel runs under `/docs`, the endpoint is served at `/docs/_fibel/search`.
 
+Collection-enabled sites accept an optional collection ID:
+
+```txt
+/docs/_fibel/search?locale=en&collection=ui&q=button
+```
+
+Omit `collection` to search every collection in the locale.
+
 ## Indexed content
 
 The index includes:
@@ -31,13 +39,15 @@ The index includes:
 - Sidebar section.
 - Markdown text of the page.
 
-For custom pages, optional `context` Markdown is indexed instead of rendered component HTML. Separate Fibel instances therefore produce naturally separate search result sets.
+For custom pages, optional `context` Markdown is indexed instead of rendered component HTML. Search entries also carry their collection ID and label when collections are configured.
 
 Search is locale-aware. An English query searches English pages. A German query searches German pages.
 
 ## Spotlight interface
 
 The default layout opens search from the header search button, `/`, or `Mod+K`. Results update without a full page reload. Arrow keys move the selection, and Enter opens the active result.
+
+With collections, search starts in the current collection. Scope buttons switch between **Everything** and individual collections without leaving the dialog.
 
 ## Project customization
 

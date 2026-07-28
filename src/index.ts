@@ -5,6 +5,8 @@ export { defaultPlugins } from "./plugins";
 export type {
   BodyItem,
   FibelApp,
+  FibelCollection,
+  FibelCollectionConfig,
   FibelConfig,
   FibelContext,
   FibelCustomPage,

@@ -42,6 +42,33 @@ Both keys are optional. `content` defaults to `docs` and points to the Markdown 
 
 Keep links in Markdown files stable and relative to the documentation. This makes mounted deployments easier to maintain.
 
+## Collections
+
+Use `collections` instead of the top-level `content` folder when several documentation areas should share one Fibel instance:
+
+```ts
+export default defineFibel({
+  title: "Cloud",
+  collections: [
+    {
+      id: "docs",
+      label: "Docs",
+      description: "Product documentation.",
+      content: "content/docs",
+    },
+    {
+      id: "ui",
+      label: "UI",
+      description: "Component reference.",
+      content: "content/ui",
+    },
+  ],
+  defaultCollection: "docs",
+});
+```
+
+`path` optionally changes a collection's public path and otherwise defaults to its ID. Custom pages select a collection with `collection`; omitted values use `defaultCollection`. The [collections guide](/en/collections) documents URL composition, locale redirects, search scopes, Solid pages, Assistant, MCP, and discovery routes.
+
 ## Routing
 
 ```ts
@@ -55,7 +82,7 @@ export default defineFibel({
 });
 ```
 
-`basePath` is the public path of the documentation. Set it when Fibel runs under a sub-route. `internalPath` is reserved for generated files and internal endpoints. `assetsPath` is the public path for the assets folder.
+`basePath` is the public path of the documentation. Set it when Fibel runs under a sub-route. `internalPath` is reserved for generated files and internal endpoints. `assetsPath` is the public path for the assets folder. Collection routes compose as `{basePath}/{locale}/{collectionPath}/{pageSlug}`.
 
 ## Locales
 
@@ -110,7 +137,7 @@ export default defineFibel({
 });
 ```
 
-`headerLinks` fills the navigation next to the site title. Local values are resolved against the locale of the current page, so `/runtime` points to `/en/runtime` for an English reader and to `/de/runtime` for a German one. Write the value as the page slug without a locale segment.
+`headerLinks` fills the navigation next to the site title. Local values are resolved against the locale and current collection of the page, so `/runtime` points to `/en/runtime` for a legacy English site and `/docs/en/ui/runtime` inside a mounted `ui` collection. Write the value as the page slug without locale or collection segments.
 
 A link is marked as active when its value matches the slug of the current page. When `headerLinks` is not set, the header shows no navigation.
 
@@ -143,7 +170,7 @@ export default defineFibel({
 });
 ```
 
-`title` is the shared brand and stays independent from the instance title used by metadata and the assistant. `homeHref` and link `href` values accept either a string or a synchronous function receiving `locale`, `pathname`, and `basePath`. `activeWhen` marks a link active for the exact prefix and its descendants.
+`title` is the shared brand and stays independent from the instance title used by metadata and the assistant. `homeHref` and link `href` values accept either a string or a synchronous function receiving `locale`, `pathname`, `basePath`, and the optional `collection` ID. `activeWhen` marks a link active for the exact prefix and its descendants.
 
 `search`, `themeToggle`, and `mobileNavigation` default to `true` and can be disabled individually. `headerLinks` remains the shorter locale-relative API for links inside a single Fibel instance.
 
@@ -159,7 +186,7 @@ export default defineFibel({
 });
 ```
 
-Each link has a `label` and a `value`. Local values are resolved against the locale of the current page, exactly like header links, so `/imprint` points to `/en/imprint` for an English reader and to `/de/imprint` for a German one. Absolute `https:`, `mailto:`, `tel:`, and hash links are used as written.
+Each link has a `label` and a `value`. Local values are resolved against the locale and current collection of the page, exactly like header links. Absolute `https:`, `mailto:`, `tel:`, and hash links are used as written.
 
 ## Frontmatter
 
@@ -181,7 +208,7 @@ Every field is optional. `title` is the page title; without it Fibel uses the fi
 
 ## Custom pages
 
-`pages` registers application-rendered routes alongside Markdown files. Page metadata follows the same navigation, search, SEO, and visibility rules. Optional `context` supplies the Markdown returned by raw routes and read by search and the assistant.
+`pages` registers application-rendered routes alongside Markdown files. Page metadata follows the same navigation, search, SEO, and visibility rules. Optional `context` supplies the Markdown returned by raw routes and read by search and the assistant. In collection mode, `collection` selects the owning collection and otherwise falls back to `defaultCollection`.
 
 The [custom pages guide](/en/custom-pages) documents the complete renderer contract, shared and localized context, Solid SSR integration, and multiple instances.
 

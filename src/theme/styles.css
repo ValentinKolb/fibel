@@ -81,6 +81,16 @@
     @apply inline-flex h-9 min-w-72 items-center gap-2 rounded-full border-0 bg-zinc-100 px-4 text-left text-sm text-zinc-500 transition hover:bg-zinc-200/70 focus-visible:outline-none focus-visible:bg-zinc-200/70 dark:bg-white/[0.07] dark:text-zinc-400 dark:hover:bg-white/10 dark:focus-visible:bg-white/10;
   }
 
+  .fibel-search-scope {
+    @apply rounded-full border-0 bg-transparent px-3 py-1.5 text-xs font-medium text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-2 focus-visible:outline-offset-2 dark:text-zinc-400 dark:hover:bg-white/10 dark:hover:text-white;
+    outline-color: var(--fibel-focus-ring);
+  }
+
+  .fibel-search-scope.is-active {
+    background: var(--fibel-accent-surface);
+    color: var(--fibel-accent-foreground-strong);
+  }
+
   .fibel-header-link {
     @apply inline-flex h-16 items-center border-b-2 border-transparent pt-0.5 leading-none text-zinc-700 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white;
   }
@@ -102,6 +112,18 @@
 
   .fibel-sidebar-link.is-active {
     border-color: var(--fibel-accent);
+  }
+
+  .fibel-collection-link {
+    @apply block rounded-r-md border-l-2 border-transparent py-2 pl-4 pr-3 text-[0.98rem] font-medium leading-6 text-zinc-600 transition hover:bg-zinc-100/70 hover:text-zinc-950 focus-visible:outline-2 focus-visible:outline-offset-2 dark:text-zinc-400 dark:hover:bg-white/10 dark:hover:text-white;
+    outline-color: var(--fibel-focus-ring);
+  }
+
+  .fibel-collection-link.is-active {
+    border-color: var(--fibel-accent);
+    background: var(--fibel-accent-surface);
+    color: var(--fibel-accent-foreground-strong);
+    font-weight: 600;
   }
 
   .fibel-footer-link:hover {

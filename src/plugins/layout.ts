@@ -1,4 +1,5 @@
 import { renderFibelHeader } from "../layout";
+import { navKey, pageRoute, sameDocument } from "../collections";
 import type {
   FibelContext,
   FibelHeaderHref,
@@ -87,13 +88,22 @@ function renderDocument(
     <link rel="stylesheet" href="${stylesheet}">${renderHeadTags(page, context)}
   </head>
   <body class="min-h-screen bg-white text-zinc-950 antialiased dark:bg-zinc-950 dark:text-zinc-100">
-    ${renderShell(page, context.nav.get(page.locale.code) ?? [], theme, searchUrl, context, document.body, options)}
+    ${renderShell(page, context.nav.get(navKey(page.locale.code, page.collection?.id)) ?? [], theme, searchUrl, context, document.body, options)}
     ${renderBodyItems(page, context)}
     <script>window.__FIBEL__=${JSON.stringify({
       cookieName: config.theme.cookieName,
       defaultTheme: config.theme.defaultMode,
       searchUrl,
       locale: page.locale.code,
+      ...(config.collections.length > 0
+        ? {
+            collection: page.collection?.id,
+            collections: config.collections.map(({ id, label }) => ({
+              id,
+              label,
+            })),
+          }
+        : {}),
     })}</script>
     <script type="module" src="${client}"></script>
     ${document.scripts ?? ""}
@@ -133,12 +143,13 @@ function renderShell(
     <div class="mx-auto grid max-w-[120rem] grid-cols-1 lg:grid-cols-[19rem_minmax(0,1fr)]">
       <div class="fixed inset-x-0 bottom-0 ${backdropTop} z-40 hidden bg-zinc-950/20 backdrop-blur-[1px] lg:hidden" data-sidebar-backdrop></div>
       <aside class="fibel-sidebar fixed bottom-0 left-0 ${sidebarPosition} z-50 w-80 -translate-x-full overflow-y-auto border-r border-zinc-200 bg-white p-5 pt-6 transition-transform dark:border-white/10 dark:bg-zinc-950 lg:sticky lg:z-20 lg:w-auto lg:translate-x-0 lg:pt-9" data-sidebar>
+        ${renderCollectionNav(page, context)}
         ${renderNav(nav, page)}
       </aside>
       ${renderMain(page, context, body)}
     </div>
     ${renderFooter(page, context, theme, themeToggle)}
-    ${searchEnabled ? renderSearchDialog(searchUrl, header.searchPlaceholder ?? "Search documentation...") : ""}
+    ${searchEnabled ? renderSearchDialog(searchUrl, header.searchPlaceholder ?? "Search documentation...", page, context) : ""}
   </div>`;
 }
 
@@ -157,7 +168,7 @@ function renderMain(page: FibelPage, context: FibelContext, body: string) {
             ${renderPageActions(page)}
           </div>
           <div class="fibel-prose">${body}</div>
-          ${renderPager(page, context.pages.filter((candidate) => candidate.locale.code === page.locale.code && !candidate.meta.hidden))}
+          ${renderPager(page, context.pages.filter((candidate) => candidate.locale.code === page.locale.code && candidate.collection?.id === page.collection?.id && !candidate.meta.hidden))}
         </article>
       </main>`;
 }
@@ -179,6 +190,7 @@ function renderConfiguredHeader(page: FibelPage, context: FibelContext, theme: T
     locale: page.locale.code,
     pathname: page.href,
     basePath: config.routing.basePath,
+    collection: page.collection?.id,
   };
   const links = header.links
     ? header.links.map((link) => {
@@ -197,7 +209,7 @@ function renderConfiguredHeader(page: FibelPage, context: FibelContext, theme: T
         active: isLocalPath(link.value) && normalizeSlug(link.value) === page.slug,
       }));
   const locales = context.pages
-    .filter((candidate) => candidate.slug === page.slug)
+    .filter((candidate) => sameDocument(candidate, page))
     .map((candidate) => ({
       label: candidate.locale.label,
       href: candidate.href,
@@ -207,7 +219,14 @@ function renderConfiguredHeader(page: FibelPage, context: FibelContext, theme: T
   return renderFibelHeader({
     title: header.title ?? config.title,
     homeHref: resolveHeaderHref(
-      header.homeHref ?? ((current) => joinUrl(current.basePath, current.locale)),
+      header.homeHref ??
+        (() =>
+          pageRoute(
+            config.routing.basePath,
+            page.locale.code,
+            "/",
+            page.collection,
+          )),
       linkContext,
     ),
     links,
@@ -254,8 +273,20 @@ function renderNav(nav: NavSection[], page: FibelPage) {
   </nav>`;
 }
 
+function renderCollectionNav(page: FibelPage, context: FibelContext) {
+  if (context.config.collections.length < 2) return "";
+  return `<nav class="mb-6 space-y-1 border-b border-zinc-200 pb-5 dark:border-white/10" aria-label="Documentation collections">
+    ${context.config.collections
+      .map((collection) => {
+        const active = collection.id === page.collection?.id;
+        return `<a class="fibel-collection-link${active ? " is-active" : ""}" href="${pageRoute(context.config.routing.basePath, page.locale.code, "/", collection)}" aria-current="${active ? "page" : "false"}">${escapeHtml(collection.label)}</a>`;
+      })
+      .join("")}
+  </nav>`;
+}
+
 function renderLocaleMenu(page: FibelPage, context: FibelContext, placement: "header" | "footer") {
-  const sameSlug = context.pages.filter((candidate) => candidate.slug === page.slug);
+  const sameSlug = context.pages.filter((candidate) => sameDocument(candidate, page));
   if (sameSlug.length < 2) return "";
   const current = sameSlug.find((candidate) => candidate.locale.code === page.locale.code) ?? page;
   const menuClass = placement === "header" ? "right-0 top-11" : "bottom-11 left-0 sm:left-auto sm:right-0";
@@ -364,7 +395,12 @@ const normalizeSlug = (value: string) => value.replace(/\/+$/g, "") || "/";
 function resolveNavHref(value: string, page: FibelPage, context: FibelContext) {
   if (!isLocalPath(value)) return value;
   const slug = normalizeSlug(value);
-  return joinUrl(context.config.routing.basePath, page.locale.code, slug === "/" ? undefined : slug);
+  return pageRoute(
+    context.config.routing.basePath,
+    page.locale.code,
+    slug,
+    page.collection,
+  );
 }
 
 function renderPager(page: FibelPage, pages: FibelPage[]) {
@@ -378,7 +414,33 @@ function renderPager(page: FibelPage, pages: FibelPage[]) {
   </div>`;
 }
 
-function renderSearchDialog(searchUrl: string, placeholder: string) {
+function renderSearchDialog(
+  searchUrl: string,
+  placeholder: string,
+  page: FibelPage,
+  context: FibelContext,
+) {
+  const initialMessage =
+    context.config.collections.length > 0
+      ? "Type to search this collection. Open anytime with Mod+K."
+      : "Type to search the current language. Open anytime with Mod+K.";
+  const scopes =
+    context.config.collections.length > 1
+      ? `<div class="flex flex-wrap gap-1 px-3 pb-2" data-search-scopes role="group" aria-label="Search scope">
+          ${[
+            { id: "", label: "Everything" },
+            ...context.config.collections.map((collection) => ({
+              id: collection.id,
+              label: collection.label,
+            })),
+          ]
+            .map(
+              (scope) =>
+                `<button class="fibel-search-scope${scope.id === page.collection?.id ? " is-active" : ""}" type="button" data-search-scope="${escapeHtml(scope.id)}" aria-pressed="${scope.id === page.collection?.id}">${escapeHtml(scope.label)}</button>`,
+            )
+            .join("")}
+        </div>`
+      : "";
   return `<div class="fixed inset-0 z-[70] hidden bg-slate-950/40 p-4 backdrop-blur-sm" data-search-dialog>
     <div class="mx-auto mt-20 max-w-2xl overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-2xl shadow-zinc-950/20 ring-1 ring-black/5 dark:border-white/10 dark:bg-zinc-900 dark:shadow-black/40 dark:ring-white/10">
       <div class="p-3">
@@ -388,8 +450,9 @@ function renderSearchDialog(searchUrl: string, placeholder: string) {
           <kbd class="rounded-full border border-zinc-200 bg-zinc-50 px-1.5 py-0.5 text-[11px] text-zinc-500 dark:border-white/10 dark:bg-white/10 dark:text-zinc-400">Esc</kbd>
         </div>
       </div>
+      ${scopes}
       <div class="max-h-[28rem] overflow-y-auto p-2" data-search-results data-search-url="${searchUrl}">
-        <p class="px-3 py-8 text-center text-sm text-slate-500 dark:text-slate-400">Type to search the current language. Open anytime with Mod+K.</p>
+        <p class="px-3 py-8 text-center text-sm text-slate-500 dark:text-slate-400">${initialMessage}</p>
       </div>
     </div>
   </div>`;

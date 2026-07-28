@@ -22,6 +22,14 @@ Der Suchendpunkt liegt unter dem internen Pfad.
 
 Wenn Fibel unter `/docs` läuft, wird der Endpunkt unter `/docs/_fibel/search` ausgeliefert.
 
+Bei konfigurierten Collections akzeptiert der Endpunkt optional eine Collection-ID:
+
+```txt
+/docs/_fibel/search?locale=de&collection=ui&q=button
+```
+
+Ohne `collection` werden alle Collections der Locale durchsucht.
+
 ## Indexierte Inhalte
 
 Der Index enthält:
@@ -31,13 +39,15 @@ Der Index enthält:
 - Sidebar-Bereich.
 - Markdown-Text der Seite.
 
-Bei eigenen Seiten wird optionales `context`-Markdown statt des gerenderten Komponenten-HTML indexiert. Getrennte Fibel-Instanzen erzeugen dadurch automatisch getrennte Ergebnismengen.
+Bei eigenen Seiten wird optionales `context`-Markdown statt des gerenderten Komponenten-HTML indexiert. Bei konfigurierten Collections enthalten Sucheinträge zusätzlich deren ID und Label.
 
 Die Suche ist locale-bewusst. Eine deutsche Anfrage durchsucht deutsche Seiten. Eine englische Anfrage durchsucht englische Seiten.
 
 ## Spotlight-Oberfläche
 
 Das Default-Layout öffnet die Suche über den Suchbutton im Header, `/` oder `Mod+K`. Ergebnisse werden ohne vollständigen Seitenreload aktualisiert. Pfeiltasten bewegen die Auswahl, Enter öffnet das aktive Ergebnis.
+
+Bei Collections startet die Suche im aktuellen Bereich. Scope-Buttons wechseln zwischen **Everything** und einzelnen Collections, ohne den Dialog zu schließen.
 
 ## Projektanpassung
 

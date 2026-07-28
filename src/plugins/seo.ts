@@ -1,4 +1,5 @@
 import type { FibelContext, FibelPage, FibelPlugin } from "../types";
+import { pageRoute, sameDocument } from "../collections";
 import { absoluteUrl as toAbsoluteUrl, escapeHtml, joinUrl, text } from "../utils";
 
 export function seoPlugin(): FibelPlugin {
@@ -83,7 +84,9 @@ function absoluteUrl(href: string, context: FibelContext) {
 }
 
 function translations(page: FibelPage, context: FibelContext) {
-  return context.pages.filter((candidate) => candidate.slug === page.slug && !candidate.meta.hidden);
+  return context.pages.filter(
+    (candidate) => sameDocument(candidate, page) && !candidate.meta.hidden,
+  );
 }
 
 function renderRobotsMeta(page: FibelPage) {
@@ -131,7 +134,18 @@ function renderSocialTags(page: FibelPage, context: FibelContext) {
 function renderStructuredData(page: FibelPage, context: FibelContext) {
   if (page.meta.hidden) return "";
   const config = context.config;
-  const home = absoluteUrl(joinUrl(config.routing.basePath, page.locale.code), context);
+  const defaultCollection = config.collections.find(
+    (collection) => collection.id === config.defaultCollection,
+  );
+  const home = absoluteUrl(
+    pageRoute(
+      config.routing.basePath,
+      page.locale.code,
+      "/",
+      defaultCollection,
+    ),
+    context,
+  );
   const site = { "@type": "WebSite", name: config.title, url: home, inLanguage: page.locale.code };
 
   const article: Record<string, unknown> = {
@@ -157,6 +171,22 @@ function renderStructuredData(page: FibelPage, context: FibelContext) {
 function breadcrumbs(page: FibelPage, context: FibelContext, home: string) {
   const trail = [
     { name: context.config.title, item: home },
+    ...(page.collection
+      ? [
+          {
+            name: page.collection.label,
+            item: absoluteUrl(
+              pageRoute(
+                context.config.routing.basePath,
+                page.locale.code,
+                "/",
+                page.collection,
+              ),
+              context,
+            ),
+          },
+        ]
+      : []),
     { name: page.meta.section },
     { name: page.meta.title, item: absoluteUrl(page.href, context) },
   ];

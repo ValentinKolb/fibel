@@ -28,11 +28,14 @@ export default defineFibel({
     ...defaultPlugins(),
     assistantPlugin({
       provider: providerFromEnv(),
+      launcherLabel: "Product fragen",
       systemPrompt: "Hilf Lesern bei der Konfiguration von Product. Antworte kurz und praktisch.",
     }),
   ],
 });
 ```
+
+`launcherLabel` ersetzt den lokalisierten Text des Launcher-Buttons (`Ask Product Docs` oder `Product Docs fragen`). Ohne Wert oder bei einem leeren String bleibt dieser lokalisierte Standard erhalten. Der Launcher verwendet das integrierte Sparkles-Icon von Fibel.
 
 Ein Modell und der native Key des ausgewählten Providers werden als Umgebungsvariablen gesetzt:
 
@@ -120,7 +123,7 @@ Das Server-Paket nutzt Redis über Bun. `createSessionStore` ist außerdem erfor
 
 ## Kontext steuern
 
-`systemPrompt` enthält vertrauenswürdige Anweisungen des Betreibers. Dort gehören ein kurzer Produktüberblick und stabile Produktregeln hinein, nicht die gesamte Dokumentation. Fibel ergänzt außerdem die aufgelöste Site-Beschreibung und die Beschreibung der aktuellen Seite als vertrauenswürdigen Überblickskontext. Einfache Fragen zu Identität, grobem Funktionsumfang und aktueller Seite lassen sich daraus ohne Tool-Aufruf beantworten. Detaillierte Anleitungen sowie Aussagen zu Konfiguration, API, Code und exaktem Verhalten erfordern weiterhin eine Suche und das Lesen eines Treffers.
+`systemPrompt` enthält vertrauenswürdige Anweisungen des Betreibers. Dort gehören ein kurzer Produktüberblick und stabile Produktregeln hinein, nicht die gesamte Dokumentation. Fibel ergänzt außerdem die aufgelöste Site-Beschreibung, die aktuelle Collection und die Beschreibung der aktuellen Seite als vertrauenswürdigen Überblickskontext. Einfache Fragen zu Identität, grobem Funktionsumfang, Collection und aktueller Seite lassen sich daraus ohne Tool-Aufruf beantworten. Detaillierte Anleitungen sowie Aussagen zu Konfiguration, API, Code und exaktem Verhalten erfordern weiterhin eine Suche und das Lesen eines Treffers.
 
 Für einfachen Request-Kontext können Template-Variablen verwendet werden:
 
@@ -128,11 +131,11 @@ Für einfachen Request-Kontext können Template-Variablen verwendet werden:
 assistantPlugin({
   provider: providerFromEnv(),
   systemPrompt:
-    "Hilf {{language}} Lesern mit {{siteTitle}}.\nSite-Überblick: {{siteDescription}}\nAktuelle Seite: {{currentPageTitle}} ({{currentPage}})\nSeitenüberblick: {{currentPageDescription}}\nHeute ist {{weekday}}, der {{date}}.",
+    "Hilf {{language}} Lesern mit {{siteTitle}}.\nSite-Überblick: {{siteDescription}}\nCollection: {{currentCollectionLabel}} ({{currentCollection}})\nCollection-Überblick: {{currentCollectionDescription}}\nAktuelle Seite: {{currentPageTitle}} ({{currentPage}})\nSeitenüberblick: {{currentPageDescription}}\nHeute ist {{weekday}}, der {{date}}.",
 });
 ```
 
-Verfügbar sind `{{siteTitle}}`, `{{siteDescription}}`, `{{locale}}`, `{{language}}`, `{{currentPage}}`, `{{currentPageTitle}}`, `{{currentPageDescription}}`, `{{date}}`, `{{time}}`, `{{weekday}}` und `{{timezone}}`. Datum und Uhrzeit verwenden die Zeitzone des Servers.
+Verfügbar sind `{{siteTitle}}`, `{{siteDescription}}`, `{{locale}}`, `{{language}}`, `{{currentCollection}}`, `{{currentCollectionLabel}}`, `{{currentCollectionDescription}}`, `{{currentPage}}`, `{{currentPageTitle}}`, `{{currentPageDescription}}`, `{{date}}`, `{{time}}`, `{{weekday}}` und `{{timezone}}`. Datum und Uhrzeit verwenden die Zeitzone des Servers.
 
 Wenn sich die Anweisung in TypeScript verständlicher zusammensetzen lässt, kann eine synchrone Funktion verwendet werden:
 
@@ -147,6 +150,8 @@ assistantPlugin({
 Pro Request ergänzt das Plugin den vertrauenswürdigen Überblickskontext, die aktuelle Sprache und Seite, eine begrenzte Session-History sowie die von den Tools abgerufene Dokumentation. Versteckte Seiten bleiben ausgeschlossen. Tool-Ergebnisse gelten als nicht vertrauenswürdiger Referenztext und können die Systemanweisungen nicht ersetzen.
 
 Eigene Seiten benötigen kein weiteres Tool und keine Registry. Ihr `context`-Markdown steht über die vorhandenen Such- und Lese-Tools bereit. Wird der Assistent auf einer eigenen Route geöffnet, löst Fibel diese Seite automatisch als aktuelle Seite auf.
+
+Auf Collection-Seiten durchsucht `search_docs` standardmäßig die aktuelle Collection. Für bereichsübergreifende Fragen kann das Modell eine andere Collection-ID oder `all` angeben. `read_doc` verlangt weiterhin genau einen kanonischen `href` aus dem Suchergebnis.
 
 ## Markdown-Antworten
 

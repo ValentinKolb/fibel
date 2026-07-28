@@ -14,6 +14,21 @@ describe("fibel app", () => {
     expect(await response.text()).toContain("Fibel publishes Markdown and host-rendered application pages");
   });
 
+  test("keeps mobile navigation available until the desktop sidebar appears", async () => {
+    const app = await createFibelApp(config);
+    const html = await (
+      await app.fetch(new Request("http://localhost/en"))
+    ).text();
+
+    expect(html).toContain(
+      'class="fibel-icon-button lg:hidden" type="button" data-nav-toggle',
+    );
+    expect(html).toContain("lg:translate-x-0");
+    expect(html).not.toContain(
+      'class="fibel-icon-button md:hidden" type="button" data-nav-toggle',
+    );
+  });
+
   test("searches server-side", async () => {
     const app = await createFibelApp(config);
     const response = await app.fetch(new Request("http://localhost/_fibel/search?locale=en&q=theme"));
@@ -83,6 +98,9 @@ describe("fibel app", () => {
     expect(styles).toContain("--fibel-focus-ring:var(--fibel-accent)");
     expect(styles).toContain("color:var(--fibel-accent-strong)");
     expect(styles).toMatch(/\.page-chip-accent\{[^}]*background:var\(--fibel-accent-surface\)/);
+    expect(styles).toMatch(
+      /\.fibel-collection-link\.is-active\{[^}]*border-color:var\(--fibel-accent\)[^}]*background:var\(--fibel-accent-surface\)/,
+    );
     expect(html).toContain("fibel-brand");
     expect(html).toContain("fibel-sidebar-link is-active");
     expect(html).toContain("fibel-pager-link");
