@@ -319,7 +319,7 @@ function renderFooter(
   const links = context.config.footerLinks;
   const footerItems = context.footerItems;
   if (links.length === 0 && context.config.locales.length < 2 && footerItems.length === 0) return "";
-  return `<footer class="border-t border-zinc-200 bg-white dark:border-white/10 dark:bg-zinc-950">
+  return `<footer class="border-t border-zinc-200 bg-white dark:border-white/10 dark:bg-zinc-950" data-fibel-footer>
     <div class="mx-auto flex max-w-[120rem] flex-col gap-4 px-5 py-7 text-sm text-zinc-500 dark:text-zinc-400 md:flex-row md:items-center md:justify-between lg:px-8">
       <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
         <span>© ${new Date().getFullYear()} ${escapeHtml(context.config.title)}</span>

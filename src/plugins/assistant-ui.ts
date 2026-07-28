@@ -13,7 +13,7 @@ export const assistantStyles = String.raw`
 .fibel-assistant-launcher {
   position: fixed;
   right: 1.25rem;
-  bottom: 1.25rem;
+  bottom: calc(1.25rem + var(--fibel-assistant-footer-offset, 0px));
   z-index: 60;
   display: inline-flex;
   align-items: center;
@@ -330,7 +330,7 @@ export const assistantStyles = String.raw`
 .dark .fibel-assistant__send:hover { background: #e4e4e7; }
 .dark .fibel-assistant__send:disabled { background: #3f3f46; color: #71717a; }
 @media (max-width: 640px) {
-  .fibel-assistant-launcher { right: .85rem; bottom: .85rem; }
+  .fibel-assistant-launcher { right: .85rem; bottom: calc(.85rem + var(--fibel-assistant-footer-offset, 0px)); }
   .fibel-assistant {
     inset: 4.5rem .75rem .75rem;
     width: auto;
@@ -356,8 +356,10 @@ if (root) {
   const send = root.querySelector("[data-fibel-assistant-send]");
   const status = root.querySelector("[data-fibel-assistant-status]");
   const welcome = root.querySelector("[data-fibel-assistant-welcome]");
+  const footer = document.querySelector("[data-fibel-footer]");
   let activeController;
   let lockedScrollY;
+  let launcherOffsetFrame;
 
   const labels = {
     ready: root.dataset.ready || "Ready",
@@ -369,6 +371,27 @@ if (root) {
   const focusInput = () => {
     requestAnimationFrame(() => input?.focus({ preventScroll: true }));
   };
+
+  const syncLauncherOffset = () => {
+    if (!launcher || launcherOffsetFrame !== undefined) return;
+    launcherOffsetFrame = requestAnimationFrame(() => {
+      launcherOffsetFrame = undefined;
+      const bounds = footer?.getBoundingClientRect();
+      const overlap = bounds
+        ? Math.max(0, Math.min(window.innerHeight, bounds.bottom) - Math.max(0, bounds.top))
+        : 0;
+      launcher.style.setProperty("--fibel-assistant-footer-offset", Math.ceil(overlap) + "px");
+    });
+  };
+
+  const footerResizeObserver =
+    footer && typeof ResizeObserver === "function"
+      ? new ResizeObserver(syncLauncherOffset)
+      : undefined;
+  footerResizeObserver?.observe(footer);
+  window.addEventListener("scroll", syncLauncherOffset, { passive: true });
+  window.addEventListener("resize", syncLauncherOffset);
+  syncLauncherOffset();
 
   const unlockScroll = (restorePosition = true) => {
     if (lockedScrollY === undefined) return;
@@ -421,6 +444,8 @@ if (root) {
   });
   window.addEventListener("pagehide", () => {
     activeController?.abort();
+    footerResizeObserver?.disconnect();
+    if (launcherOffsetFrame !== undefined) cancelAnimationFrame(launcherOffsetFrame);
     unlockScroll(false);
   });
 

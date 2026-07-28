@@ -134,6 +134,7 @@ describe("assistant plugin", () => {
     expect(html).toContain('data-fibel-assistant-expand');
     expect(html).toContain('<span>Ask Fibel</span>');
     expect(html).toContain('class="fibel-assistant-launcher__icon"');
+    expect(html).toContain("data-fibel-footer");
     expect(html).not.toContain('d="M4 5.5A2.5');
     expect(html).not.toContain("Answers from visible pages");
 
@@ -143,6 +144,8 @@ describe("assistant plugin", () => {
     expect(internal.headers.get("cache-control")).toBe("no-cache");
     const internalScript = await internal.text();
     expect(internalScript).toContain("fibel-assistant-scroll-locked");
+    expect(internalScript).toContain('document.querySelector("[data-fibel-footer]")');
+    expect(internalScript).toContain("getBoundingClientRect()");
     expect(internalScript).toContain("requestAnimationFrame");
     expect(internalScript).toContain("focus({ preventScroll: true })");
 
@@ -150,6 +153,12 @@ describe("assistant plugin", () => {
     expect(styles.status).toBe(200);
     const assistantCss = await styles.text();
     expect(assistantCss).toContain(".fibel-assistant-scroll-locked");
+    expect(assistantCss).toContain(
+      "bottom: calc(1.25rem + var(--fibel-assistant-footer-offset, 0px))",
+    );
+    expect(assistantCss).toContain(
+      "bottom: calc(.85rem + var(--fibel-assistant-footer-offset, 0px))",
+    );
     expect(assistantCss).toContain("var(--fibel-focus-ring)");
     expect(assistantCss).toContain(".fibel-table-scroll");
     expect(assistantCss).not.toMatch(/table\s*\{\s*display:\s*block/);
