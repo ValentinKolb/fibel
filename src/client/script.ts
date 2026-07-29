@@ -22,6 +22,22 @@ document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
 const sidebar = document.querySelector("[data-sidebar]");
 const sidebarBackdrop = document.querySelector("[data-sidebar-backdrop]");
 const navToggles = document.querySelectorAll("[data-nav-toggle]");
+const sidebarScrollKey = sidebar?.dataset.sidebarScrollKey;
+const saveSidebarScroll = () => {
+  if (!sidebar || !sidebarScrollKey) return;
+  try {
+    sessionStorage.setItem(sidebarScrollKey, String(sidebar.scrollTop));
+  } catch {}
+};
+let sidebarScrollFrame;
+sidebar?.addEventListener("scroll", () => {
+  cancelAnimationFrame(sidebarScrollFrame);
+  sidebarScrollFrame = requestAnimationFrame(saveSidebarScroll);
+}, { passive: true });
+document.addEventListener("click", (event) => {
+  if (event.target?.closest?.("a[href]")) saveSidebarScroll();
+}, { capture: true });
+window.addEventListener("pagehide", saveSidebarScroll);
 const setSidebar = (open) => {
   sidebar?.classList.toggle("-translate-x-full", !open);
   sidebar?.setAttribute("data-open", open ? "true" : "false");

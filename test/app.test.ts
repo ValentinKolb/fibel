@@ -29,6 +29,36 @@ describe("fibel app", () => {
     );
   });
 
+  test("restores the scoped sidebar scroll position before rendering the page body", async () => {
+    const app = await createFibelApp(config);
+    const english = await (await app.fetch(new Request("http://localhost/en"))).text();
+    const german = await (await app.fetch(new Request("http://localhost/de"))).text();
+    const client = await (await app.fetch(new Request("http://localhost/_fibel/client.js"))).text();
+    const scopedApp = await createFibelApp({
+      ...config,
+      routing: { ...config.routing, basePath: "/docs" },
+      collections: [{ id: "guide", label: "Guide", content: "docs" }],
+      defaultCollection: "guide",
+    });
+    const scoped = await (
+      await scopedApp.fetch(new Request("http://localhost/docs/en/guide"))
+    ).text();
+
+    expect(english).toContain('data-sidebar-scroll-key="fibel-sidebar:/:en:"');
+    expect(german).toContain('data-sidebar-scroll-key="fibel-sidebar:/:de:"');
+    expect(scoped).toContain(
+      'data-sidebar-scroll-key="fibel-sidebar:/docs:en:guide"',
+    );
+    expect(english.indexOf("sessionStorage.getItem")).toBeGreaterThan(
+      english.indexOf("data-sidebar-scroll-key"),
+    );
+    expect(english.indexOf("sessionStorage.getItem")).toBeLessThan(
+      english.indexOf("<main"),
+    );
+    expect(client).toContain("sessionStorage.setItem(sidebarScrollKey");
+    expect(client).toContain('window.addEventListener("pagehide", saveSidebarScroll)');
+  });
+
   test("searches server-side", async () => {
     const app = await createFibelApp(config);
     const response = await app.fetch(new Request("http://localhost/_fibel/search?locale=en&q=theme"));

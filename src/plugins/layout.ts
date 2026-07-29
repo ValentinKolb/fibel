@@ -137,20 +137,38 @@ function renderShell(
     ? "top-16 lg:top-16 lg:h-[calc(100vh-4rem)]"
     : "top-0 lg:top-0 lg:h-screen";
   const backdropTop = headerVisible ? "top-16" : "top-0";
+  const sidebarScrollKey = [
+    "fibel-sidebar",
+    context.config.routing.basePath || "/",
+    page.locale.code,
+    page.collection?.id ?? "",
+  ].join(":");
   return `<div class="fibel-app min-h-screen">
     ${headerVisible ? renderConfiguredHeader(page, context, theme) : ""}
 
     <div class="mx-auto grid max-w-[120rem] grid-cols-1 lg:grid-cols-[19rem_minmax(0,1fr)]">
       <div class="fixed inset-x-0 bottom-0 ${backdropTop} z-40 hidden bg-zinc-950/20 backdrop-blur-[1px] lg:hidden" data-sidebar-backdrop></div>
-      <aside class="fibel-sidebar fixed bottom-0 left-0 ${sidebarPosition} z-50 w-80 -translate-x-full overflow-y-auto border-r border-zinc-200 bg-white p-5 pt-6 transition-transform dark:border-white/10 dark:bg-zinc-950 lg:sticky lg:z-20 lg:w-auto lg:translate-x-0 lg:pt-9" data-sidebar>
+      <aside class="fibel-sidebar fixed bottom-0 left-0 ${sidebarPosition} z-50 w-80 -translate-x-full overflow-y-auto border-r border-zinc-200 bg-white p-5 pt-6 transition-transform dark:border-white/10 dark:bg-zinc-950 lg:sticky lg:z-20 lg:w-auto lg:translate-x-0 lg:pt-9" data-sidebar data-sidebar-scroll-key="${escapeHtml(sidebarScrollKey)}">
         ${renderCollectionNav(page, context)}
         ${renderNav(nav, page)}
       </aside>
+      ${renderSidebarScrollRestore()}
       ${renderMain(page, context, body)}
     </div>
     ${renderFooter(page, context, theme, themeToggle)}
     ${searchEnabled ? renderSearchDialog(searchUrl, header.searchPlaceholder ?? "Search documentation...", page, context) : ""}
   </div>`;
+}
+
+function renderSidebarScrollRestore() {
+  return `<script>
+try {
+  const sidebar = document.currentScript.previousElementSibling;
+  const value = sessionStorage.getItem(sidebar.dataset.sidebarScrollKey);
+  const scrollTop = Number(value);
+  if (value !== null && Number.isFinite(scrollTop) && scrollTop >= 0) sidebar.scrollTop = scrollTop;
+} catch {}
+</script>`;
 }
 
 function renderMain(page: FibelPage, context: FibelContext, body: string) {
