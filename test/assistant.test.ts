@@ -310,6 +310,21 @@ describe("assistant plugin", () => {
       "For instructions, configuration, APIs, code, exact behavior",
     );
     expect(requests[0]?.systemPrompt).toContain(
+      "Match explanatory prose to the language used by the user's latest question.",
+    );
+    expect(requests[0]?.systemPrompt).toContain(
+      "The documentation or page language does not determine the answer language.",
+    );
+    expect(requests[0]?.systemPrompt).toContain(
+      "Copy commands, code blocks, configuration, frontmatter, paths, package names, identifiers, option and flag names, literal values, and exact UI labels verbatim",
+    );
+    expect(requests[0]?.systemPrompt).toContain(
+      "Never translate, normalize, improve, or invent them.",
+    );
+    expect(requests[0]?.systemPrompt).toContain(
+      "using English only as fallback, and keep technical source material verbatim.",
+    );
+    expect(requests[0]?.systemPrompt).toContain(
       "site_description=Publish Markdown collections and host-rendered application pages in one documentation shell",
     );
     expect(requests[0]?.systemPrompt).toContain(

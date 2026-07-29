@@ -129,6 +129,8 @@ Active agent integrations are included automatically. When `agentSkillsPlugin()`
 
 For questions not covered by trusted context, the assistant searches visible documentation. It can answer from the bounded result snippets when they are sufficient and reads one exact result when more detail is required.
 
+The default prompt matches explanatory prose to the language of the user's latest question. The configured page language is only a fallback when the question's language is unclear. Commands, code, configuration, paths, package names, identifiers, flags, literal values, and exact UI labels remain verbatim from the documentation even when the surrounding answer uses another language. Surrounding documentation prose may be translated or summarized only without changing its supported meaning.
+
 For simple request context, use template variables:
 
 ```ts

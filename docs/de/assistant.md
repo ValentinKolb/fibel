@@ -129,6 +129,8 @@ Aktive Agent-Integrationen werden automatisch ergänzt. Ist `agentSkillsPlugin()
 
 Bei Fragen außerhalb des vertrauenswürdigen Kontexts durchsucht der Assistent die sichtbare Dokumentation. Reichen die begrenzten Suchausschnitte aus, kann er direkt antworten; andernfalls liest er genau einen Treffer vollständig.
 
+Der Standard-Prompt passt erklärende Prosa an die Sprache der letzten Nutzerfrage an. Die konfigurierte Seitensprache dient nur als Fallback, wenn die Sprache der Frage unklar ist. Befehle, Code, Konfiguration, Pfade, Paketnamen, Bezeichner, Flags, Literalwerte und exakte UI-Texte bleiben auch bei einer anderssprachigen Antwort wortgetreu aus der Dokumentation erhalten. Umgebende Dokumentationsprosa darf nur so übersetzt oder zusammengefasst werden, dass ihre belegte Bedeutung unverändert bleibt.
+
 Für einfachen Request-Kontext können Template-Variablen verwendet werden:
 
 ```ts
