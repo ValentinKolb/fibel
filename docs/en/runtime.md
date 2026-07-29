@@ -45,7 +45,7 @@ If the host owns its server bundle and output directory, generate only Fibel's
 runtime stylesheet:
 
 ```ts
-import { buildFibelStyles } from "@k2b/fibel";
+import { buildFibelStyles } from "@k2b/fibel/build";
 
 await buildFibelStyles(process.cwd(), true);
 ```

@@ -265,7 +265,7 @@ Hosts that build their own server bundle can generate only Fibel's runtime
 stylesheet and keep ownership of their output directory:
 
 ```ts
-import { buildFibelStyles } from "@k2b/fibel";
+import { buildFibelStyles } from "@k2b/fibel/build";
 
 await buildFibelStyles(process.cwd(), true);
 ```

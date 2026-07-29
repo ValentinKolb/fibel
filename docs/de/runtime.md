@@ -45,7 +45,7 @@ Wenn der Host sein Server-Bundle und Ausgabeverzeichnis selbst verwaltet, kann
 er nur das Fibel-Stylesheet erzeugen:
 
 ```ts
-import { buildFibelStyles } from "@k2b/fibel";
+import { buildFibelStyles } from "@k2b/fibel/build";
 
 await buildFibelStyles(process.cwd(), true);
 ```

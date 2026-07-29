@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, test } from "bun:test";
-import { buildFibelStyles, createFibelApp, defaultPlugins } from "../src";
+import { createFibelApp, defaultPlugins } from "../src";
+import { buildFibelStyles } from "../src/build";
 import { resolveConfig } from "../src/config";
 import config from "../fibel.config";
 

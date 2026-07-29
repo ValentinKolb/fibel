@@ -11,6 +11,7 @@
   },
   "exports": {
     ".": "./src/index.ts",
+    "./build": "./src/build.ts",
     "./layout": "./src/layout.ts",
     "./plugins": "./src/plugins/index.ts",
     "./solid": "./src/solid.ts"
