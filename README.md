@@ -259,6 +259,21 @@ export default defineFibel({
 
 Use `solidPage()` from `@k2b/fibel/solid` when the body contains Solid server components or `@k2b/ssr` islands. The host supplies its existing `html()` renderer and remains responsible for the single SSR plugin, `/_ssr` route, and production build. The [custom pages guide](https://fibel.dev/en/custom-pages) includes complete examples for Solid and multiple Fibel instances.
 
+### Host-owned production builds
+
+Hosts that build their own server bundle can generate only Fibel's runtime
+stylesheet and keep ownership of their output directory:
+
+```ts
+import { buildFibelStyles } from "@k2b/fibel";
+
+await buildFibelStyles(process.cwd(), true);
+```
+
+The second argument enables minification. The stylesheet is written to
+`.fibel/public/styles.css`; the host decides how and when its remaining server
+and asset output is replaced.
+
 ## SEO
 
 Set `siteUrl` so canonical URLs, language alternates, and sitemap entries become absolute. Fibel then adds `hreflang` alternates for every translation of a page plus an `x-default`, so search engines treat the language versions as one page instead of competitors.

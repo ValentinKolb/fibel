@@ -41,6 +41,19 @@ bunx --bun @k2b/fibel build
 
 The build creates a runtime entry and generated documentation files. Requests still pass through Fibel. This keeps the theme cookie, search, Markdown routes, and mounted paths consistent.
 
+If the host owns its server bundle and output directory, generate only Fibel's
+runtime stylesheet:
+
+```ts
+import { buildFibelStyles } from "@k2b/fibel";
+
+await buildFibelStyles(process.cwd(), true);
+```
+
+The stylesheet is written to `.fibel/public/styles.css`. The second argument
+enables minification. The host remains responsible for its other assets and for
+replacing its build output.
+
 ## Deploy behind Traefik
 
 The recommended deployment is the container image behind Traefik.

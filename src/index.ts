@@ -2,6 +2,7 @@ export { createFibelApp } from "./app";
 export { defineFibel, loadConfig, resolveConfig } from "./config";
 export { renderFibelHeader } from "./layout";
 export { defaultPlugins } from "./plugins";
+export { buildStyles as buildFibelStyles } from "./styles";
 export type {
   BodyItem,
   FibelApp,
