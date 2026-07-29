@@ -27,13 +27,16 @@ bunx --bun @k2b/fibel dev
 
 Fibel moved from `@valentinkolb/fibel` to `@k2b/fibel` in `v0.2.0`. Existing projects need to replace root imports with `@k2b/fibel`, plugin imports with `@k2b/fibel/plugins`, and CLI commands with `bunx --bun @k2b/fibel`. The previous package is deprecated.
 
-Projects worked on by coding agents should also install the Fibel agent skill:
+Projects worked on by coding agents should also install the English Fibel
+Agent Skill directly from this website with the
+[open-source Vercel Skills CLI](https://github.com/vercel-labs/skills):
 
 ```sh
-bunx skills add k2b-dev/fibel
+bunx skills add https://fibel.dev
 ```
 
-It provides the current conventions for configuration, Markdown pages, raw `.md` routes, plugins, hosting, and verification, so agents work from the documented API rather than guessing.
+It provides a concise workflow and uses the public Fibel MCP server for exact
+current details. The agent still answers in the user's language.
 
 ## Capabilities
 
@@ -99,4 +102,4 @@ Frontmatter controls metadata, navigation, and the chips below the page title. A
 
 ## Next steps
 
-[Configuration](/en/configuration) covers project setup. [Hosting](/en/runtime) describes running Fibel as a server or mounting it inside an existing application. [SEO](/en/seo) documents what search engines and language models receive. [Built-in plugins](/en/built-in-plugins) lists the default capabilities, and [Plugin API](/en/plugins) describes how to extend them.
+[Configuration](/en/configuration) covers project setup. [Hosting](/en/runtime) describes running Fibel as a server or mounting it inside an existing application. [SEO](/en/seo) documents what search engines and language models receive. [Agent Skills](/en/agent-skills) documents website-based skill installation. [Built-in plugins](/en/built-in-plugins) lists the default capabilities, and [Plugin API](/en/plugins) describes how to extend them.

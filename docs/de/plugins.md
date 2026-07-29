@@ -113,7 +113,11 @@ export function docsManifestPlugin(): FibelPlugin {
 }
 ```
 
-Ein `path`, der auf `/*` endet, wird als Präfix statt exakt abgeglichen. Das Assets-Plugin liefert damit ein ganzes Verzeichnis aus. Mit `scope: "internal"` ist eine Route nur unter `routing.internalPath` erreichbar, mit `scope: "public"` nur unter dem öffentlichen Pfad. Routen ohne Scope behalten das bestehende Verhalten und passen auf beide Pfade.
+Ein `path`, der auf `/*` endet, wird als Präfix statt exakt abgeglichen. Das Assets-Plugin liefert damit ein ganzes Verzeichnis aus. Mit `scope: "internal"` ist eine Route nur unter `routing.internalPath` erreichbar, mit `scope: "public"` nur unter dem öffentlichen Pfad. `scope: "origin"` prüft den Request-Pfad, bevor `routing.basePath` entfernt wird, und ist für domain-weite Protokolle wie Agent-Skills-Discovery vorgesehen. Routen ohne Scope behalten das bestehende Verhalten und passen auf öffentliche und interne Pfade, niemals jedoch auf Origin-Pfade.
+
+Eine Origin-Route funktioniert automatisch, wenn Fibel den vollständigen
+Fetch-Handler besitzt. Ein Host, der Fibel unter einem Subrouter einbindet,
+muss den Origin-Pfad separat an `fibel.fetch` weiterleiten.
 
 Eigene Routenpfade sollten nicht mit internen Routen oder Seitenpfaden kollidieren.
 

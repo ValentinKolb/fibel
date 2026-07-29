@@ -39,6 +39,9 @@ export async function createFibelApp(input: FibelConfig): Promise<FibelApp> {
 
 async function handleRequest(request: Request, context: FibelContext) {
   const url = new URL(request.url);
+  const originRoute = matchRoute(url.pathname, context.routes, "origin");
+  if (originRoute) return originRoute.handler(request, context);
+
   const localPath = withoutBasePath(url.pathname, context.config.routing.basePath);
   if (localPath === undefined) return new Response("Not found", { status: 404 });
 
@@ -249,10 +252,17 @@ async function handleInternalRoute(request: Request, path: string, context: Fibe
   return new Response("Not found", { status: 404 });
 }
 
-function matchRoute(path: string, routes: FibelRoute[], scope: "public" | "internal") {
+function matchRoute(
+  path: string,
+  routes: FibelRoute[],
+  scope: "public" | "internal" | "origin",
+) {
   return routes.find((route) => {
     const routeScope = route.scope ?? "both";
-    const matchesScope = routeScope === "both" || routeScope === scope;
+    const matchesScope =
+      scope === "origin"
+        ? routeScope === "origin"
+        : routeScope === "both" || routeScope === scope;
     const matchesPath = route.path === path || (route.path.endsWith("/*") && path.startsWith(route.path.slice(0, -1)));
     return matchesScope && matchesPath;
   });

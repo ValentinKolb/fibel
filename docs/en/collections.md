@@ -159,6 +159,11 @@ Global `llms.txt` files describe the site and link all collections. Each collect
 
 Sitemaps, language alternates, canonical tags, and raw Markdown URLs use the canonical locale-and-collection route.
 
+Agent Skills are independent of locales and collections. One configured
+`agentSkillsPlugin()` publishes one origin-level skill index for the complete
+Fibel instance. The skill can use the shared MCP server and its
+`list_collections` tool for exact collection-aware details.
+
 ## Keep existing sites unchanged
 
 Collections are optional. A configuration without `collections` continues to read the top-level `content` directory and keeps routes such as `/docs/en/configuration`. No collection segment, selector, MCP tool, or scoped discovery route is added.

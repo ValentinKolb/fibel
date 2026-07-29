@@ -104,9 +104,21 @@ export default defineFibel({
 
 Fibel then generates links, internal routes, and assets relative to `/docs`.
 
+If this instance enables `agentSkillsPlugin()`, also forward its
+origin-scoped well-known route:
+
+```ts
+app.all("/.well-known/agent-skills/*", (c) =>
+  docs.fetch(c.req.raw),
+);
+```
+
+The host must do this explicitly because a `/docs` subrouter never receives
+requests for the origin root. See [Agent Skills discovery](/en/agent-skills).
+
 ## Mount several instances
 
-Several Fibel instances can run in one server and one deployment. Separate base paths keep their navigation, search indexes, assistant context, chat sessions, and discovery routes independent:
+Several Fibel instances can run in one server and one deployment. Separate base paths keep their navigation, search indexes, assistant context, chat sessions, MCP endpoints, and path-scoped discovery routes independent:
 
 ```ts
 const docs = await createFibelApp(docsConfig); // basePath: "/docs"
@@ -117,7 +129,7 @@ export default new Hono()
   .mount("/ui", ui.fetch);
 ```
 
-The instances can share the same header configuration, theme cookie, assistant provider, and process-wide rate limiters. The [custom pages guide](/en/custom-pages) shows the complete header and Solid SSR setup.
+The instances can share the same header configuration, theme cookie, assistant provider, and process-wide rate limiters. Only one instance can own origin-level Agent Skills discovery; route `/.well-known/agent-skills/*` to that explicit owner. The [custom pages guide](/en/custom-pages) shows the complete header and Solid SSR setup.
 
 ## Mount in other servers
 
@@ -144,6 +156,7 @@ A Fibel app handles:
 - Internal files under `routing.internalPath`.
 - Assets under `routing.assetsPath`.
 - Plugin routes, including the SEO and `llms.txt` files.
+- Origin-scoped plugin routes when the outer server forwards them.
 - A redirect from the mount root to the default locale, so `/` lands on `/en`.
 
 When a project runs under a base path, external links and reverse proxies should preserve that path.

@@ -210,7 +210,7 @@ export type SearchEntry = {
 
 export type FibelRoute = {
   path: string;
-  scope?: "public" | "internal" | "both";
+  scope?: "public" | "internal" | "origin" | "both";
   handler: (request: Request, context: FibelContext) => Response | Promise<Response>;
 };
 

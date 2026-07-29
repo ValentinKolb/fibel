@@ -26,13 +26,17 @@ Fibel moved from `@valentinkolb/fibel` to `@k2b/fibel` in `v0.2.0`. Replace root
 
 ## Agent skill
 
-Fibel ships a Codex agent skill for documentation work. Install it in agent environments that should understand Fibel projects:
+Fibel publishes one English Agent Skill for documentation work. Install it
+directly from the documentation website with the
+[open-source Vercel Skills CLI](https://github.com/vercel-labs/skills):
 
 ```sh
-bunx skills add k2b-dev/fibel
+bunx skills add https://fibel.dev
 ```
 
-The skill tells agents how to configure Fibel, write Markdown pages, use raw `.md` routes, expose documentation through MCP, extend plugins, mount the Fetch app, and verify changes.
+The concise skill gives agents the stable Fibel workflow and tells them to use
+the public MCP server for exact current API details. It answers in the user's
+language without maintaining translated copies of the skill.
 
 When working from this repository:
 
@@ -60,6 +64,7 @@ bun run src/cli.ts dev --port 5173
 - Language alternates, social cards, and structured data on every page
 - `llms.txt` and `llms-full.txt` routes for language models
 - An optional public MCP endpoint for coding agents
+- Optional origin-level Agent Skills discovery from a local directory
 - A Tailwind-based default theme
 - A small plugin API for replacing or extending built-in behavior
 
@@ -290,7 +295,9 @@ The index lists each page grouped by sidebar section and links to the raw `.md` 
 
 ## MCP for coding agents
 
-The optional MCP plugin exposes the same visible Markdown knowledge to coding agents through two read-only tools. It runs inside the existing Fetch app and adds an **MCP** setup item to the default footer.
+The optional MCP plugin exposes the same visible Markdown knowledge to coding
+agents through two read-only tools. It runs inside the existing Fetch app and
+adds an **MCP** setup item to the default footer.
 
 ```ts
 import { defaultPlugins, defineFibel } from "@k2b/fibel";
@@ -303,6 +310,41 @@ export default defineFibel({
 ```
 
 The endpoint is `${basePath}${internalPath}/mcp`, for example `/docs/_fibel/mcp`. It has no authentication and is intended for public documentation. Multiple Fibel instances remain separate MCP servers, so `/docs` and `/ui` keep independent search scopes. The [MCP guide](https://fibel.dev/en/mcp) covers setup, limits, and shared rate limiting.
+
+## Agent Skills discovery
+
+The optional Agent Skills plugin publishes self-contained skills from one
+directory through the standard origin-level well-known endpoint:
+
+```ts
+import { defaultPlugins, defineFibel } from "@k2b/fibel";
+import { agentSkillsPlugin } from "@k2b/fibel/plugins";
+
+export default defineFibel({
+  title: "Product Docs",
+  plugins: [
+    ...defaultPlugins(),
+    agentSkillsPlugin({ directory: "skills" }),
+  ],
+});
+```
+
+Each immediate child such as `skills/product-docs/SKILL.md` becomes one
+discoverable skill. The directory name must match its frontmatter `name`.
+Supporting files are not accepted in this initial `skill-md` implementation.
+
+With the default layout, Agent Skills adds an **Agents** footer item with the
+Vercel Skills CLI installation command. When MCP is active too, the same dialog
+contains the Skills installation plus the Codex, Claude Code, OpenCode, and
+Other MCP setup. The skill provides compact workflow guidance; MCP supplies exact
+current documentation.
+
+Discovery is served at `/.well-known/agent-skills/index.json` regardless of
+`routing.basePath`. A standalone Fibel server receives that route
+automatically. A host that mounts Fibel below `/docs` must additionally forward
+`/.well-known/agent-skills/*` to the same `fibel.fetch` handler. Only one Fibel
+instance should own that origin route. See the
+[Agent Skills guide](https://fibel.dev/en/agent-skills).
 
 ## Search
 
@@ -337,7 +379,7 @@ export default {
 
 For a larger app, mount `fibel.fetch` below the same public route configured as `routing.basePath`.
 
-Several Fibel apps can be mounted in one process. Each instance then has its own navigation, search index, assistant context, MCP endpoint, and discovery routes while sharing the same header config, theme cookie, provider, rate limiters, and deployment.
+Several Fibel apps can be mounted in one process. Each instance then has its own navigation, search index, assistant context, MCP endpoint, and path-scoped discovery routes while sharing the same header config, theme cookie, provider, rate limiters, and deployment. Origin-level Agent Skills discovery has one explicit owner per domain.
 
 ## Docker
 

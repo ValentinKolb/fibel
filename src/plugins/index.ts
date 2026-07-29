@@ -1,4 +1,5 @@
 import { assetsPlugin } from "./assets";
+import { agentSkillsPlugin } from "./agent-skills";
 import { assistantPlugin } from "./assistant";
 import { i18nPlugin } from "./i18n";
 import { imprintPlugin } from "./imprint";
@@ -13,7 +14,7 @@ import { themePlugin } from "./theme";
 import type { FibelPlugin } from "../types";
 
 export { providerFromEnv } from "./assistant-provider";
-export { assistantPlugin, assetsPlugin, i18nPlugin, imprintPlugin, layoutPlugin, llmsPlugin, markdownPlugin, mcpPlugin, poweredByPlugin, searchPlugin, seoPlugin, themePlugin };
+export { agentSkillsPlugin, assistantPlugin, assetsPlugin, i18nPlugin, imprintPlugin, layoutPlugin, llmsPlugin, markdownPlugin, mcpPlugin, poweredByPlugin, searchPlugin, seoPlugin, themePlugin };
 export type {
   AssistantLimits,
   AssistantOptions,
@@ -22,6 +23,7 @@ export type {
   AssistantSystemPromptContext,
   AssistantUsageEvent,
 } from "./assistant";
+export type { AgentSkillsOptions } from "./agent-skills";
 export type { AssistantProviderEnv, AssistantProviderName } from "./assistant-provider";
 export type { ImprintOptions } from "./imprint";
 export type { LayoutOptions } from "./layout";

@@ -104,9 +104,21 @@ export default defineFibel({
 
 So erzeugt Fibel Links, interne Routen und Assets relativ zu `/docs`.
 
+Aktiviert diese Instanz `agentSkillsPlugin()`, wird zusätzlich ihre
+origin-weite Well-known-Route weitergeleitet:
+
+```ts
+app.all("/.well-known/agent-skills/*", (c) =>
+  docs.fetch(c.req.raw),
+);
+```
+
+Der Host muss dies explizit tun, weil ein `/docs`-Subrouter keine Requests an
+den Origin-Root erhält. Siehe [Agent-Skills-Discovery](/de/agent-skills).
+
 ## Mehrere Instanzen mounten
 
-Mehrere Fibel-Instanzen können in einem Server und einem Deployment laufen. Getrennte Base Paths halten Navigation, Suchindizes, Assistenten-Kontext, Chat-Sessions und Discovery-Routen unabhängig:
+Mehrere Fibel-Instanzen können in einem Server und einem Deployment laufen. Getrennte Base Paths halten Navigation, Suchindizes, Assistenten-Kontext, Chat-Sessions, MCP-Endpunkte und pfadbezogene Discovery-Routen unabhängig:
 
 ```ts
 const docs = await createFibelApp(docsConfig); // basePath: "/docs"
@@ -117,7 +129,7 @@ export default new Hono()
   .mount("/ui", ui.fetch);
 ```
 
-Die Instanzen können dieselbe Header-Konfiguration, denselben Theme-Cookie, Assistant-Provider und prozessweiten Rate-Limiter verwenden. Der [Guide für eigene Seiten](/de/custom-pages) zeigt die vollständige Header- und Solid-SSR-Konfiguration.
+Die Instanzen können dieselbe Header-Konfiguration, denselben Theme-Cookie, Assistant-Provider und prozessweiten Rate-Limiter verwenden. Nur eine Instanz kann die origin-weite Agent-Skills-Discovery besitzen; `/.well-known/agent-skills/*` wird explizit an diese Instanz geroutet. Der [Guide für eigene Seiten](/de/custom-pages) zeigt die vollständige Header- und Solid-SSR-Konfiguration.
 
 ## In andere Server einbinden
 
@@ -144,6 +156,7 @@ Eine Fibel-App verarbeitet:
 - interne Dateien unter `routing.internalPath`.
 - Assets unter `routing.assetsPath`.
 - Plugin-Routen, einschließlich der SEO- und `llms.txt`-Dateien.
+- Origin-weite Plugin-Routen, wenn der äußere Server sie weiterleitet.
 - Eine Weiterleitung vom Mount-Root auf das Standard-Locale, `/` landet also auf `/de`.
 
 Wenn ein Projekt unter einem Base Path läuft, sollten externe Links und Reverse-Proxies diesen Pfad unverändert weitergeben.

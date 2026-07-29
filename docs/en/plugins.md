@@ -113,7 +113,11 @@ export function docsManifestPlugin(): FibelPlugin {
 }
 ```
 
-A `path` ending in `/*` matches by prefix instead of exactly. The assets plugin uses this to serve a whole directory. Set `scope: "internal"` to expose a route only below `routing.internalPath`, or `scope: "public"` to expose it only at the public path. Routes without a scope keep the existing behavior and match both.
+A `path` ending in `/*` matches by prefix instead of exactly. The assets plugin uses this to serve a whole directory. Set `scope: "internal"` to expose a route only below `routing.internalPath`, or `scope: "public"` to expose it only at the public path. `scope: "origin"` matches the request pathname before `routing.basePath` is removed and is reserved for domain-level protocols such as Agent Skills discovery. Routes without a scope keep the existing behavior and match public and internal paths, but never origin paths.
+
+An origin-scoped route works automatically when Fibel owns the complete Fetch
+handler. A host that mounts Fibel below a subrouter must separately forward the
+origin path to `fibel.fetch`.
 
 Choose custom route paths so they do not collide with internal routes or page paths.
 

@@ -3,15 +3,18 @@ import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/
 import { ratelimit, type RateLimiter } from "@k2b/sync/browser";
 import { z } from "zod";
 import type { FibelContext, FibelPage, FibelPlugin } from "../types";
-import { escapeHtml, joinUrl } from "../utils";
-import { mcpClientScript } from "./mcp-ui";
+import { joinUrl } from "../utils";
+import {
+  addAgentSetupUi,
+  agentSetupScriptResponse,
+  hasPlugin,
+} from "./agent-setup";
 
 const maxRequestBytes = 64 * 1024;
 const maxDocumentChars = 80_000;
 const maxSearchResults = 8;
 const maxConcurrentRequests = 16;
 const requestsPerMinute = 240;
-const mcpScriptVersion = Bun.hash(mcpClientScript).toString(36);
 
 export type McpOptions = {
   rateLimiter?: RateLimiter;
@@ -32,20 +35,21 @@ export function mcpPlugin(options: McpOptions = {}): FibelPlugin {
         windowSecs: 60,
       });
 
-      context.footerItems.push(
-        '<button class="fibel-footer-link cursor-pointer appearance-none border-0 bg-transparent p-0 font-[inherit] text-[inherit] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:[outline-color:var(--fibel-focus-ring)]" type="button" data-fibel-mcp-open aria-haspopup="dialog">MCP</button>',
-      );
-      context.bodyItems.push(
-        (page) =>
-          `${renderMcpDialog(page, context, endpoint)}\n<script type="module" src="${escapeHtml(`${script}?v=${mcpScriptVersion}`)}"></script>`,
-      );
+      addAgentSetupUi(context, {
+        mcp: {
+          endpoint,
+          name: serverName(context),
+        },
+        skills: hasPlugin(context, "agent-skills"),
+        script,
+      });
     },
     routes(context) {
       return [
         {
           path: "/mcp.js",
           scope: "internal",
-          handler: () => asset(mcpClientScript, "application/javascript; charset=utf-8"),
+          handler: agentSetupScriptResponse,
         },
         {
           path: "/mcp",
@@ -292,133 +296,6 @@ async function readJsonBody(request: Request): Promise<{ value: unknown } | { re
   }
 }
 
-function renderMcpDialog(page: FibelPage, context: FibelContext, endpoint: string) {
-  const name = serverName(context);
-  const copy = mcpCopy(page.locale.code, context.config.title, name);
-  const focus =
-    "focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:[outline-color:var(--fibel-focus-ring)]";
-  const clients = [
-    {
-      id: "general",
-      label: copy.general,
-      valueLabel: copy.endpoint,
-      command: "{endpoint}",
-      hint: copy.generalHint,
-    },
-    {
-      id: "codex",
-      label: "Codex",
-      valueLabel: copy.command,
-      command: `codex mcp add ${name} --url {endpoint}`,
-      hint: copy.codexHint,
-    },
-    {
-      id: "claude",
-      label: "Claude Code",
-      valueLabel: copy.command,
-      command: `claude mcp add --transport http ${name} {endpoint}`,
-      hint: copy.claudeHint,
-    },
-    {
-      id: "opencode",
-      label: "OpenCode",
-      valueLabel: copy.command,
-      command: `opencode mcp add ${name} --url {endpoint}`,
-      hint: copy.openCodeHint,
-    },
-  ];
-  const tabs = clients
-    .map(
-      (client, index) =>
-        `<button class="${focus} flex-1 cursor-pointer whitespace-nowrap rounded-[0.65rem] border-0 bg-transparent px-3 py-2 text-xs font-medium text-zinc-500 aria-selected:bg-white aria-selected:text-zinc-900 aria-selected:shadow-[0_1px_4px_rgb(24_24_27_/_0.08)] dark:text-zinc-400 dark:aria-selected:bg-white/10 dark:aria-selected:text-white dark:aria-selected:shadow-none" type="button" role="tab" id="fibel-mcp-tab-${client.id}" aria-controls="fibel-mcp-panel-${client.id}" aria-selected="${index === 0}" tabindex="${index === 0 ? "0" : "-1"}" data-fibel-mcp-tab="${client.id}">${escapeHtml(client.label)}</button>`,
-    )
-    .join("");
-  const panels = clients
-    .map((client, index) => {
-      const fallbackValue = client.command.replace("{endpoint}", endpoint);
-      const steps =
-        client.id === "general"
-          ? `<ol class="mt-4 grid list-none gap-4 p-0 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
-      ${copy.steps.map((step, stepIndex) => `<li class="grid grid-cols-[1.75rem_minmax(0,1fr)] items-start gap-3"><span class="grid h-7 w-7 place-items-center rounded-full bg-[var(--fibel-accent-surface)] text-xs font-bold [color:var(--fibel-accent-foreground-strong)]">${stepIndex + 1}</span><span>${escapeHtml(step)}</span></li>`).join("")}
-    </ol>`
-          : "";
-      return `<section role="tabpanel" id="fibel-mcp-panel-${client.id}" aria-labelledby="fibel-mcp-tab-${client.id}" data-fibel-mcp-panel="${client.id}"${index === 0 ? "" : " hidden"}>
-    <span class="mb-2 block text-xs font-semibold uppercase tracking-[0.06em] text-zinc-500 dark:text-zinc-400">${escapeHtml(client.valueLabel)}</span>
-    <div class="flex items-center gap-3 rounded-[0.9rem] bg-zinc-100 py-3 pl-4 pr-3 dark:bg-white/[0.07]">
-      <code class="min-w-0 flex-1 overflow-x-auto whitespace-pre font-mono text-[0.78rem] leading-5 text-zinc-800 dark:text-zinc-200" data-fibel-mcp-value data-command="${escapeHtml(client.command)}">${escapeHtml(fallbackValue)}</code>
-      <button class="${focus} inline-grid h-9 w-9 flex-none cursor-pointer place-items-center rounded-full border-0 bg-white text-zinc-600 shadow-[0_1px_4px_rgb(24_24_27_/_0.08)] hover:[color:var(--fibel-accent-strong)] dark:bg-white/10 dark:text-zinc-300 dark:shadow-none" type="button" data-fibel-mcp-copy data-copied-label="${escapeHtml(copy.copied)}" data-error-label="${escapeHtml(copy.copyError)}" aria-label="${escapeHtml(copy.copy)}">${copyIcon()}</button>
-    </div>
-    <p class="mb-0 mt-2 text-xs leading-5 text-zinc-500 dark:text-zinc-400">${escapeHtml(client.hint)}</p>
-    ${steps}
-  </section>`;
-    })
-    .join("");
-  return `<dialog class="m-auto max-h-[min(42rem,calc(100dvh-2rem))] w-[min(36rem,calc(100vw-2rem))] overflow-auto rounded-[1.25rem] border border-zinc-200 bg-white p-0 text-zinc-900 shadow-[0_24px_80px_rgb(24_24_27_/_0.22)] backdrop:bg-zinc-950/40 backdrop:backdrop-blur-[3px] dark:border-white/10 dark:bg-zinc-900 dark:text-zinc-50 dark:shadow-[0_24px_80px_rgb(0_0_0_/_0.55)]" data-fibel-mcp-dialog data-endpoint="${escapeHtml(endpoint)}" aria-labelledby="fibel-mcp-title">
-  <div class="relative p-5 sm:p-7">
-    <button class="${focus} absolute right-4 top-4 inline-grid h-9 w-9 cursor-pointer place-items-center rounded-full border-0 bg-transparent text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-white/10 dark:hover:text-white" type="button" data-fibel-mcp-close aria-label="${escapeHtml(copy.close)}">${closeIcon()}</button>
-    <h2 class="m-0 max-w-[calc(100%_-_3rem)] text-xl font-semibold tracking-[-0.015em]" id="fibel-mcp-title">${escapeHtml(copy.title)}</h2>
-    <p class="mb-5 mt-2 max-w-[30rem] text-[0.925rem] leading-6 text-zinc-600 dark:text-zinc-400">${escapeHtml(copy.intro)}</p>
-    <div class="-mx-1 mb-5 overflow-x-auto px-1 pb-1">
-      <div class="flex w-full min-w-max gap-1 rounded-[0.8rem] bg-zinc-100 p-1 dark:bg-white/[0.06]" role="tablist" aria-label="${escapeHtml(copy.clientSelector)}">
-        ${tabs}
-      </div>
-    </div>
-    ${panels}
-    <p class="mb-0 mt-2 min-h-5 text-xs [color:var(--fibel-accent-foreground-strong)]" data-fibel-mcp-status aria-live="polite"></p>
-    <p class="mb-0 mt-6 border-t border-zinc-200 pt-4 text-[0.8rem] leading-5 text-zinc-500 dark:border-white/10 dark:text-zinc-400">${escapeHtml(copy.note)}</p>
-  </div>
-</dialog>`;
-}
-
-function mcpCopy(locale: string, title: string, name: string) {
-  if (locale === "de") {
-    return {
-      title: "Coding-Agent verbinden",
-      intro: `Diese öffentliche MCP-Schnittstelle stellt die sichtbare ${title}-Dokumentation ohne Zugangsdaten bereit.`,
-      clientSelector: "Coding-Agent auswählen",
-      general: "Allgemein",
-      endpoint: "Streamable-HTTP-Endpunkt",
-      command: "CLI-Befehl",
-      close: "MCP-Einrichtung schließen",
-      copy: "Einrichtung kopieren",
-      copied: "Kopiert.",
-      copyError: "Kopieren fehlgeschlagen.",
-      generalHint: "Dieser Endpunkt funktioniert mit jedem Client, der Streamable HTTP unterstützt.",
-      codexHint: "Der Befehl fügt die Dokumentation zur Codex-Konfiguration hinzu.",
-      claudeHint: "Der Befehl fügt die Dokumentation für das aktuelle Claude-Code-Projekt hinzu.",
-      openCodeHint: "Der Befehl fügt die entfernte Dokumentation zu OpenCode hinzu.",
-      steps: [
-        "Im Coding-Agent einen entfernten MCP-Server hinzufügen und keine Authentifizierung konfigurieren.",
-        `Den Server „${name}“ nennen und den Endpunkt oben einfügen.`,
-        "Den Agenten auffordern, die Dokumentation zu durchsuchen und die passende Markdown-Seite zu lesen.",
-      ],
-      note: "Mehrere Fibel-Instanzen werden als getrennte MCP-Server mit eindeutigen Namen hinzugefügt, zum Beispiel product-docs und product-ui.",
-    };
-  }
-  return {
-    title: "Connect a coding agent",
-    intro: `This public MCP endpoint exposes the visible ${title} documentation without credentials.`,
-    clientSelector: "Choose a coding agent",
-    general: "General",
-    endpoint: "Streamable HTTP endpoint",
-    command: "CLI command",
-    close: "Close MCP setup",
-    copy: "Copy setup",
-    copied: "Copied.",
-    copyError: "Copy failed.",
-    generalHint: "This endpoint works with any client that supports Streamable HTTP.",
-    codexHint: "This command adds the documentation to the Codex configuration.",
-    claudeHint: "This command adds the documentation for the current Claude Code project.",
-    openCodeHint: "This command adds the remote documentation to OpenCode.",
-    steps: [
-      "Add a remote MCP server in the coding agent without configuring authentication.",
-      `Name the server “${name}” and paste the endpoint above.`,
-      "Ask the agent to search the documentation and read the matching Markdown page.",
-    ],
-    note: "Add several Fibel instances as separate MCP servers with distinct names, such as product-docs and product-ui.",
-  };
-}
-
 function serverName(context: FibelContext) {
   const title = context.config.title
     .toLowerCase()
@@ -470,22 +347,4 @@ function mcpError(status: number, code: number, message: string, extraHeaders?: 
       },
     },
   );
-}
-
-function asset(body: string, contentType: string) {
-  return new Response(body, {
-    headers: {
-      "Cache-Control": "public, max-age=3600",
-      "Content-Type": contentType,
-      "X-Content-Type-Options": "nosniff",
-    },
-  });
-}
-
-function closeIcon() {
-  return '<svg viewBox="0 0 24 24" aria-hidden="true" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg>';
-}
-
-function copyIcon() {
-  return '<svg viewBox="0 0 24 24" aria-hidden="true" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="11" height="11" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>';
 }

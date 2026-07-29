@@ -27,13 +27,17 @@ bunx --bun @k2b/fibel dev
 
 Fibel ist mit `v0.2.0` von `@valentinkolb/fibel` zum Paket `@k2b/fibel` umgezogen. In bestehenden Projekten werden Root-Imports durch `@k2b/fibel`, Plugin-Imports durch `@k2b/fibel/plugins` und CLI-Aufrufe durch `bunx --bun @k2b/fibel` ersetzt. Das bisherige Paket ist deprecated.
 
-In Projekten, an denen Coding-Agents arbeiten, kommt zusätzlich der Fibel-Agent-Skill dazu:
+In Projekten, an denen Coding-Agents arbeiten, kommt zusätzlich der englische
+Fibel-Agent-Skill direkt von dieser Website dazu. Die Installation übernimmt
+die [Open-Source-Skills-CLI von Vercel](https://github.com/vercel-labs/skills):
 
 ```sh
-bunx skills add k2b-dev/fibel
+bunx skills add https://fibel.dev
 ```
 
-Er stellt die aktuellen Konventionen für Konfiguration, Markdown-Seiten, rohe `.md`-Routen, Plugins, Hosting und Verifikation bereit, damit Agents auf der dokumentierten API arbeiten statt zu raten.
+Er liefert einen kompakten Arbeitsablauf und nutzt für exakte aktuelle Details
+den öffentlichen Fibel-MCP-Server. Der Agent antwortet weiterhin in der Sprache
+des Nutzers.
 
 ## Funktionsumfang
 
@@ -99,4 +103,4 @@ Das Frontmatter steuert Metadaten, Navigation und die Chips unter dem Seitentite
 
 ## Nächste Schritte
 
-Die [Konfiguration](/de/configuration) behandelt die Einrichtung eines Projekts. [Hosting](/de/runtime) beschreibt den Betrieb als Server oder das Einbinden in eine bestehende Anwendung. [SEO](/de/seo) dokumentiert, was Suchmaschinen und Sprachmodelle erhalten. [Integrierte Plugins](/de/built-in-plugins) listet den Funktionsumfang auf, die [Plugin-API](/de/plugins) beschreibt dessen Erweiterung.
+Die [Konfiguration](/de/configuration) behandelt die Einrichtung eines Projekts. [Hosting](/de/runtime) beschreibt den Betrieb als Server oder das Einbinden in eine bestehende Anwendung. [SEO](/de/seo) dokumentiert, was Suchmaschinen und Sprachmodelle erhalten. [Agent Skills](/de/agent-skills) beschreibt die Installation direkt von einer Website. [Integrierte Plugins](/de/built-in-plugins) listet den Funktionsumfang auf, die [Plugin-API](/de/plugins) beschreibt dessen Erweiterung.

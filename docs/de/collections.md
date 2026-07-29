@@ -159,6 +159,11 @@ Globale `llms.txt`-Dateien beschreiben die Instanz und verlinken alle Collection
 
 Sitemap, Sprachalternativen, Canonical-Tags und rohe Markdown-URLs verwenden die kanonische Route mit Locale und Collection.
 
+Agent Skills sind unabhängig von Locales und Collections. Ein konfiguriertes
+`agentSkillsPlugin()` veröffentlicht einen origin-weiten Skill-Index für die
+gesamte Fibel-Instanz. Der Skill kann für exakte Collection-spezifische Details
+den gemeinsamen MCP-Server und dessen Tool `list_collections` verwenden.
+
 ## Bestehende Sites bleiben unverändert
 
 Collections sind optional. Eine Konfiguration ohne `collections` liest weiterhin den übergeordneten `content`-Ordner und behält Routen wie `/docs/en/configuration`. Collection-Segment, Scope-Auswahl, MCP-Tool und Collection-spezifische Discovery-Routen werden dann nicht ergänzt.

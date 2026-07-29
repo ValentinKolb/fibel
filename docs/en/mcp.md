@@ -5,7 +5,7 @@ section: Built-in plugins
 order: 29
 description: Expose visible Fibel documentation to coding agents through a public, read-only MCP endpoint.
 tags: [mcp, coding-agents, plugin]
-updated: 2026-07-27
+updated: 2026-07-29
 ---
 
 # MCP for coding agents
@@ -31,7 +31,18 @@ export default defineFibel({
 
 With the default routing, the Streamable HTTP endpoint is available at `/_fibel/mcp`. A site mounted below `/docs` exposes `/docs/_fibel/mcp`.
 
-When the default layout is present, the plugin also adds an **MCP** item to the footer. It opens setup instructions and an absolute endpoint URL derived from the current browser origin and Fibel routing. No additional application URL setting is required. `siteUrl` remains the canonical public URL used by SEO and discovery output.
+When the default layout is present, the plugin also adds an **MCP** item to
+the footer. It opens setup instructions and an absolute endpoint URL derived
+from the current browser origin and Fibel routing.
+
+When `agentSkillsPlugin()` is active in the same instance, the footer item is
+named **Agents** instead. One dialog then combines a **Skills** tab with the
+MCP setup for Codex, Claude Code, OpenCode, and other clients. The installed skill
+provides compact workflow guidance; MCP supplies exact current documentation.
+Plugin order does not affect this composition.
+
+No additional application URL setting is required. `siteUrl` remains the
+canonical public URL used by SEO and discovery output.
 
 ## Available tools
 
@@ -51,6 +62,11 @@ Pages with `hidden: true` are excluded. The endpoint cannot read arbitrary files
 Add the displayed URL as a remote Streamable HTTP MCP server in the coding agent. Name the server after its documentation scope, for example `product-docs`. Authentication headers are not needed.
 
 Once connected, the agent can discover `search_docs` and `read_doc` and call them when a request needs documentation details. Client-specific setup formats differ, so the footer dialog provides the endpoint rather than a configuration file tied to one agent.
+
+When the **Skills** tab is available, it installs the website-published skill
+with the open-source [Vercel Skills CLI](https://github.com/vercel-labs/skills).
+Connecting MCP as well is recommended: the skill explains how to work with the
+product, while MCP retrieves its current documentation.
 
 ## Collections or several Fibel instances
 

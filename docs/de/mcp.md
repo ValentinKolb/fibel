@@ -5,7 +5,7 @@ section: Integrierte Plugins
 order: 29
 description: Stellt sichtbare Fibel-Dokumentation über einen öffentlichen, schreibgeschützten MCP-Endpunkt für Coding-Agenten bereit.
 tags: [mcp, coding-agenten, plugin]
-updated: 2026-07-27
+updated: 2026-07-29
 ---
 
 # MCP für Coding-Agenten
@@ -31,7 +31,20 @@ export default defineFibel({
 
 Mit dem Standard-Routing liegt der Streamable-HTTP-Endpunkt unter `/_fibel/mcp`. Eine unter `/docs` eingebundene Website stellt ihn unter `/docs/_fibel/mcp` bereit.
 
-Bei vorhandenem Standard-Layout ergänzt das Plugin außerdem den Eintrag **MCP** im Footer. Er öffnet Einrichtungsinformationen und eine absolute Endpunkt-URL, die aus dem aktuellen Browser-Origin und dem Fibel-Routing entsteht. Ein zusätzlicher Wert für die Anwendungs-URL ist nicht erforderlich. `siteUrl` bleibt die kanonische öffentliche URL für SEO- und Discovery-Ausgaben.
+Bei vorhandenem Standard-Layout ergänzt das Plugin außerdem den Eintrag
+**MCP** im Footer. Er öffnet Einrichtungsinformationen und eine absolute
+Endpunkt-URL, die aus dem aktuellen Browser-Origin und dem Fibel-Routing
+entsteht.
+
+Ist in derselben Instanz zusätzlich `agentSkillsPlugin()` aktiv, heißt der
+Footer-Eintrag **Agents**. Ein gemeinsamer Dialog verbindet dann einen
+**Skills**-Tab mit der MCP-Einrichtung für Codex, Claude Code, OpenCode und
+andere Clients. Der installierte Skill liefert kompakte Arbeitsanweisungen; MCP
+stellt die exakte aktuelle Dokumentation bereit. Die Reihenfolge der Plugins
+ändert diese Zusammensetzung nicht.
+
+Ein zusätzlicher Wert für die Anwendungs-URL ist nicht erforderlich. `siteUrl`
+bleibt die kanonische öffentliche URL für SEO- und Discovery-Ausgaben.
 
 ## Verfügbare Tools
 
@@ -51,6 +64,12 @@ Seiten mit `hidden: true` sind ausgeschlossen. Der Endpunkt kann keine beliebige
 Die angezeigte URL wird im Coding-Agent als entfernter Streamable-HTTP-MCP-Server eingetragen. Ein Name wie `product-docs` beschreibt den Dokumentationsbereich. Authentifizierungs-Header sind nicht erforderlich.
 
 Nach der Verbindung kann der Agent `search_docs` und `read_doc` erkennen und bei Fragen mit Dokumentationsbezug aufrufen. Da sich die Konfigurationsformate der Clients unterscheiden, zeigt der Footer-Dialog den Endpunkt statt einer clientspezifischen Konfigurationsdatei.
+
+Ein vorhandener **Skills**-Tab installiert den von der Website
+veröffentlichten Skill mit der
+[Vercel Skills CLI](https://github.com/vercel-labs/skills). Die zusätzliche
+MCP-Verbindung ist empfehlenswert: Der Skill beschreibt den Arbeitsablauf, MCP
+ruft die aktuelle Dokumentation ab.
 
 ## Collections oder mehrere Fibel-Instanzen
 

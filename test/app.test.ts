@@ -271,6 +271,35 @@ describe("fibel app", () => {
     expect(full).not.toContain("Source: https://fibel.dev/en/hidden-example.md");
   });
 
+  test("publishes the bundled Fibel agent skill from the origin", async () => {
+    const app = await createFibelApp(config);
+    const index = await app.fetch(
+      new Request(
+        "http://localhost/.well-known/agent-skills/index.json",
+      ),
+    );
+    const body = await index.json();
+
+    expect(index.status).toBe(200);
+    expect(body.skills).toHaveLength(1);
+    expect(body.skills[0]).toMatchObject({
+      name: "fibel",
+      type: "skill-md",
+      url: "/.well-known/agent-skills/fibel/SKILL.md",
+    });
+    expect(body.skills[0].digest).toMatch(/^sha256:[a-f0-9]{64}$/);
+
+    const skill = await app.fetch(
+      new Request(
+        "http://localhost/.well-known/agent-skills/fibel/SKILL.md",
+      ),
+    );
+    expect(skill.status).toBe(200);
+    expect(await skill.text()).toContain(
+      "Reply in the user's language unless they request another language.",
+    );
+  });
+
   test("renders powered-by attribution as a removable default plugin", async () => {
     const app = await createFibelApp(config);
     const response = await app.fetch(new Request("http://localhost/en"));

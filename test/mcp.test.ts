@@ -2,26 +2,33 @@ import { describe, expect, test } from "bun:test";
 import { ratelimit } from "@k2b/sync/browser";
 import config from "../fibel.config";
 import { createFibelApp, defaultPlugins, type FibelConfig } from "../src";
-import { mcpPlugin } from "../src/plugins";
+import {
+  agentSkillsPlugin,
+  mcpPlugin,
+} from "../src/plugins";
 
 let limiterId = 0;
 
 function mcpConfig(overrides: Partial<FibelConfig> = {}): FibelConfig {
-  limiterId += 1;
   return {
     ...config,
     ...overrides,
     plugins: [
       ...defaultPlugins(),
-      mcpPlugin({
-        rateLimiter: ratelimit({
-          id: `fibel-mcp-test-${limiterId}`,
-          limit: 1_000,
-          windowSecs: 60,
-        }),
-      }),
+      testMcpPlugin(),
     ],
   };
+}
+
+function testMcpPlugin() {
+  limiterId += 1;
+  return mcpPlugin({
+    rateLimiter: ratelimit({
+      id: `fibel-mcp-test-${limiterId}`,
+      limit: 1_000,
+      windowSecs: 60,
+    }),
+  });
 }
 
 async function mcpRequest(
@@ -63,23 +70,198 @@ describe("MCP plugin", () => {
   test("renders setup UI only when the plugin is active", async () => {
     const enabled = await createFibelApp(mcpConfig());
     const enabledHtml = await (await enabled.fetch(new Request("http://localhost/en"))).text();
+    expect(enabledHtml).toContain("data-fibel-agent-setup-open");
     expect(enabledHtml).toContain("data-fibel-mcp-open");
+    expect(enabledHtml).toContain("data-fibel-agent-setup-dialog");
     expect(enabledHtml).toContain('data-fibel-mcp-dialog data-endpoint="/_fibel/mcp"');
     expect(enabledHtml).toContain('src="/_fibel/mcp.js?');
     expect(enabledHtml).toContain('role="tablist"');
-    expect(enabledHtml).toContain('data-fibel-mcp-tab="general"');
-    expect(enabledHtml).toContain('data-fibel-mcp-tab="codex"');
-    expect(enabledHtml).toContain('data-fibel-mcp-tab="claude"');
-    expect(enabledHtml).toContain('data-fibel-mcp-tab="opencode"');
+    expect(enabledHtml).toContain('data-fibel-agent-setup-tab="general"');
+    expect(enabledHtml).toContain('data-fibel-agent-setup-tab="codex"');
+    expect(enabledHtml).toContain('data-fibel-agent-setup-tab="claude"');
+    expect(enabledHtml).toContain('data-fibel-agent-setup-tab="opencode"');
+    expect(enabledHtml).not.toContain('data-fibel-agent-setup-tab="skills"');
     expect(enabledHtml).toContain("codex mcp add fibel --url {endpoint}");
     expect(enabledHtml).toContain("claude mcp add --transport http fibel {endpoint}");
     expect(enabledHtml).toContain("opencode mcp add fibel --url {endpoint}");
-    expect(enabledHtml).not.toContain('data-fibel-mcp-tab="pi"');
+    expect(enabledHtml).toContain(">MCP</button>");
+    expect(enabledHtml).not.toContain(">Agents</button>");
 
     const disabled = await createFibelApp({ ...config, plugins: defaultPlugins() });
     const disabledHtml = await (await disabled.fetch(new Request("http://localhost/en"))).text();
+    expect(disabledHtml).not.toContain("data-fibel-agent-setup-open");
     expect(disabledHtml).not.toContain("data-fibel-mcp-open");
-    expect(disabledHtml).not.toContain("data-fibel-mcp-dialog");
+    expect(disabledHtml).not.toContain("data-fibel-agent-setup-dialog");
+  });
+
+  test("renders a standalone Skills setup without empty MCP controls", async () => {
+    const app = await createFibelApp({
+      ...config,
+      plugins: [
+        ...defaultPlugins(),
+        agentSkillsPlugin({ directory: "skills" }),
+      ],
+    });
+    const html = await (
+      await app.fetch(new Request("http://localhost/en"))
+    ).text();
+
+    expect(html).toContain(">Agents</button>");
+    expect(html).toContain("data-fibel-agent-setup-open");
+    expect(html).not.toContain("data-fibel-mcp-open");
+    expect(html).toContain(
+      'data-fibel-agent-setup-panel="skills"',
+    );
+    expect(html).not.toContain('role="tablist"');
+    expect(html).not.toContain(
+      'data-fibel-agent-setup-panel="general"',
+    );
+    expect(html).toContain(
+      'data-command="bunx skills add {origin}"',
+    );
+    expect(html).toContain("https://github.com/vercel-labs/skills");
+    expect(html).toContain('src="/_fibel/agents.js?');
+    expect(occurrences(html, "data-fibel-agent-setup-dialog")).toBe(1);
+
+    const script = await app.fetch(
+      new Request("http://localhost/_fibel/agents.js"),
+    );
+    expect(script.status).toBe(200);
+    expect(await script.text()).toContain(
+      '.replace("{origin}", window.location.origin)',
+    );
+    expect(
+      (
+        await app.fetch(
+          new Request(
+            "http://localhost/.well-known/agent-skills/index.json",
+          ),
+        )
+      ).status,
+    ).toBe(200);
+    expect(
+      (
+        await app.fetch(
+          new Request("http://localhost/_fibel/mcp"),
+        )
+      ).status,
+    ).toBe(404);
+
+    const german = await (
+      await app.fetch(new Request("http://localhost/de"))
+    ).text();
+    expect(german).toContain("Open-Source-Skills-CLI von Vercel");
+    expect(german).toContain(
+      "Ein zusätzlich aktivierter MCP-Server kann exakte aktuelle Dokumentation bereitstellen.",
+    );
+  });
+
+  test("combines Skills and MCP setup independently of plugin order", async () => {
+    const orderings = [
+      [
+        testMcpPlugin(),
+        agentSkillsPlugin({ directory: "skills" }),
+      ],
+      [
+        agentSkillsPlugin({ directory: "skills" }),
+        testMcpPlugin(),
+      ],
+    ];
+
+    for (const optionalPlugins of orderings) {
+      const app = await createFibelApp({
+        ...config,
+        plugins: [...defaultPlugins(), ...optionalPlugins],
+      });
+      const html = await (
+        await app.fetch(new Request("http://localhost/en"))
+      ).text();
+
+      expect(html).toContain(">Agents</button>");
+      expect(html).not.toContain(">MCP</button>");
+      expect(html).toContain(
+        'data-fibel-agent-setup-tab="skills"',
+      );
+      expect(html).toContain(
+        'data-fibel-agent-setup-tab="general"',
+      );
+      expect(html).toContain(
+        'data-fibel-agent-setup-tab="codex"',
+      );
+      expect(html).toContain(
+        'data-fibel-agent-setup-tab="claude"',
+      );
+      expect(html).toContain(
+        'data-fibel-agent-setup-tab="opencode"',
+      );
+      expect(html).toContain(">Other</button>");
+      expect(
+        html.indexOf('data-fibel-agent-setup-tab="skills"'),
+      ).toBeLessThan(
+        html.indexOf('data-fibel-agent-setup-tab="codex"'),
+      );
+      expect(
+        html.indexOf('data-fibel-agent-setup-tab="codex"'),
+      ).toBeLessThan(
+        html.indexOf('data-fibel-agent-setup-tab="claude"'),
+      );
+      expect(
+        html.indexOf('data-fibel-agent-setup-tab="claude"'),
+      ).toBeLessThan(
+        html.indexOf('data-fibel-agent-setup-tab="opencode"'),
+      );
+      expect(
+        html.indexOf('data-fibel-agent-setup-tab="opencode"'),
+      ).toBeLessThan(
+        html.indexOf('data-fibel-agent-setup-tab="general"'),
+      );
+      expect(html).toContain(
+        'data-command="bunx skills add {origin}"',
+      );
+      expect(html).toContain(
+        "For exact, current details, also connect the MCP server through one of the agent tabs.",
+      );
+      expect(html).toContain(
+        "https://github.com/vercel-labs/skills",
+      );
+      expect(html).toContain('src="/_fibel/mcp.js?');
+      expect(html).not.toContain('src="/_fibel/agents.js?');
+      expect(occurrences(html, "data-fibel-agent-setup-open")).toBe(
+        1,
+      );
+      expect(
+        occurrences(html, "data-fibel-agent-setup-dialog"),
+      ).toBe(1);
+
+      expect(
+        (
+          await app.fetch(
+            new Request(
+              "http://localhost/.well-known/agent-skills/index.json",
+            ),
+          )
+        ).status,
+      ).toBe(200);
+      expect(
+        (
+          await app.fetch(
+            new Request("http://localhost/_fibel/mcp.js"),
+          )
+        ).status,
+      ).toBe(200);
+      expect(
+        (
+          await app.fetch(
+            new Request("http://localhost/_fibel/agents.js"),
+          )
+        ).status,
+      ).toBe(404);
+
+      const german = await (
+        await app.fetch(new Request("http://localhost/de"))
+      ).text();
+      expect(german).toContain(">Andere</button>");
+    }
   });
 
   test("uses a distinct setup name for a mounted instance", async () => {
@@ -309,3 +491,7 @@ describe("MCP plugin", () => {
     expect(second.body.error?.message).toContain("request limit");
   });
 });
+
+function occurrences(value: string, needle: string) {
+  return value.split(needle).length - 1;
+}
