@@ -5,7 +5,7 @@ section: Integrierte Plugins
 order: 28
 description: Begrenzter Dokumentationschat mit Nessi, standardmäßigem In-Memory-Rate-Limit von Sync und optional geteilter Infrastruktur.
 tags: [plugins, ki, nessi, rate-limit]
-updated: 2026-07-26
+updated: 2026-07-29
 ---
 
 # Dokumentationsassistent
@@ -123,7 +123,11 @@ Das Server-Paket nutzt Redis über Bun. `createSessionStore` ist außerdem erfor
 
 ## Kontext steuern
 
-`systemPrompt` enthält vertrauenswürdige Anweisungen des Betreibers. Dort gehören ein kurzer Produktüberblick und stabile Produktregeln hinein, nicht die gesamte Dokumentation. Fibel ergänzt außerdem die aufgelöste Site-Beschreibung, die aktuelle Collection und die Beschreibung der aktuellen Seite als vertrauenswürdigen Überblickskontext. Einfache Fragen zu Identität, grobem Funktionsumfang, Collection und aktueller Seite lassen sich daraus ohne Tool-Aufruf beantworten. Detaillierte Anleitungen sowie Aussagen zu Konfiguration, API, Code und exaktem Verhalten erfordern weiterhin eine Suche und das Lesen eines Treffers.
+`systemPrompt` enthält vertrauenswürdige Anweisungen des Betreibers. Dort gehören ein kurzer Produktüberblick und stabile Produktregeln hinein, nicht die gesamte Dokumentation. Fibel ergänzt außerdem die aufgelöste Site-Beschreibung, die aktuelle Collection und die Beschreibung der aktuellen Seite als vertrauenswürdigen Überblickskontext. Einfache Fragen zu Identität, grobem Funktionsumfang, Collection und aktueller Seite lassen sich daraus ohne Tool-Aufruf beantworten.
+
+Aktive Agent-Integrationen werden automatisch ergänzt. Ist `agentSkillsPlugin()` aktiv, enthält der vertrauenswürdige Kontext den Skills-CLI-Befehl für den aktuellen Request-Origin. Ist `mcpPlugin()` aktiv, enthält er den aufgelösten öffentlichen, schreibgeschützten MCP-Endpunkt und den Hinweis, dass keine Authentifizierung erforderlich ist. Bei beiden Plugins kennt der Assistent außerdem die Aufgabenteilung: Der Skill liefert kompakte Arbeitsanweisungen, MCP die exakte aktuelle Dokumentation. Nicht aktivierte Plugins werden nicht erwähnt; weitere Konfiguration und ein Opt-out sind nicht erforderlich.
+
+Bei Fragen außerhalb des vertrauenswürdigen Kontexts durchsucht der Assistent die sichtbare Dokumentation. Reichen die begrenzten Suchausschnitte aus, kann er direkt antworten; andernfalls liest er genau einen Treffer vollständig.
 
 Für einfachen Request-Kontext können Template-Variablen verwendet werden:
 
@@ -147,7 +151,7 @@ assistantPlugin({
 });
 ```
 
-Pro Request ergänzt das Plugin den vertrauenswürdigen Überblickskontext, die aktuelle Sprache und Seite, eine begrenzte Session-History sowie die von den Tools abgerufene Dokumentation. Versteckte Seiten bleiben ausgeschlossen. Tool-Ergebnisse gelten als nicht vertrauenswürdiger Referenztext und können die Systemanweisungen nicht ersetzen.
+Pro Request ergänzt das Plugin den vertrauenswürdigen Überblicks- und Agent-Zugriffskontext, die aktuelle Sprache und Seite, eine begrenzte Session-History sowie die von den Tools abgerufene Dokumentation. Versteckte Seiten bleiben ausgeschlossen. Tool-Ergebnisse gelten als nicht vertrauenswürdiger Referenztext und können die Systemanweisungen nicht ersetzen.
 
 Eigene Seiten benötigen kein weiteres Tool und keine Registry. Ihr `context`-Markdown steht über die vorhandenen Such- und Lese-Tools bereit. Wird der Assistent auf einer eigenen Route geöffnet, löst Fibel diese Seite automatisch als aktuelle Seite auf.
 

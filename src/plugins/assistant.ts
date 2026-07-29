@@ -12,6 +12,7 @@ import { ratelimit, type RateLimiter } from "@k2b/sync/browser";
 import { z } from "zod";
 import type { FibelContext, FibelPage, FibelPlugin, SearchEntry } from "../types";
 import { escapeHtml, joinUrl, json } from "../utils";
+import { hasPlugin } from "./agent-setup";
 import { assistantClientScript, assistantStyles } from "./assistant-ui";
 import { renderAssistantMarkdown } from "./markdown";
 
@@ -230,7 +231,13 @@ export function assistantPlugin(options: AssistantOptions): FibelPlugin {
               currentPage?.collection?.id,
               limits,
             );
-            const systemPrompt = buildSystemPrompt(context, locale, currentPage, options.systemPrompt);
+            const systemPrompt = buildSystemPrompt(
+              context,
+              locale,
+              currentPage,
+              options.systemPrompt,
+              origin ?? url.origin,
+            );
             const abort = new AbortController();
             const onRequestAbort = () => abort.abort();
             request.signal.addEventListener("abort", onRequestAbort, { once: true });
@@ -361,7 +368,7 @@ function documentationTools(
   const searchDocs = defineTool({
     name: "search_docs",
     description:
-      "Search the visible documentation in the current language for details not fully covered by the trusted overview context. Use only for questions about this documentation. Do not use for unrelated requests, general knowledge, or simple overview questions already answered by that context." +
+      "Search the visible documentation in the current language for details not fully covered by the trusted context. Results include bounded documentation snippets: answer from them when they fully answer the question, otherwise read the single most relevant page. Use only for questions about this documentation. Do not use for unrelated requests, general knowledge, or simple questions already answered by trusted context." +
       collectionHint,
     inputSchema: z.object({
       query: z.string().trim().min(1).max(200),
@@ -391,7 +398,7 @@ function documentationTools(
   const readDoc = defineTool({
     name: "read_doc",
     description:
-      "Read one visible documentation page from the current language using an exact href returned by search_docs. Use after search_docs for detailed documentation claims, not for unrelated requests, general knowledge, or simple overview questions already answered by the trusted context.",
+      "Read one visible documentation page from the current language using an exact href returned by search_docs. Use after search_docs when its snippets do not fully answer the question or an exact detailed claim is needed. Do not use for unrelated requests, general knowledge, or simple questions already answered by trusted context.",
     inputSchema: z.object({ href: z.string().min(1).max(500) }),
     outputSchema: z.object({ source: sourceSchema }),
     toHistoricalResult: ({ output }) => ({
@@ -443,9 +450,11 @@ function buildSystemPrompt(
   locale: string,
   page: FibelPage | undefined,
   operatorPrompt: AssistantSystemPrompt | undefined,
+  requestOrigin: string,
 ) {
   const promptContext = createSystemPromptContext(context, locale, page);
   const resolvedOperatorPrompt = resolveSystemPrompt(operatorPrompt, promptContext);
+  const agentAccess = buildAgentAccessContext(context, requestOrigin);
   const scopeRefusal = locale.toLowerCase().startsWith("de")
     ? `Ich kann nur bei Fragen zur ${context.config.title}-Dokumentation helfen.`
     : `I can only help with ${context.config.title} documentation.`;
@@ -453,8 +462,8 @@ function buildSystemPrompt(
     `You are the documentation assistant for ${context.config.title}.`,
     `You answer only questions that can be answered from the ${context.config.title} documentation. For unrelated requests, general programming, or content creation outside that documentation, do not solve the request and do not call tools. Reply exactly: "${scopeRefusal}"`,
     `Out-of-scope example: User: "Write a React Hello World app." Assistant: "${scopeRefusal}"`,
-    "Answer simple questions about what the documented product is, its high-level capabilities, or what the current page covers directly from the trusted overview context below. Do not call tools when that context fully answers the question.",
-    "For instructions, configuration, APIs, code, exact behavior, or any question not fully answered by the trusted overview context, call search_docs once, then read_doc once for the single most relevant result, then answer without calling another tool.",
+    "Answer simple questions about what the documented product is, its high-level capabilities, what the current page covers, or how to connect the active agent integrations directly from the trusted context below. Do not call tools when that context fully answers the question.",
+    "For instructions, configuration, APIs, code, exact behavior, or any question not fully answered by the trusted context, call search_docs once. Answer from its documentation snippets when they fully answer the question; otherwise call read_doc once for the single most relevant result, then answer without calling another tool.",
     page?.collection
       ? `Search the current "${page.collection.label}" collection first. Search all collections only when the question crosses collection boundaries or the current collection has no relevant result.`
       : "",
@@ -464,12 +473,50 @@ function buildSystemPrompt(
     "Keep answers concise and practical. Format structured content as valid GitHub Flavored Markdown: use `- ` for list items, fenced code blocks with a language for code, configuration, frontmatter, and directory trees, and inline code for identifiers. Never imitate those structures with bullet glyphs, indentation, or unfenced plain text. Do not start with a heading. The interface renders source links separately.",
     resolvedOperatorPrompt ? `Operator guidance:\n${resolvedOperatorPrompt}` : "",
     `Trusted overview context:\nsite_title=${promptContext.siteTitle}\nsite_description=${promptContext.siteDescription}\ncurrent_collection=${promptContext.currentCollection}\ncurrent_collection_label=${promptContext.currentCollectionLabel}\ncurrent_collection_description=${promptContext.currentCollectionDescription}\ncurrent_page=${promptContext.currentPage}\ncurrent_page_title=${promptContext.currentPageTitle}\ncurrent_page_description=${promptContext.currentPageDescription}`,
+    agentAccess,
     `Runtime context: language=${promptContext.language}; locale=${promptContext.locale}; date=${promptContext.date}; time=${promptContext.time}; weekday=${promptContext.weekday}; timezone=${promptContext.timezone}.`,
     `Answer in ${promptContext.language}.`,
     `Final scope check: if the request is not about ${context.config.title} documentation, reply exactly: "${scopeRefusal}"`,
   ]
     .filter(Boolean)
     .join("\n\n");
+}
+
+function buildAgentAccessContext(
+  context: FibelContext,
+  requestOrigin: string,
+) {
+  const skills = hasPlugin(context, "agent-skills");
+  const mcp = hasPlugin(context, "mcp");
+  if (!skills && !mcp) return "";
+
+  const lines = ["Trusted agent access:"];
+  if (skills) {
+    lines.push(
+      `agent_skills_install_command=bunx skills add ${requestOrigin}`,
+      "agent_skills_role=compact workflow guidance published by this website",
+    );
+  }
+  if (mcp) {
+    lines.push(
+      `mcp_endpoint=${new URL(
+        joinUrl(
+          context.config.routing.basePath,
+          context.config.routing.internalPath,
+          "mcp",
+        ),
+        requestOrigin,
+      ).toString()}`,
+      "mcp_access=public read-only documentation search and reading without authentication",
+      "mcp_role=exact current documentation",
+    );
+  }
+  if (skills && mcp) {
+    lines.push(
+      "agent_setup_recommendation=Install the skill for compact workflow guidance and connect MCP for exact current documentation.",
+    );
+  }
+  return lines.join("\n");
 }
 
 function createSystemPromptContext(

@@ -4,7 +4,9 @@ import { ratelimit } from "@k2b/sync/browser";
 import config from "../fibel.config";
 import { createFibelApp, defaultPlugins } from "../src";
 import {
+  agentSkillsPlugin,
   assistantPlugin,
+  mcpPlugin,
   providerFromEnv,
   type AssistantSystemPromptContext,
 } from "../src/plugins";
@@ -90,6 +92,40 @@ function docsProvider(
         block: { type: "text", text: "Use the **theme** configuration." },
       };
       yield { type: "usage", usage: { input: 20, output: 5, total: 25 }, finishReason: "stop" };
+    },
+    async complete(): Promise<GenerateResult> {
+      throw new Error("complete() is not used by these tests");
+    },
+  };
+}
+
+function directProvider(requests: GenerateRequest[]): Provider {
+  return {
+    name: "test",
+    family: "openai-compatible",
+    model: "test-model",
+    capabilities: {
+      streaming: true,
+      tools: true,
+      images: false,
+      thinking: false,
+      usage: true,
+    },
+    async *stream(request): AsyncIterable<StreamEvent> {
+      requests.push(request);
+      yield { type: "block_start", blockId: "text", index: 0, kind: "text" };
+      yield { type: "block_delta", blockId: "text", delta: "Done." };
+      yield {
+        type: "block_end",
+        blockId: "text",
+        index: 0,
+        block: { type: "text", text: "Done." },
+      };
+      yield {
+        type: "usage",
+        usage: { input: 1, output: 1, total: 2 },
+        finishReason: "stop",
+      };
     },
     async complete(): Promise<GenerateResult> {
       throw new Error("complete() is not used by these tests");
@@ -285,10 +321,94 @@ describe("assistant plugin", () => {
     expect(requests[0]?.tools?.map((tool) => tool.name)).toEqual(["search_docs", "read_doc"]);
     expect(JSON.stringify(requests[0]?.tools)).toContain("Do not use for unrelated requests");
     expect(JSON.stringify(requests[0]?.tools)).toContain(
-      "simple overview questions already answered",
+      "simple questions already answered",
     );
     expect(JSON.stringify(requests[2]?.messages)).toContain("/en/theme");
     expect(usage).toEqual([{ provider: "test", total: 52 }]);
+  });
+
+  test("describes only active agent integrations using the request origin and routing", async () => {
+    async function capturePrompt(
+      extraPlugins: Parameters<typeof createFibelApp>[0]["plugins"],
+      requestUrl = "https://docs.example.com/_fibel/assistant",
+      basePath = "",
+      assistantFirst = false,
+      origin = new URL(requestUrl).origin,
+    ) {
+      const requests: GenerateRequest[] = [];
+      const assistant = assistantPlugin({ provider: directProvider(requests) });
+      const app = await createFibelApp({
+        ...config,
+        siteUrl: origin,
+        routing: { ...config.routing, basePath },
+        plugins: assistantFirst
+          ? [...defaultPlugins(), assistant, ...(extraPlugins ?? [])]
+          : [...defaultPlugins(), ...(extraPlugins ?? []), assistant],
+      });
+      const response = await app.fetch(
+        new Request(requestUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Origin: origin,
+          },
+          body: JSON.stringify({
+            message: "How can I connect a coding agent?",
+            locale: "en",
+            page: `${basePath}/en`,
+          }),
+        }),
+      );
+      expect(response.status).toBe(200);
+      expect(await response.text()).toContain('"type":"done"');
+      return requests[0]?.systemPrompt ?? "";
+    }
+
+    const none = await capturePrompt([]);
+    expect(none).not.toContain("Trusted agent access:");
+    expect(none).not.toContain("agent_skills_install_command");
+    expect(none).not.toContain("mcp_endpoint");
+
+    const skills = await capturePrompt([
+      agentSkillsPlugin({ directory: "skills" }),
+    ]);
+    expect(skills).toContain("Trusted agent access:");
+    expect(skills).toContain(
+      "agent_skills_install_command=bunx skills add https://docs.example.com",
+    );
+    expect(skills).not.toContain("mcp_endpoint");
+    expect(skills).not.toContain("agent_setup_recommendation");
+
+    const mcp = await capturePrompt([mcpPlugin()]);
+    expect(mcp).toContain("Trusted agent access:");
+    expect(mcp).toContain(
+      "mcp_endpoint=https://docs.example.com/_fibel/mcp",
+    );
+    expect(mcp).toContain(
+      "mcp_access=public read-only documentation search and reading without authentication",
+    );
+    expect(mcp).not.toContain("agent_skills_install_command");
+    expect(mcp).not.toContain("agent_setup_recommendation");
+
+    const both = await capturePrompt(
+      [
+        agentSkillsPlugin({ directory: "skills" }),
+        mcpPlugin(),
+      ],
+      "http://fibel.internal/docs/_fibel/assistant",
+      "/docs",
+      true,
+      "https://docs.example.com",
+    );
+    expect(both).toContain(
+      "agent_skills_install_command=bunx skills add https://docs.example.com",
+    );
+    expect(both).toContain(
+      "mcp_endpoint=https://docs.example.com/docs/_fibel/mcp",
+    );
+    expect(both).toContain(
+      "agent_setup_recommendation=Install the skill for compact workflow guidance and connect MCP for exact current documentation.",
+    );
   });
 
   test("builds operator guidance from a synchronous request context", async () => {

@@ -5,7 +5,7 @@ section: Built-in plugins
 order: 28
 description: Add a bounded documentation chat powered by Nessi, with in-memory Sync rate limits by default and optional shared infrastructure.
 tags: [plugins, ai, nessi, rate-limit]
-updated: 2026-07-26
+updated: 2026-07-29
 ---
 
 # Documentation assistant
@@ -123,7 +123,11 @@ The server package uses Redis through Bun. Also provide `createSessionStore` whe
 
 ## Control context
 
-`systemPrompt` is trusted operator guidance. Keep a short product brief and stable product rules there, not the full documentation. Fibel also supplies the resolved site description, current collection, and current page description as trusted overview context. The assistant can answer simple identity, high-level capability, collection, and current-page overview questions from this context without a tool call. Detailed instructions, configuration, API, code, and exact behavior still require search followed by reading one result.
+`systemPrompt` is trusted operator guidance. Keep a short product brief and stable product rules there, not the full documentation. Fibel also supplies the resolved site description, current collection, and current page description as trusted overview context. The assistant can answer simple identity, high-level capability, collection, and current-page overview questions from this context without a tool call.
+
+Active agent integrations are included automatically. When `agentSkillsPlugin()` is active, the trusted context contains the Skills CLI command for the current request origin. When `mcpPlugin()` is active, it contains the resolved public, read-only MCP endpoint and its no-authentication contract. With both plugins, the assistant also knows that the skill provides compact workflow guidance while MCP supplies exact current documentation. Omitted plugins are not mentioned, and no additional configuration or opt-out is needed.
+
+For questions not covered by trusted context, the assistant searches visible documentation. It can answer from the bounded result snippets when they are sufficient and reads one exact result when more detail is required.
 
 For simple request context, use template variables:
 
@@ -147,7 +151,7 @@ assistantPlugin({
 });
 ```
 
-For each request, the plugin adds the trusted overview context, current language and page, a bounded session history, and documentation retrieved by the tools. Hidden pages are excluded. Tool results are treated as untrusted reference text and cannot replace the system instructions.
+For each request, the plugin adds the trusted overview and active agent-access context, current language and page, a bounded session history, and documentation retrieved by the tools. Hidden pages are excluded. Tool results are treated as untrusted reference text and cannot replace the system instructions.
 
 Custom pages need no additional tool or registry. Their `context` Markdown is available through the existing search and read tools, and opening the assistant on a custom route resolves that page as the current page automatically.
 

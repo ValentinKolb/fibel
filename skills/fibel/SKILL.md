@@ -176,6 +176,11 @@ Code, OpenCode, and Other MCP setup. The skill provides compact workflow
 guidance; MCP supplies exact current documentation. Plugin order does not
 change the result.
 
+When `assistantPlugin()` is active, it automatically receives trusted setup
+metadata for the enabled Agent Skills and MCP plugins. It derives the Skills
+CLI command from the current request origin and the MCP endpoint from resolved
+routing. Omitted integrations are not described and require no opt-out.
+
 Agent Skills discovery is origin-scoped, not `basePath`-scoped. A standalone
 Fibel server receives root requests automatically. When Fibel is mounted below
 a Hono subrouter, forward both the public mount and the well-known route:
