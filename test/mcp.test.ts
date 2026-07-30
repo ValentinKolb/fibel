@@ -73,6 +73,15 @@ describe("MCP plugin", () => {
     expect(enabledHtml).toContain("data-fibel-agent-setup-open");
     expect(enabledHtml).toContain("data-fibel-mcp-open");
     expect(enabledHtml).toContain("data-fibel-agent-setup-dialog");
+    expect(enabledHtml).toContain(
+      "h-[min(42rem,calc(100dvh-2rem))]",
+    );
+    expect(enabledHtml).toContain(
+      "relative flex min-h-full flex-col",
+    );
+    expect(enabledHtml).toContain(
+      "mb-0 mt-auto border-t",
+    );
     expect(enabledHtml).toContain('data-fibel-mcp-dialog data-endpoint="/_fibel/mcp"');
     expect(enabledHtml).toContain('src="/_fibel/mcp.js?');
     expect(enabledHtml).toContain('role="tablist"');

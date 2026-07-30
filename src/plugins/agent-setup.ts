@@ -205,15 +205,15 @@ function renderAgentSetupDialog(
     : "";
   const legacyDialog = options.mcp ? " data-fibel-mcp-dialog" : "";
 
-  return `<dialog class="m-auto max-h-[min(42rem,calc(100dvh-2rem))] w-[min(36rem,calc(100vw-2rem))] overflow-auto rounded-[1.25rem] border border-zinc-200 bg-white p-0 text-zinc-900 shadow-[0_24px_80px_rgb(24_24_27_/_0.22)] backdrop:bg-zinc-950/40 backdrop:backdrop-blur-[3px] dark:border-white/10 dark:bg-zinc-900 dark:text-zinc-50 dark:shadow-[0_24px_80px_rgb(0_0_0_/_0.55)]" data-fibel-agent-setup-dialog${legacyDialog}${endpoint} aria-labelledby="fibel-agent-setup-title">
-  <div class="relative p-5 sm:p-7">
+  return `<dialog class="m-auto h-[min(42rem,calc(100dvh-2rem))] w-[min(36rem,calc(100vw-2rem))] overflow-auto rounded-[1.25rem] border border-zinc-200 bg-white p-0 text-zinc-900 shadow-[0_24px_80px_rgb(24_24_27_/_0.22)] backdrop:bg-zinc-950/40 backdrop:backdrop-blur-[3px] dark:border-white/10 dark:bg-zinc-900 dark:text-zinc-50 dark:shadow-[0_24px_80px_rgb(0_0_0_/_0.55)]" data-fibel-agent-setup-dialog${legacyDialog}${endpoint} aria-labelledby="fibel-agent-setup-title">
+  <div class="relative flex min-h-full flex-col p-5 sm:p-7">
     <button class="${focus} absolute right-4 top-4 inline-grid h-9 w-9 cursor-pointer place-items-center rounded-full border-0 bg-transparent text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-white/10 dark:hover:text-white" type="button" data-fibel-agent-setup-close aria-label="${escapeHtml(copy.close)}">${closeIcon()}</button>
     <h2 class="m-0 max-w-[calc(100%_-_3rem)] text-xl font-semibold tracking-[-0.015em]" id="fibel-agent-setup-title">${escapeHtml(copy.title)}</h2>
     <p class="mb-5 mt-2 max-w-[30rem] text-[0.925rem] leading-6 text-zinc-600 dark:text-zinc-400">${escapeHtml(copy.intro)}</p>
     ${tabs}
     ${panels}
     <p class="mb-0 mt-2 min-h-5 text-xs [color:var(--fibel-accent-foreground-strong)]" data-fibel-agent-setup-status aria-live="polite"></p>
-    <p class="mb-0 mt-6 border-t border-zinc-200 pt-4 text-[0.8rem] leading-5 text-zinc-500 dark:border-white/10 dark:text-zinc-400">${escapeHtml(copy.note)}</p>
+    <p class="mb-0 mt-auto border-t border-zinc-200 pt-4 text-[0.8rem] leading-5 text-zinc-500 dark:border-white/10 dark:text-zinc-400">${escapeHtml(copy.note)}</p>
   </div>
 </dialog>`;
 }
