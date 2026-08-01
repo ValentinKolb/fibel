@@ -12,6 +12,7 @@ import type {
 } from "../types";
 import { escapeHtml, joinUrl } from "../utils";
 import { clientScript } from "../client/script";
+import { readingTime } from "../reading-time";
 
 export type LayoutOptions = {
   header?: boolean;
@@ -357,9 +358,13 @@ function renderFooter(
 function renderPageActions(page: FibelPage) {
   const markdownHref = rawMarkdownHref(page);
   const tags = page.meta.tags.slice(0, 4);
+  const date = page.meta.date ? `<span class="page-chip">${calendarIcon()}${escapeHtml(page.meta.date)}</span>` : "";
+  const authors = page.meta.authors.length > 0 ? `<span class="page-chip">By ${escapeHtml(page.meta.authors.join(", "))}</span>` : "";
   const updated = page.meta.updated ? `<span class="page-chip">${calendarIcon()}Updated ${escapeHtml(page.meta.updated)}</span>` : "";
   return `<div class="mt-5 flex flex-wrap items-center gap-2">
     <span class="page-chip">${clockIcon()}${readingTime(page.body)} min read</span>
+    ${date}
+    ${authors}
     ${updated}
     ${tags.map((tag) => `<span class="page-chip page-chip-accent">#${escapeHtml(tag)}</span>`).join("")}
     <button class="page-chip-action" type="button" data-copy-page aria-label="Copy page link" title="Copy page link"><span class="copy-feedback-icon">${linkIcon("h-3.5 w-3.5")}</span></button>
@@ -370,16 +375,6 @@ function renderPageActions(page: FibelPage) {
 function rawMarkdownHref(page: FibelPage) {
   const normalized = page.href.replace(/\/+$/g, "");
   return `${normalized || "/index"}.md`;
-}
-
-function readingTime(markdown: string) {
-  const words = markdown
-    .replace(/```[\s\S]*?```/g, " ")
-    .replace(/`[^`]*`/g, " ")
-    .replace(/<[^>]+>/g, " ")
-    .split(/\s+/)
-    .filter(Boolean).length;
-  return Math.max(1, Math.ceil(words / 220));
 }
 
 function chevronIcon() {

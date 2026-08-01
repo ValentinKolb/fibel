@@ -117,6 +117,21 @@ defaultCollection: "docs",
 Each collection content directory contains the normal locale directories.
 Canonical routes are `{basePath}/{locale}/{collectionPath}/{pageSlug}`.
 
+Turn one Markdown collection into a date-sorted editorial feed with the
+optional blog plugin:
+
+```ts
+import { blogPlugin } from "@k2b/fibel/plugins";
+
+plugins: [...defaultPlugins(), blogPlugin({ collection: "blog" })],
+```
+
+Blog posts require `date` frontmatter and may set `authors`. Content before
+`<!-- truncate -->` becomes the feed excerpt; otherwise Fibel uses the
+description. Do not add an `index.md` to that collection because the plugin
+owns its root. Posts remain available to search, Assistant, MCP, raw Markdown,
+and `llms.txt`.
+
 ## Custom application pages
 
 Use `pages` when the visible body comes from the host application but search

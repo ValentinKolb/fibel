@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import type { GenerateRequest, GenerateResult, Provider, StreamEvent } from "@k2b/nessi/ai";
 import { ratelimit } from "@k2b/sync/browser";
-import config from "../fibel.config";
+import config from "./fixture-config";
 import { createFibelApp, defaultPlugins } from "../src";
 import {
   agentSkillsPlugin,

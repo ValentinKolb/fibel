@@ -127,7 +127,7 @@ app.all("/.well-known/agent-skills/*", (c) =>
 ```
 
 The host must do this explicitly because a `/docs` subrouter never receives
-requests for the origin root. See [Agent Skills discovery](/en/agent-skills).
+requests for the origin root. See [Agent Skills discovery](/en/docs/agent-skills).
 
 ## Mount several instances
 
@@ -142,7 +142,7 @@ export default new Hono()
   .mount("/ui", ui.fetch);
 ```
 
-The instances can share the same header configuration, theme cookie, assistant provider, and process-wide rate limiters. Only one instance can own origin-level Agent Skills discovery; route `/.well-known/agent-skills/*` to that explicit owner. The [custom pages guide](/en/custom-pages) shows the complete header and Solid SSR setup.
+The instances can share the same header configuration, theme cookie, assistant provider, and process-wide rate limiters. Only one instance can own origin-level Agent Skills discovery; route `/.well-known/agent-skills/*` to that explicit owner. The [custom pages guide](/en/docs/custom-pages) shows the complete header and Solid SSR setup.
 
 ## Mount in other servers
 

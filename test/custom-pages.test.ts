@@ -5,7 +5,7 @@ import type {
   Provider,
   StreamEvent,
 } from "@k2b/nessi/ai";
-import config from "../fibel.config";
+import config from "./fixture-config";
 import {
   createFibelApp,
   defaultPlugins,

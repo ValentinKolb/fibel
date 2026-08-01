@@ -14,6 +14,18 @@ Collections let one Fibel instance serve related documentation areas such as pro
 
 Use separate Fibel instances instead when the areas need independent search indexes, assistant sessions, plugins, or operational limits.
 
+## See collections on this website
+
+This Fibel website is itself a collection example. **Docs** contains the guides
+you are reading under `/en/docs`. The separate **Blog Demo** collection contains
+normal Markdown posts under `/en/blog`; `blogPlugin({ collection: "blog" })`
+turns only that collection's root into a date-sorted feed with year navigation.
+
+Both areas still belong to one Fibel instance. They share the header, search,
+assistant, MCP server, theme, and deployment, while keeping independent content
+folders and sidebars. Use the collection links above the sidebar to switch
+between them, or select **Everything** in search to query both.
+
 ## Configure collections
 
 Replace the top-level `content` directory with a collection list:

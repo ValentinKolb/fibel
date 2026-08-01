@@ -146,7 +146,7 @@ Both renderers point at the same `/_ssr` path. Only `siteSsr.plugin()` is regist
 
 When one Fibel instance defines `collections`, `collection` places a custom or Solid page in that area's routes, sidebar, search scope, assistant context, MCP results, and discovery output. An omitted value uses `defaultCollection`.
 
-Add `collection: "ui"` to the earlier `solidPage` example to serve it at `/en/ui/panel-header` when the `ui` collection uses its default `/ui` path. See [content collections](/en/collections) for the complete config and URL contract.
+Add `collection: "ui"` to the earlier `solidPage` example to serve it at `/en/ui/panel-header` when the `ui` collection uses its default `/ui` path. See [content collections](/en/docs/collections) for the complete config and URL contract.
 
 ## Choose separate instances
 

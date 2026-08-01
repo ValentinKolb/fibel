@@ -116,6 +116,7 @@ function renderSocialTags(page: FibelPage, context: FibelContext) {
   }
 
   if (page.meta.updated) tags.push(`<meta property="article:modified_time" content="${escapeHtml(page.meta.updated)}">`);
+  if (page.meta.date) tags.push(`<meta property="article:published_time" content="${escapeHtml(page.meta.date)}">`);
 
   const image = resolveImage(page, context);
   if (image) {
@@ -158,6 +159,8 @@ function renderStructuredData(page: FibelPage, context: FibelContext) {
   };
   const modified = lastModified(page);
   if (modified) article.dateModified = modified;
+  if (page.meta.date) article.datePublished = page.meta.date;
+  if (page.meta.authors.length > 0) article.author = page.meta.authors.map((name) => ({ "@type": "Person", name }));
   const image = resolveImage(page, context);
   if (image) article.image = image;
 

@@ -103,4 +103,4 @@ Das Frontmatter steuert Metadaten, Navigation und die Chips unter dem Seitentite
 
 ## Nächste Schritte
 
-Die [Konfiguration](/de/configuration) behandelt die Einrichtung eines Projekts. [Hosting](/de/runtime) beschreibt den Betrieb als Server oder das Einbinden in eine bestehende Anwendung. [SEO](/de/seo) dokumentiert, was Suchmaschinen und Sprachmodelle erhalten. [Agent Skills](/de/agent-skills) beschreibt die Installation direkt von einer Website. [Integrierte Plugins](/de/built-in-plugins) listet den Funktionsumfang auf, die [Plugin-API](/de/plugins) beschreibt dessen Erweiterung.
+Die [Konfiguration](/de/docs/configuration) behandelt die Einrichtung eines Projekts. [Hosting](/de/docs/runtime) beschreibt den Betrieb als Server oder das Einbinden in eine bestehende Anwendung. [SEO](/de/docs/seo) dokumentiert, was Suchmaschinen und Sprachmodelle erhalten. [Agent Skills](/de/docs/agent-skills) beschreibt die Installation direkt von einer Website. [Integrierte Plugins](/de/docs/built-in-plugins) listet den Funktionsumfang auf, die [Plugin-API](/de/docs/plugins) beschreibt dessen Erweiterung.

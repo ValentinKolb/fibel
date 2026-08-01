@@ -15,7 +15,7 @@ für Coding-Agenten direkt über eine Fibel-Website. Es folgt dem
 Agent-Skills-Discovery-Format. Kompatible Clients können Skills dadurch finden
 und installieren, ohne das Quell-Repository zu klonen.
 
-Agent Skills ergänzen [MCP](/de/mcp): Ein Skill liefert kompakte Arbeitsabläufe
+Agent Skills ergänzen [MCP](/de/docs/mcp): Ein Skill liefert kompakte Arbeitsabläufe
 und Orientierung, während MCP bei Bedarf die exakte aktuelle Dokumentation
 bereitstellt.
 
@@ -123,7 +123,7 @@ keine Fibel-Einstellung.
 Nur eine Fibel-Instanz sollte auf einem Origin
 `/.well-known/agent-skills/*` besitzen. Für zusammengehörige
 Dokumentationsbereiche eignet sich eine Instanz mit
-[Collections](/de/collections). Andernfalls wird genau eine Instanz als
+[Collections](/de/docs/collections). Andernfalls wird genau eine Instanz als
 Discovery-Owner ausgewählt.
 
 ## Installieren und prüfen

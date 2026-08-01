@@ -10,7 +10,7 @@ updated: 2026-06-09
 
 # Plugin API
 
-Plugins erweitern Fibel an klaren Stellen: vor dem Laden der Inhalte, nach dem Rendern der Seiten und beim Registrieren zusätzlicher Routen. Damit lassen sich Projektregeln, eigene Endpunkte und alternative Implementierungen ergänzen, ohne den Kern zu verändern.
+Plugins erweitern Fibel an klaren Stellen: vor dem Laden der Inhalte, vor und nach dem Rendern der Seiten sowie beim Registrieren zusätzlicher Routen. Damit lassen sich Projektregeln, eigene Endpunkte und alternative Implementierungen ergänzen, ohne den Kern zu verändern.
 
 ## Plugin-Form
 
@@ -21,6 +21,7 @@ export function projectPlugin(): FibelPlugin {
   return {
     name: "project-plugin",
     setup(context) {},
+    transformContent(context) {},
     afterContent(context) {},
     routes(context) {
       return [];
@@ -30,6 +31,8 @@ export function projectPlugin(): FibelPlugin {
 ```
 
 `setup` läuft vor dem Laden der Markdown-Dateien und dient dem Ersetzen oder Umschließen von Services.
+
+`transformContent` läuft, nachdem alle Markdown- und Custom-Seiten geladen wurden, aber bevor Markdown und Navigation gerendert werden. Der Hook eignet sich für kleine Metadaten-Transformationen, die Rendering, Suche und spätere Plugins sehen sollen.
 
 `afterContent` läuft nach dem Laden und Rendern der Seiten und eignet sich für Validierung, Indizes oder abgeleitete Metadaten.
 

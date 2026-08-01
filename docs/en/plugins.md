@@ -10,7 +10,7 @@ updated: 2026-06-09
 
 # Plugin API
 
-Plugins extend Fibel at defined points: before content is loaded, after pages are rendered, and when additional routes are registered. This lets projects add rules, endpoints, and alternative implementations without changing the core.
+Plugins extend Fibel at defined points: before content is loaded, before pages are rendered, after pages are rendered, and when additional routes are registered. This lets projects add rules, endpoints, and alternative implementations without changing the core.
 
 ## Plugin shape
 
@@ -21,6 +21,7 @@ export function projectPlugin(): FibelPlugin {
   return {
     name: "project-plugin",
     setup(context) {},
+    transformContent(context) {},
     afterContent(context) {},
     routes(context) {
       return [];
@@ -30,6 +31,8 @@ export function projectPlugin(): FibelPlugin {
 ```
 
 `setup` runs before Markdown files are loaded. Use it to replace or wrap services.
+
+`transformContent` runs after all Markdown and custom pages have been loaded but before their Markdown and navigation are rendered. Use it for small metadata transformations that rendering, search, and later plugins must observe.
 
 `afterContent` runs after pages have been loaded and rendered. Use it for validation, indexes, or derived metadata.
 

@@ -55,7 +55,7 @@ Jeder Server stellt bereit:
 
 Bei konfigurierten Collections ergänzt der Server `list_collections()`. Das Tool liefert ID, Label und Beschreibung jeder Collection, damit ein Agent vor der Suche einen Scope wählen kann.
 
-Die Tools verwenden die vorhandene Fibel-Suche und den Seitenkontext. Markdown-Dateien und das explizite `context`-Markdown von [Custom Pages](/de/custom-pages) stehen damit zur Verfügung, ohne gerendertes HTML zu indexieren.
+Die Tools verwenden die vorhandene Fibel-Suche und den Seitenkontext. Markdown-Dateien und das explizite `context`-Markdown von [Custom Pages](/de/docs/custom-pages) stehen damit zur Verfügung, ohne gerendertes HTML zu indexieren.
 
 Seiten mit `hidden: true` sind ausgeschlossen. Der Endpunkt kann keine beliebigen Dateien oder Pfade lesen.
 

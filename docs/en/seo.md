@@ -94,4 +94,4 @@ Hidden pages are excluded from both.
 
 ## Custom head tags
 
-Analytics snippets and verification tags belong in a plugin rather than in a replaced layout. The [Plugin API](/en/plugins) documents the `headTags` hook.
+Analytics snippets and verification tags belong in a plugin rather than in a replaced layout. The [Plugin API](/en/docs/plugins) documents the `headTags` hook.

@@ -15,7 +15,7 @@ agents directly from a Fibel website. It follows the Agent Skills discovery
 format, so a compatible client can find and install the skills without cloning
 the source repository.
 
-Agent Skills complement [MCP](/en/mcp): a skill provides compact workflow and
+Agent Skills complement [MCP](/en/docs/mcp): a skill provides compact workflow and
 orientation instructions, while MCP supplies exact current documentation when
 the agent needs details.
 
@@ -118,7 +118,7 @@ requests. This is a router ownership boundary rather than a Fibel setting.
 
 Only one Fibel instance should own `/.well-known/agent-skills/*` on an origin.
 For related documentation areas, prefer one instance with
-[collections](/en/collections). Otherwise, explicitly choose one instance as
+[collections](/en/docs/collections). Otherwise, explicitly choose one instance as
 the discovery owner.
 
 ## Install and verify

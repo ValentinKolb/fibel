@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { ratelimit } from "@k2b/sync/browser";
-import config from "../fibel.config";
+import config from "./fixture-config";
 import { createFibelApp, defaultPlugins, type FibelConfig } from "../src";
 import {
   agentSkillsPlugin,

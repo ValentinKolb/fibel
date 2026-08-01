@@ -67,7 +67,7 @@ export default defineFibel({
 });
 ```
 
-`path` optionally changes a collection's public path and otherwise defaults to its ID. Custom pages select a collection with `collection`; omitted values use `defaultCollection`. The [collections guide](/en/collections) documents URL composition, locale redirects, search scopes, Solid pages, Assistant, MCP, and discovery routes.
+`path` optionally changes a collection's public path and otherwise defaults to its ID. Custom pages select a collection with `collection`; omitted values use `defaultCollection`. The [collections guide](/en/docs/collections) documents URL composition, locale redirects, search scopes, Solid pages, Assistant, MCP, and discovery routes.
 
 ## Routing
 
@@ -200,17 +200,19 @@ order: 2
 description: Configure content, routes, locales, assets, theme, and plugins.
 hidden: false
 tags: [config, routing]
+date: 2026-05-21
+authors: [Fibel Team]
 updated: 2026-06-09
 image: /assets/configuration.png
 ```
 
-Every field is optional. `title` is the page title; without it Fibel uses the first `#` heading, then a title-cased version of the slug. `navTitle` is the sidebar label and defaults to the title. `section` selects the sidebar group and defaults to `Guide`. `order` sorts pages within a locale and defaults to `100`. `description` is used for SEO, search, and the intro; without it Fibel takes the first paragraph, shortened to 180 characters, and falls back to the site description. `hidden` removes a page from navigation, pagination, the site's own search, `llms.txt`, and the sitemap, and marks it as `noindex`. The page stays reachable at its URL, which is what makes it useful for pages linked only from the footer. `tags` are displayed as chips. `updated` displays an update date and fills `article:modified_time`. `image` overrides the social preview image for this page.
+Every field is optional. `title` is the page title; without it Fibel uses the first `#` heading, then a title-cased version of the slug. `navTitle` is the sidebar label and defaults to the title. `section` selects the sidebar group and defaults to `Guide`. `order` sorts pages within a locale and defaults to `100`. `description` is used for SEO, search, and the intro; without it Fibel takes the first paragraph, shortened to 180 characters, and falls back to the site description. `hidden` removes a page from navigation, pagination, the site's own search, `llms.txt`, and the sitemap, and marks it as `noindex`. The page stays reachable at its URL, which is what makes it useful for pages linked only from the footer. `tags` are displayed as chips. `date` is the publication date and fills `article:published_time`; `authors` lists the authors. `updated` displays an update date and fills `article:modified_time`. `image` overrides the social preview image for this page.
 
 ## Custom pages
 
 `pages` registers application-rendered routes alongside Markdown files. Page metadata follows the same navigation, search, SEO, and visibility rules. Optional `context` supplies the Markdown returned by raw routes and read by search and the assistant. In collection mode, `collection` selects the owning collection and otherwise falls back to `defaultCollection`.
 
-The [custom pages guide](/en/custom-pages) documents the complete renderer contract, shared and localized context, Solid SSR integration, and multiple instances.
+The [custom pages guide](/en/docs/custom-pages) documents the complete renderer contract, shared and localized context, Solid SSR integration, and multiple instances.
 
 ## Plugin list
 

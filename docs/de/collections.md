@@ -14,6 +14,19 @@ Collections fassen zusammengehörige Dokumentationsbereiche in einer Fibel-Insta
 
 Getrennte Fibel-Instanzen eignen sich weiterhin, wenn Bereiche unabhängige Suchindizes, Assistant-Sitzungen, Plugins oder Betriebsgrenzen benötigen.
 
+## Collections auf dieser Website ansehen
+
+Diese Fibel-Website ist selbst ein Collection-Beispiel. **Docs** enthält die
+Anleitungen unter `/de/docs`. Die getrennte Collection **Blog Demo** enthält
+normale Markdown-Beiträge unter `/de/blog`; nur ihre Startseite wird durch
+`blogPlugin({ collection: "blog" })` zu einem nach Datum sortierten Feed mit
+Jahresnavigation.
+
+Beide Bereiche gehören weiterhin zu einer Fibel-Instanz. Sie teilen Header,
+Suche, Assistent, MCP-Server, Theme und Deployment, besitzen aber getrennte
+Content-Ordner und Sidebars. Die Collection-Links oberhalb der Sidebar wechseln
+zwischen beiden Bereichen; **Everything** in der Suche durchsucht beide.
+
 ## Collections konfigurieren
 
 An die Stelle des übergeordneten `content`-Ordners tritt eine Collection-Liste:

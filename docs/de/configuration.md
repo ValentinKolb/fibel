@@ -67,7 +67,7 @@ export default defineFibel({
 });
 ```
 
-`path` ändert optional den öffentlichen Pfad einer Collection und verwendet ansonsten deren ID. Benutzerdefinierte Seiten wählen ihre Collection über `collection`; ohne Angabe gilt `defaultCollection`. Der [Collection-Leitfaden](/de/collections) beschreibt URL-Aufbau, Locale-Weiterleitungen, Such-Scopes, Solid-Seiten, Assistent, MCP und Discovery-Routen.
+`path` ändert optional den öffentlichen Pfad einer Collection und verwendet ansonsten deren ID. Benutzerdefinierte Seiten wählen ihre Collection über `collection`; ohne Angabe gilt `defaultCollection`. Der [Collection-Leitfaden](/de/docs/collections) beschreibt URL-Aufbau, Locale-Weiterleitungen, Such-Scopes, Solid-Seiten, Assistent, MCP und Discovery-Routen.
 
 ## Routing
 
@@ -200,17 +200,19 @@ order: 2
 description: Konfiguriere Content, Routen, Locales, Assets, Theme und Plugins.
 hidden: false
 tags: [config, routing]
+date: 2026-05-21
+authors: [Fibel Team]
 updated: 2026-06-09
 image: /assets/konfiguration.png
 ```
 
-Alle Felder sind optional. `title` ist der Seitentitel; fehlt er, nutzt Fibel die erste `#`-Überschrift und danach den Slug in Titelschreibweise. `navTitle` ist das Label in der Sidebar und entspricht standardmäßig dem Titel. `section` bestimmt die Sidebar-Gruppe und ist standardmäßig `Guide`. `order` sortiert Seiten innerhalb eines Locales und ist standardmäßig `100`. `description` wird für SEO, Suche und das Intro genutzt; fehlt sie, nimmt Fibel den ersten Absatz auf 180 Zeichen gekürzt und fällt danach auf die Seitenbeschreibung zurück. `hidden` entfernt eine Seite aus Navigation, Pagination, der seiteneigenen Suche, `llms.txt` und der Sitemap und markiert sie als `noindex`. Die Seite bleibt unter ihrer URL erreichbar, genau das macht sie für Seiten nützlich, die nur im Footer verlinkt sind. `tags` werden als Chips angezeigt. `updated` zeigt ein Aktualisierungsdatum an und füllt `article:modified_time`. `image` überschreibt das Social-Preview-Bild dieser Seite.
+Alle Felder sind optional. `title` ist der Seitentitel; fehlt er, nutzt Fibel die erste `#`-Überschrift und danach den Slug in Titelschreibweise. `navTitle` ist das Label in der Sidebar und entspricht standardmäßig dem Titel. `section` bestimmt die Sidebar-Gruppe und ist standardmäßig `Guide`. `order` sortiert Seiten innerhalb eines Locales und ist standardmäßig `100`. `description` wird für SEO, Suche und das Intro genutzt; fehlt sie, nimmt Fibel den ersten Absatz auf 180 Zeichen gekürzt und fällt danach auf die Seitenbeschreibung zurück. `hidden` entfernt eine Seite aus Navigation, Pagination, der seiteneigenen Suche, `llms.txt` und der Sitemap und markiert sie als `noindex`. Die Seite bleibt unter ihrer URL erreichbar, genau das macht sie für Seiten nützlich, die nur im Footer verlinkt sind. `tags` werden als Chips angezeigt. `date` ist das Veröffentlichungsdatum und füllt `article:published_time`; `authors` listet die Autorinnen und Autoren. `updated` zeigt ein Aktualisierungsdatum an und füllt `article:modified_time`. `image` überschreibt das Social-Preview-Bild dieser Seite.
 
 ## Eigene Seiten
 
 `pages` registriert von einer Anwendung gerenderte Routen neben Markdown-Dateien. Die Seitenmetadaten folgen denselben Regeln für Navigation, Suche, SEO und Sichtbarkeit. Optionales `context` liefert das Markdown für rohe Routen, Suche und Assistent. Im Collection-Modus wählt `collection` den zugehörigen Bereich; ohne Angabe gilt `defaultCollection`.
 
-Der [Guide für eigene Seiten](/de/custom-pages) beschreibt den vollständigen Renderer-Vertrag, gemeinsamen und lokalisierten Kontext, Solid-SSR-Integration und mehrere Instanzen.
+Der [Guide für eigene Seiten](/de/docs/custom-pages) beschreibt den vollständigen Renderer-Vertrag, gemeinsamen und lokalisierten Kontext, Solid-SSR-Integration und mehrere Instanzen.
 
 ## Plugin-Liste
 

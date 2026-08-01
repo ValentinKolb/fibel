@@ -2,6 +2,7 @@ import { defaultPlugins, defineFibel } from "./src";
 import {
   agentSkillsPlugin,
   assistantPlugin,
+  blogPlugin,
   imprintPlugin,
   mcpPlugin,
   providerFromEnv,
@@ -21,7 +22,21 @@ export default defineFibel({
   title: "Fibel",
   description: "Publish Markdown collections and host-rendered application pages in one documentation shell with search, multilingual routing, and Markdown sources for tools.",
   siteUrl: "https://fibel.dev",
-  content: "docs",
+  collections: [
+    {
+      id: "docs",
+      label: "Docs",
+      description: "Guides and reference for building documentation with Fibel.",
+      content: "docs",
+    },
+    {
+      id: "blog",
+      label: "Blog Demo",
+      description: "Notes, ideas, and small updates from the Fibel project.",
+      content: "blog",
+    },
+  ],
+  defaultCollection: "docs",
   assets: "assets",
   routing: {
     basePath: "",
@@ -46,6 +61,7 @@ export default defineFibel({
     imprintPlugin({ url: "https://impressum.valentin-kolb.com", label: "Impressum" }),
     mcpPlugin(),
     agentSkillsPlugin({ directory: "skills" }),
+    blogPlugin({ collection: "blog" }),
     ...assistant,
   ],
 });

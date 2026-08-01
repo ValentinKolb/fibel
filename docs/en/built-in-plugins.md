@@ -23,12 +23,12 @@ const plugins = defaultPlugins();
 The default set includes:
 
 - `markdownPlugin`: renders Markdown to HTML, processes code blocks, and creates heading anchors.
-- `themePlugin`: reads the theme cookie and provides the selected theme to the layout. See [Theme](/en/theme).
+- `themePlugin`: reads the theme cookie and provides the selected theme to the layout. See [Theme](/en/docs/theme).
 - `i18nPlugin`: checks whether translated pages exist in the configured locales.
 - `seoPlugin`: serves SEO files such as favicon, sitemap, and robots output, and adds language alternates and social card metadata to every page.
-- `llmsPlugin`: serves `llms.txt` and `llms-full.txt` so language models can discover and read the documentation. See [SEO](/en/seo).
+- `llmsPlugin`: serves `llms.txt` and `llms-full.txt` so language models can discover and read the documentation. See [SEO](/en/docs/seo).
 - `assetsPlugin`: serves files from the configured assets folder.
-- `searchPlugin`: builds the search index and exposes the search endpoint. See [Search](/en/search).
+- `searchPlugin`: builds the search index and exposes the search endpoint. See [Search](/en/docs/search).
 - `poweredByPlugin`: adds the `Powered by fibel.dev` attribution to the footer.
 - `layoutPlugin`: renders navigation, page layout, page actions, footer, search dialog, and client script. `layoutPlugin({ header: false })` removes only the built-in header.
 
@@ -36,17 +36,22 @@ The default set includes:
 
 Fibel ships plugins that are not part of the default set because they need configuration.
 
-`assistantPlugin` adds a bounded documentation chat powered by `@k2b/nessi`. It uses in-memory rate limits by default and keeps provider credentials on the server. See [Documentation assistant](/en/assistant).
+`assistantPlugin` adds a bounded documentation chat powered by `@k2b/nessi`. It uses in-memory rate limits by default and keeps provider credentials on the server. See [Documentation assistant](/en/docs/assistant).
 
 `mcpPlugin` exposes visible documentation to coding agents through a public,
 read-only Streamable HTTP endpoint. By itself it adds an **MCP** setup item to
-the footer. See [MCP for coding agents](/en/mcp).
+the footer. See [MCP for coding agents](/en/docs/mcp).
 
 `agentSkillsPlugin` publishes self-contained Agent Skills from a configured
 directory at the origin-level well-known endpoint and adds an **Agents** setup
 item for the Vercel Skills CLI. When MCP is active, one **Agents** dialog
 contains both setup methods. See
-[Agent Skills discovery](/en/agent-skills).
+[Agent Skills discovery](/en/docs/agent-skills).
+
+`blogPlugin({ collection: "blog" })` turns one Markdown collection into a
+date-sorted editorial feed with year navigation. Posts remain normal Fibel
+pages and therefore stay available to search, Assistant, MCP, raw Markdown,
+and `llms.txt`. See [Blog collections](/en/docs/blog).
 
 `imprintPlugin` adds a footer link to legal information hosted somewhere else. Use it when the imprint belongs to the company or person behind several sites and should not be maintained as a documentation page.
 
@@ -76,7 +81,7 @@ export default defineFibel({
 });
 ```
 
-This is the right starting point for most projects. The [Plugin API](/en/plugins) describes the available hooks.
+This is the right starting point for most projects. The [Plugin API](/en/docs/plugins) describes the available hooks.
 
 ## Replace the defaults
 

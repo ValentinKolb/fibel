@@ -50,6 +50,7 @@ bun run src/cli.ts dev --port 5173
 
 - Documentation pages from `docs/<locale>/**/*.md`
 - Optional content collections with separate Markdown roots and navigation
+- Optional date-sorted blog feeds backed by normal Markdown collections
 - Framework-neutral custom pages with searchable Markdown context
 - Optional Solid SSR and island integration through a host-owned `@k2b/ssr` build
 - A standalone Web-standard `fetch` app
@@ -119,6 +120,31 @@ export default defineFibel({
 Canonical URLs use `{basePath}/{locale}/{collection}/{page}`, for example `/docs/en/ui/button`. `/docs/ui/button` redirects temporarily to the saved, requested, or default locale. Search starts in the current collection and can switch to **Everything**. Assistant and MCP tools can also select a collection.
 
 Sites without `collections` keep the existing content directory and URL format.
+
+## Blog collections
+
+The optional blog plugin turns one Markdown collection into an editorial feed
+with date sorting and year navigation:
+
+```ts
+import { defaultPlugins, defineFibel } from "@k2b/fibel";
+import { blogPlugin } from "@k2b/fibel/plugins";
+
+export default defineFibel({
+  title: "Product",
+  collections: [
+    { id: "docs", label: "Docs", content: "content/docs" },
+    { id: "blog", label: "Blog", content: "content/blog" },
+  ],
+  plugins: [...defaultPlugins(), blogPlugin({ collection: "blog" })],
+});
+```
+
+Posts require `date` frontmatter and may set `authors`. Add
+`<!-- truncate -->` after the feed excerpt; without it, the feed uses the page
+description. Do not add an `index.md` to the blog collection because the plugin
+generates that route. Posts remain normal pages for search, Assistant, MCP, raw
+Markdown, and `llms.txt`.
 
 ## Configuration
 
@@ -219,6 +245,8 @@ Supported frontmatter fields:
 - `description`: SEO description and page summary.
 - `hidden`: Remove the page from navigation, pagination, site search, `llms.txt`, and the sitemap, and render it with `noindex`. The page stays reachable at its URL.
 - `tags`: List of tags rendered as page chips.
+- `date`: Publication date rendered as a page chip and used as `article:published_time`.
+- `authors`: List of author names rendered on the page and included in structured data.
 - `updated`: Date string rendered as a page chip and used as `article:modified_time`.
 - `image`: Social preview image for this page, overriding `seo.ogImage`.
 
@@ -257,7 +285,7 @@ export default defineFibel({
 });
 ```
 
-Use `solidPage()` from `@k2b/fibel/solid` when the body contains Solid server components or `@k2b/ssr` islands. The host supplies its existing `html()` renderer and remains responsible for the single SSR plugin, `/_ssr` route, and production build. The [custom pages guide](https://fibel.dev/en/custom-pages) includes complete examples for Solid and multiple Fibel instances.
+Use `solidPage()` from `@k2b/fibel/solid` when the body contains Solid server components or `@k2b/ssr` islands. The host supplies its existing `html()` renderer and remains responsible for the single SSR plugin, `/_ssr` route, and production build. The [custom pages guide](https://fibel.dev/en/docs/custom-pages) includes complete examples for Solid and multiple Fibel instances.
 
 ### Host-owned production builds
 
@@ -324,7 +352,7 @@ export default defineFibel({
 });
 ```
 
-The endpoint is `${basePath}${internalPath}/mcp`, for example `/docs/_fibel/mcp`. It has no authentication and is intended for public documentation. Multiple Fibel instances remain separate MCP servers, so `/docs` and `/ui` keep independent search scopes. The [MCP guide](https://fibel.dev/en/mcp) covers setup, limits, and shared rate limiting.
+The endpoint is `${basePath}${internalPath}/mcp`, for example `/docs/_fibel/mcp`. It has no authentication and is intended for public documentation. Multiple Fibel instances remain separate MCP servers, so `/docs` and `/ui` keep independent search scopes. The [MCP guide](https://fibel.dev/en/docs/mcp) covers setup, limits, and shared rate limiting.
 
 ## Agent Skills discovery
 
@@ -359,7 +387,7 @@ Discovery is served at `/.well-known/agent-skills/index.json` regardless of
 automatically. A host that mounts Fibel below `/docs` must additionally forward
 `/.well-known/agent-skills/*` to the same `fibel.fetch` handler. Only one Fibel
 instance should own that origin route. See the
-[Agent Skills guide](https://fibel.dev/en/agent-skills).
+[Agent Skills guide](https://fibel.dev/en/docs/agent-skills).
 
 ## Search
 

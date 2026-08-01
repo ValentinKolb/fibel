@@ -27,6 +27,7 @@ export async function createFibelApp(input: FibelConfig): Promise<FibelApp> {
 
   for (const plugin of config.plugins) await plugin.setup?.(context);
   context.pages = loadPages(config);
+  for (const plugin of config.plugins) await plugin.transformContent?.(context);
   renderPages(context);
   for (const plugin of config.plugins) await plugin.afterContent?.(context);
   context.routes = (await Promise.all(config.plugins.map((plugin) => plugin.routes?.(context) ?? []))).flat();

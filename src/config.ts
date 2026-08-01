@@ -100,7 +100,7 @@ export function resolveConfig(config: FibelConfig): ResolvedFibelConfig {
     header: config.header ?? {},
     headerLinks: config.headerLinks ?? [],
     footerLinks: config.footerLinks ?? [],
-    pages: config.pages ?? [],
+    pages: [...(config.pages ?? [])],
     plugins: config.plugins ?? defaultPlugins(),
   };
 }

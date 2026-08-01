@@ -102,4 +102,4 @@ Frontmatter controls metadata, navigation, and the chips below the page title. A
 
 ## Next steps
 
-[Configuration](/en/configuration) covers project setup. [Hosting](/en/runtime) describes running Fibel as a server or mounting it inside an existing application. [SEO](/en/seo) documents what search engines and language models receive. [Agent Skills](/en/agent-skills) documents website-based skill installation. [Built-in plugins](/en/built-in-plugins) lists the default capabilities, and [Plugin API](/en/plugins) describes how to extend them.
+[Configuration](/en/docs/configuration) covers project setup. [Hosting](/en/docs/runtime) describes running Fibel as a server or mounting it inside an existing application. [SEO](/en/docs/seo) documents what search engines and language models receive. [Agent Skills](/en/docs/agent-skills) documents website-based skill installation. [Built-in plugins](/en/docs/built-in-plugins) lists the default capabilities, and [Plugin API](/en/docs/plugins) describes how to extend them.

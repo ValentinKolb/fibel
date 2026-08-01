@@ -2,7 +2,7 @@ import { beforeAll, describe, expect, test } from "bun:test";
 import { createFibelApp, defaultPlugins } from "../src";
 import { buildFibelStyles } from "../src/build";
 import { resolveConfig } from "../src/config";
-import config from "../fibel.config";
+import config from "./fixture-config";
 
 describe("fibel app", () => {
   beforeAll(() => buildFibelStyles(resolveConfig(config).root, true));

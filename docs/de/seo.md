@@ -94,4 +94,4 @@ Versteckte Seiten fehlen in beiden.
 
 ## Eigene Head-Tags
 
-Analytics-Snippets und Verification-Tags gehören in ein Plugin statt in ein ersetztes Layout. Die [Plugin-API](/de/plugins) dokumentiert den `headTags`-Hook.
+Analytics-Snippets und Verification-Tags gehören in ein Plugin statt in ein ersetztes Layout. Die [Plugin-API](/de/docs/plugins) dokumentiert den `headTags`-Hook.

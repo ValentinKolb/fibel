@@ -127,7 +127,7 @@ app.all("/.well-known/agent-skills/*", (c) =>
 ```
 
 Der Host muss dies explizit tun, weil ein `/docs`-Subrouter keine Requests an
-den Origin-Root erhält. Siehe [Agent-Skills-Discovery](/de/agent-skills).
+den Origin-Root erhält. Siehe [Agent-Skills-Discovery](/de/docs/agent-skills).
 
 ## Mehrere Instanzen mounten
 
@@ -142,7 +142,7 @@ export default new Hono()
   .mount("/ui", ui.fetch);
 ```
 
-Die Instanzen können dieselbe Header-Konfiguration, denselben Theme-Cookie, Assistant-Provider und prozessweiten Rate-Limiter verwenden. Nur eine Instanz kann die origin-weite Agent-Skills-Discovery besitzen; `/.well-known/agent-skills/*` wird explizit an diese Instanz geroutet. Der [Guide für eigene Seiten](/de/custom-pages) zeigt die vollständige Header- und Solid-SSR-Konfiguration.
+Die Instanzen können dieselbe Header-Konfiguration, denselben Theme-Cookie, Assistant-Provider und prozessweiten Rate-Limiter verwenden. Nur eine Instanz kann die origin-weite Agent-Skills-Discovery besitzen; `/.well-known/agent-skills/*` wird explizit an diese Instanz geroutet. Der [Guide für eigene Seiten](/de/docs/custom-pages) zeigt die vollständige Header- und Solid-SSR-Konfiguration.
 
 ## In andere Server einbinden
 

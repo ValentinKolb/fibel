@@ -107,6 +107,8 @@ export type FibelCustomPage = {
   order?: number;
   hidden?: boolean;
   tags?: string[];
+  date?: string;
+  authors?: string[];
   updated?: string;
   image?: string;
   layout?: FibelPageLayout;
@@ -164,6 +166,8 @@ export type PageMeta = {
   order: number;
   hidden: boolean;
   tags: string[];
+  date?: string;
+  authors: string[];
   updated?: string;
   image?: string;
 };
@@ -248,6 +252,7 @@ export type FibelContext = {
 export type FibelPlugin = {
   name: string;
   setup?: (context: FibelContext) => void | Promise<void>;
+  transformContent?: (context: FibelContext) => void | Promise<void>;
   afterContent?: (context: FibelContext) => void | Promise<void>;
   routes?: (context: FibelContext) => FibelRoute[] | Promise<FibelRoute[]>;
 };

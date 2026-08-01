@@ -19,4 +19,4 @@ hidden: true
 
 Its response also carries `<meta name="robots" content="noindex, nofollow">`, so search engines leave it alone.
 
-This is the mechanism for pages that must exist at a stable URL without appearing in navigation: legal notices, deep links from external systems, or drafts that are not ready to be found yet. See [Configuration](/en/configuration) for the rest of the frontmatter fields.
+This is the mechanism for pages that must exist at a stable URL without appearing in navigation: legal notices, deep links from external systems, or drafts that are not ready to be found yet. See [Configuration](/en/docs/configuration) for the rest of the frontmatter fields.

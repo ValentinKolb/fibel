@@ -19,4 +19,4 @@ hidden: true
 
 Ihre Antwort trägt zusätzlich `<meta name="robots" content="noindex, nofollow">`, Suchmaschinen lassen sie also in Ruhe.
 
-Das ist der Mechanismus für Seiten, die unter einer stabilen URL existieren müssen, ohne in der Navigation aufzutauchen: rechtliche Hinweise, Deeplinks aus externen Systemen oder Entwürfe, die noch nicht gefunden werden sollen. Die übrigen Frontmatter-Felder stehen in der [Konfiguration](/de/configuration).
+Das ist der Mechanismus für Seiten, die unter einer stabilen URL existieren müssen, ohne in der Navigation aufzutauchen: rechtliche Hinweise, Deeplinks aus externen Systemen oder Entwürfe, die noch nicht gefunden werden sollen. Die übrigen Frontmatter-Felder stehen in der [Konfiguration](/de/docs/configuration).
