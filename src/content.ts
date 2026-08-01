@@ -180,15 +180,70 @@ export function parseFrontmatter(raw: string): { data: Frontmatter; body: string
   if (!raw.startsWith("---\n")) return { data: {}, body: raw };
   const end = raw.indexOf("\n---", 4);
   if (end === -1) return { data: {}, body: raw };
-  const block = raw.slice(4, end).trim();
+  const block = raw.slice(4, end);
   const body = raw.slice(end + 4).replace(/^\n/, "");
   const data: Frontmatter = {};
-  for (const line of block.split("\n")) {
+  const lines = block.split("\n");
+  for (let index = 0; index < lines.length; index++) {
+    const line = lines[index];
     const match = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
     if (!match) continue;
+    const value = match[2].trim();
+    if (value === ">" || value === "|") {
+      const parsed = parseBlockScalar(lines, index + 1, value);
+      data[match[1]] = parsed.value;
+      index = parsed.end - 1;
+      continue;
+    }
     data[match[1]] = coerceValue(match[2]);
   }
   return { data, body };
+}
+
+function parseBlockScalar(
+  lines: string[],
+  start: number,
+  style: ">" | "|",
+) {
+  const content: string[] = [];
+  let indentation: number | undefined;
+  let end = start;
+
+  while (end < lines.length) {
+    const line = lines[end];
+    if (!line.trim()) {
+      content.push("");
+      end++;
+      continue;
+    }
+
+    const leadingWhitespace = line.match(/^\s*/)?.[0].length ?? 0;
+    if (leadingWhitespace === 0) break;
+    indentation ??= leadingWhitespace;
+    if (leadingWhitespace < indentation) break;
+    content.push(line.slice(indentation));
+    end++;
+  }
+
+  return {
+    value: (style === "|" ? content.join("\n") : foldLines(content)).trim(),
+    end,
+  };
+}
+
+function foldLines(lines: string[]) {
+  let value = "";
+  for (let index = 0; index < lines.length; index++) {
+    const line = lines[index];
+    if (index === 0 || lines[index - 1] === "") {
+      value += line;
+    } else if (line === "") {
+      value += "\n";
+    } else {
+      value += ` ${line}`;
+    }
+  }
+  return value;
 }
 
 function coerceValue(value: string) {

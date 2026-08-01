@@ -126,6 +126,41 @@ describe("agent skills plugin", () => {
     expect(await skill.text()).toBe(content);
   });
 
+  test("publishes folded frontmatter descriptions", async () => {
+    const root = temporaryRoot();
+    const directory = join(root, "skills", "cloud-dev");
+    mkdirSync(directory, { recursive: true });
+    writeFileSync(
+      join(directory, "SKILL.md"),
+      `---
+name: cloud-dev
+description: >
+  Build and maintain applications on Cloud.
+  Use this skill for application development.
+---
+
+# cloud-dev
+`,
+    );
+    const app = await createFibelApp(
+      testConfig(root, [
+        agentSkillsPlugin({ directory: "skills" }),
+      ]),
+    );
+
+    const response = await app.fetch(
+      new Request(
+        "https://example.com/.well-known/agent-skills/index.json",
+      ),
+    );
+    const discovery = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(discovery.skills[0].description).toBe(
+      "Build and maintain applications on Cloud. Use this skill for application development.",
+    );
+  });
+
   test("serves discovery at the origin root rather than below basePath", async () => {
     const root = temporaryRoot();
     writeSkill(
