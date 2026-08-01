@@ -155,7 +155,7 @@ assistantPlugin({
 
 Pro Request ergänzt das Plugin den vertrauenswürdigen Überblicks- und Agent-Zugriffskontext, die aktuelle Sprache und Seite, eine begrenzte Session-History sowie die von den Tools abgerufene Dokumentation. Versteckte Seiten bleiben ausgeschlossen. Tool-Ergebnisse gelten als nicht vertrauenswürdiger Referenztext und können die Systemanweisungen nicht ersetzen.
 
-Eigene Seiten benötigen kein weiteres Tool und keine Registry. Ihr `context`-Markdown steht über die vorhandenen Such- und Lese-Tools bereit. Wird der Assistent auf einer eigenen Route geöffnet, löst Fibel diese Seite automatisch als aktuelle Seite auf.
+Eigene Seiten benötigen kein weiteres Tool und keine Registry. Ihr `content`-Markdown steht über die vorhandenen Such- und Lese-Tools bereit. Wird der Assistent auf einer eigenen Route geöffnet, löst Fibel diese Seite automatisch als aktuelle Seite auf.
 
 Auf Collection-Seiten durchsucht `search_docs` standardmäßig die aktuelle Collection. Für bereichsübergreifende Fragen kann das Modell eine andere Collection-ID oder `all` angeben. `read_doc` verlangt weiterhin genau einen kanonischen `href` aus dem Suchergebnis.
 

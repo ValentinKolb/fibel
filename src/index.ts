@@ -10,6 +10,7 @@ export type {
   FibelConfig,
   FibelContext,
   FibelCustomPage,
+  FibelCustomPageContent,
   FibelCustomPageContext,
   FibelCustomPageRenderContext,
   FibelCustomPageRenderResult,

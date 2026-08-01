@@ -39,7 +39,7 @@ Der Index enthält:
 - Sidebar-Bereich.
 - Markdown-Text der Seite.
 
-Bei eigenen Seiten wird optionales `context`-Markdown statt des gerenderten Komponenten-HTML indexiert. Bei konfigurierten Collections enthalten Sucheinträge zusätzlich deren ID und Label.
+Bei eigenen Seiten wird optionales `content`-Markdown statt des gerenderten Komponenten-HTML indexiert. Bei konfigurierten Collections enthalten Sucheinträge zusätzlich deren ID und Label.
 
 Die Suche ist locale-bewusst. Eine deutsche Anfrage durchsucht deutsche Seiten. Eine englische Anfrage durchsucht englische Seiten.
 

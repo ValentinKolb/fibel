@@ -75,7 +75,10 @@ export type FooterLink = NavLink;
 
 export type FibelPageLayout = "article" | "full";
 
-export type FibelCustomPageContext = string | ({ default: string } & Record<string, string>);
+export type FibelCustomPageContent = string | ({ default: string } & Record<string, string>);
+
+/** @deprecated Use FibelCustomPageContent. */
+export type FibelCustomPageContext = FibelCustomPageContent;
 
 export type FibelPageDocument = {
   body: string;
@@ -87,6 +90,11 @@ export type FibelDocumentRenderer = (document: FibelPageDocument) => string;
 export type FibelCustomPageRenderContext = {
   request: Request;
   page: FibelPage;
+  content: {
+    markdown: string;
+    html: string;
+  };
+  /** @deprecated Use content. */
   context: {
     markdown: string;
     html: string;
@@ -112,6 +120,8 @@ export type FibelCustomPage = {
   updated?: string;
   image?: string;
   layout?: FibelPageLayout;
+  content?: FibelCustomPageContent;
+  /** @deprecated Use content. */
   context?: FibelCustomPageContext;
   render: (
     context: FibelCustomPageRenderContext,

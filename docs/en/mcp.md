@@ -53,7 +53,7 @@ Every server exposes:
 
 When collections are configured, the server also exposes `list_collections()`. It returns each collection's ID, label, and description so an agent can select a search scope before querying.
 
-The tools use the existing Fibel search and page context. Markdown files and the explicit `context` Markdown of [custom pages](/en/docs/custom-pages) are therefore available without indexing rendered HTML.
+The tools use the existing Fibel search and page content. Markdown files and the explicit `content` Markdown of [custom pages](/en/docs/custom-pages) are therefore available without indexing rendered HTML.
 
 Pages with `hidden: true` are excluded. The endpoint cannot read arbitrary files or paths.
 
@@ -85,7 +85,7 @@ product-docs  https://product.example/docs/_fibel/mcp
 product-ui    https://product.example/ui/_fibel/mcp
 ```
 
-Each endpoint closes over its own Fibel context. Navigation, locales, visible pages, custom-page context, and search results remain separate. This fits areas that require independent search, assistant sessions, plugins, or operational limits.
+Each endpoint closes over its own Fibel context. Navigation, locales, visible pages, custom-page content, and search results remain separate. This fits areas that require independent search, assistant sessions, plugins, or operational limits.
 
 ## Public endpoint limits
 

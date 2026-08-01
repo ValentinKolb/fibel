@@ -53,10 +53,10 @@ export const app = await createFibelApp({
       path: "/counter",
       title: "Counter",
       description: "An interactive counter.",
-      context: "# Counter\\n\\nThe counter-probe documents an interactive component.",
-      component: ({ context }) => (
+      content: "# Counter\\n\\nThe counter-probe documents an interactive component.",
+      component: ({ content }) => (
         <section data-showcase>
-          <div innerHTML={context.html} />
+          <div innerHTML={content.html} />
           <Counter initial={2} />
         </section>
       ),

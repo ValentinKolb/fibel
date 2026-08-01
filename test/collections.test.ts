@@ -145,8 +145,8 @@ describe("collections", () => {
           path: "/status-card",
           title: "StatusCard",
           description: "Displays service state.",
-          context: "# StatusCard\n\nThe status-card-probe is host rendered.",
-          render: ({ context }) => `<section data-status-card>${context.html}</section>`,
+          content: "# StatusCard\n\nThe status-card-probe is host rendered.",
+          render: ({ content }) => `<section data-status-card>${content.html}</section>`,
         },
       ],
     });

@@ -135,14 +135,14 @@ const panelHeaderPage = solidPage({
   path: "/panel-header",
   title: "PanelHeader",
   description: "Ein einheitlicher Bereich für Überschrift und Aktionen.",
-  context: panelHeaderMarkdown,
-  component: ({ context }) => (
-    <PanelHeaderShowcase documentation={context.html} />
+  content: panelHeaderMarkdown,
+  component: ({ content }) => (
+    <PanelHeaderShowcase documentation={content.html} />
   ),
 });
 ```
 
-Mit der vorherigen Konfiguration liegt diese Seite unter `/docs/en/ui/panel-header`. Das `context`-Markdown fließt wie reguläres Collection-Markdown in Suche, rohe Markdown-Routen, Assistent, MCP und `llms.txt` ein.
+Mit der vorherigen Konfiguration liegt diese Seite unter `/docs/en/ui/panel-header`. Das `content`-Markdown fließt wie reguläres Collection-Markdown in Suche, rohe Markdown-Routen, Assistent, MCP und `llms.txt` ein.
 
 ## Collections durchsuchen
 

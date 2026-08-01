@@ -51,7 +51,7 @@ bun run src/cli.ts dev --port 5173
 - Documentation pages from `docs/<locale>/**/*.md`
 - Optional content collections with separate Markdown roots and navigation
 - Optional date-sorted blog feeds backed by normal Markdown collections
-- Framework-neutral custom pages with searchable Markdown context
+- Framework-neutral custom pages with searchable Markdown content
 - Optional Solid SSR and island integration through a host-owned `@k2b/ssr` build
 - A standalone Web-standard `fetch` app
 - Server-rendered HTML with page metadata and canonical URLs
@@ -264,7 +264,7 @@ If the app is mounted under `basePath`, link to assets through that public route
 
 ## Custom application pages
 
-`pages` adds server-rendered application output to the normal Fibel shell. Optional Markdown context remains the source for search, raw `.md` routes, `llms.txt`, and the documentation assistant.
+`pages` adds server-rendered application output to the normal Fibel shell. Optional Markdown content remains the source for search, raw `.md` routes, `llms.txt`, and the documentation assistant.
 
 ```ts
 export default defineFibel({
@@ -274,16 +274,18 @@ export default defineFibel({
       path: "/panel-header",
       title: "PanelHeader",
       description: "A consistent heading and action area.",
-      context: {
+      content: {
         default: panelHeaderMarkdown,
         de: panelHeaderMarkdownDe,
       },
-      render: ({ context }) =>
-        `<section>${context.html}</section>`,
+      render: ({ content }) =>
+        `<section>${content.html}</section>`,
     },
   ],
 });
 ```
+
+The previous `context` definition and render property remain as deprecated aliases and emit a migration warning. If both definition keys are present, `content` takes precedence.
 
 Use `solidPage()` from `@k2b/fibel/solid` when the body contains Solid server components or `@k2b/ssr` islands. The host supplies its existing `html()` renderer and remains responsible for the single SSR plugin, `/_ssr` route, and production build. The [custom pages guide](https://fibel.dev/en/docs/custom-pages) includes complete examples for Solid and multiple Fibel instances.
 

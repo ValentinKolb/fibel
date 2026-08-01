@@ -28,12 +28,13 @@ export function loadPages(config: ResolvedFibelConfig): FibelPage[] {
 
   for (const definition of config.pages) {
     const slug = customPagePath(definition);
+    warnDeprecatedCustomPageContext(definition);
     const collection = config.collections.find(
       (candidate) =>
         candidate.id === (definition.collection ?? config.defaultCollection),
     );
     for (const locale of config.locales) {
-      const body = customPageContext(definition, locale.code);
+      const body = customPageContent(definition, locale.code);
       pages.push({
         id: collection
           ? `custom:${collection.id}:${locale.code}:${slug}`
@@ -250,14 +251,28 @@ function customPagePath(page: FibelCustomPage) {
   return path;
 }
 
-function customPageContext(page: FibelCustomPage, locale: string) {
-  if (!page.context) return "";
-  if (typeof page.context === "string") return page.context;
-  const context = page.context[locale] ?? page.context.default;
-  if (typeof context !== "string") {
-    throw new Error(`Custom page "${page.path}" context requires a default Markdown string.`);
+function customPageContent(page: FibelCustomPage, locale: string) {
+  const content = page.content ?? page.context;
+  if (!content) return "";
+  if (typeof content === "string") return content;
+  const localizedContent = content[locale] ?? content.default;
+  if (typeof localizedContent !== "string") {
+    throw new Error(`Custom page "${page.path}" content requires a default Markdown string.`);
   }
-  return context;
+  return localizedContent;
+}
+
+function warnDeprecatedCustomPageContext(page: FibelCustomPage) {
+  if (page.context === undefined) return;
+  if (page.content !== undefined) {
+    console.warn(
+      `[fibel] Custom page "${page.path}" defines both "content" and deprecated "context"; "content" takes precedence.`,
+    );
+    return;
+  }
+  console.warn(
+    `[fibel] Custom page "${page.path}" uses deprecated "context"; rename it to "content".`,
+  );
 }
 
 function assertUniquePageHrefs(pages: FibelPage[]) {

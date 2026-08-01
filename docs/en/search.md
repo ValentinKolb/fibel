@@ -39,7 +39,7 @@ The index includes:
 - Sidebar section.
 - Markdown text of the page.
 
-For custom pages, optional `context` Markdown is indexed instead of rendered component HTML. Search entries also carry their collection ID and label when collections are configured.
+For custom pages, optional `content` Markdown is indexed instead of rendered component HTML. Search entries also carry their collection ID and label when collections are configured.
 
 Search is locale-aware. An English query searches English pages. A German query searches German pages.
 

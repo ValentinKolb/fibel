@@ -2,6 +2,7 @@ import { renderFibelHeader } from "../layout";
 import { navKey, pageRoute, sameDocument } from "../collections";
 import type {
   FibelContext,
+  FibelCustomPageRenderContext,
   FibelHeaderHref,
   FibelHeaderLinkContext,
   FibelPage,
@@ -19,6 +20,7 @@ export type LayoutOptions = {
 };
 
 export function layoutPlugin(options: LayoutOptions = {}): FibelPlugin {
+  const warnedRenderContextPages = new Set<string>();
   return {
     name: "layout",
     setup(context) {
@@ -27,16 +29,27 @@ export function layoutPlugin(options: LayoutOptions = {}): FibelPlugin {
           renderDocument(page, request, context, document, options);
         if (!page.render) return renderDocumentForPage({ body: page.html });
 
-        const rendered = await page.render({
+        const content = {
+          markdown: page.body,
+          html: page.html,
+        };
+        const renderContext: FibelCustomPageRenderContext = {
           request,
           page,
-          context: {
-            markdown: page.body,
-            html: page.html,
+          content,
+          get context() {
+            if (!warnedRenderContextPages.has(page.id)) {
+              warnedRenderContextPages.add(page.id);
+              console.warn(
+                `[fibel] Custom page "${page.href}" renderer uses deprecated "context"; use "content" instead.`,
+              );
+            }
+            return content;
           },
           fibel: context,
           renderDocument: renderDocumentForPage,
-        });
+        };
+        const rendered = await page.render(renderContext);
         if (rendered instanceof Response) return rendered;
         return renderDocumentForPage(typeof rendered === "string" ? { body: rendered } : rendered);
       };

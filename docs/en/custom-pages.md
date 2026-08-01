@@ -3,9 +3,9 @@ title: Custom and Solid pages
 navTitle: Custom pages
 section: Architecture
 order: 15
-description: Add server-rendered application pages to the Fibel shell while keeping their Markdown context available to search and the documentation assistant.
+description: Add server-rendered application pages to the Fibel shell while keeping their Markdown content available to search and the documentation assistant.
 tags: [custom-pages, solid, ssr, islands]
-updated: 2026-07-27
+updated: 2026-08-01
 ---
 
 # Custom and Solid pages
@@ -32,12 +32,12 @@ export default defineFibel({
       description: "A consistent heading and action area.",
       section: "Components",
       order: 10,
-      context: {
+      content: {
         default: panelHeaderMarkdown,
         de: panelHeaderMarkdownDe,
       },
-      render: ({ context }) =>
-        `<section class="panel-showcase">${context.html}</section>`,
+      render: ({ content }) =>
+        `<section class="panel-showcase">${content.html}</section>`,
     },
   ],
 });
@@ -45,14 +45,16 @@ export default defineFibel({
 
 Fibel creates the page under every configured locale. In this example the routes are `/en/panel-header` and `/de/panel-header`.
 
-`context.default` is the language-neutral fallback. Locale keys override it only where a translation exists. A single string can be used when every locale should receive the same context.
+`content.default` is the language-neutral fallback. Locale keys override it only where a translation exists. A single string can be used when every locale should receive the same content.
 
 The render callback receives both forms:
 
-- `context.markdown` is indexed by search and returned by raw `.md` routes, `llms.txt`, and the assistant's existing `read_doc` tool.
-- `context.html` is produced once with Fibel's Markdown renderer and can be displayed on the page.
+- `content.markdown` is indexed by search and returned by raw `.md` routes, `llms.txt`, and the assistant's existing `read_doc` tool.
+- `content.html` is produced once with Fibel's Markdown renderer and can be displayed on the page.
 
 This keeps the searchable explanation and the visible component documentation in one source. Fibel does not derive documentation from rendered HTML.
+
+The previous `context` definition and render property remain as deprecated migration aliases. Fibel warns when either alias is used. If a definition provides both `content` and `context`, `content` takes precedence.
 
 ## Choose the body layout
 
@@ -66,9 +68,9 @@ This keeps the searchable explanation and the visible component documentation in
   title: "Component catalog",
   description: "Browse the shared UI components.",
   layout: "full",
-  context: catalogMarkdown,
-  render: ({ context }) =>
-    `<div class="catalog">${context.html}</div>`,
+  content: catalogMarkdown,
+  render: ({ content }) =>
+    `<div class="catalog">${content.html}</div>`,
 }
 ```
 
@@ -108,9 +110,9 @@ export default defineFibel({
       title: "PanelHeader",
       description: "A consistent heading and action area.",
       section: "Components",
-      context: panelHeaderMarkdown,
-      component: ({ context }) => (
-        <PanelHeaderPage documentation={context.html} />
+      content: panelHeaderMarkdown,
+      component: ({ content }) => (
+        <PanelHeaderPage documentation={content.html} />
       ),
     }),
   ],

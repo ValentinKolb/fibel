@@ -14,7 +14,7 @@ Fibel reads Markdown from a content directory and serves it as a website. The so
 
 Every built-in capability is a plugin: Markdown rendering, layout, search, theme handling, i18n checks, and SEO output. The default set can be extended, individual plugins can be replaced, and the list can be assembled from scratch. Rendering, navigation, search, and routing therefore remain under project control rather than fixed by the framework.
 
-Fibel runs on Bun and is configured in a single file. Markdown content requires no build step. Applications can additionally place custom server-rendered pages and optional Solid islands inside the same shell while keeping explicit Markdown context for search and tools.
+Fibel runs on Bun and is configured in a single file. Markdown content requires no build step. Applications can additionally place custom server-rendered pages and optional Solid islands inside the same shell while keeping explicit Markdown content for search and tools.
 
 ## Quick start
 
@@ -41,7 +41,7 @@ current details. The agent still answers in the user's language.
 ## Capabilities
 
 - Pages generated from `docs/<locale>/**/*.md`, with navigation, sections, and pagination derived from frontmatter.
-- Custom server-rendered pages with searchable Markdown context and an optional Solid SSR bridge.
+- Custom server-rendered pages with searchable Markdown content and an optional Solid SSR bridge.
 - Server-side search with a spotlight dialog, opened with `/` or `Mod+K`.
 - Native language routes and a language switcher that preserves the current page.
 - Light and dark mode resolved on the server, so the first paint is already correct.

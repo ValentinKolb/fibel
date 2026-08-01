@@ -144,11 +144,15 @@ pages: [
     collection: "ui",
     title: "PanelHeader",
     description: "A consistent heading and action area.",
-    context: panelHeaderMarkdown,
-    render: ({ context }) => `<section>${context.html}</section>`,
+    content: panelHeaderMarkdown,
+    render: ({ content }) => `<section>${content.html}</section>`,
   },
 ],
 ```
+
+`content` is the canonical custom-page knowledge field. The deprecated
+`context` definition and render aliases still work with migration warnings;
+do not use them in new code.
 
 Use `solidPage()` from `@k2b/fibel/solid` for Solid server components or
 `@k2b/ssr` islands. The host owns its SSR renderer and route.

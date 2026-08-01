@@ -319,7 +319,7 @@ describe("MCP plugin", () => {
     expect(page.body.result?.content?.[0]?.text).toContain("# Light and dark mode");
   });
 
-  test("searches the explicit Markdown context of custom pages", async () => {
+  test("searches the explicit Markdown content of custom pages", async () => {
     const app = await createFibelApp(
       mcpConfig({
         pages: [
@@ -327,8 +327,8 @@ describe("MCP plugin", () => {
             path: "/status-card",
             title: "StatusCard",
             description: "Displays the current service state.",
-            context: "# StatusCard\n\nUse the `tone` property to select the service state.",
-            render: ({ context }) => `<section>${context.html}</section>`,
+            content: "# StatusCard\n\nUse the `tone` property to select the service state.",
+            render: ({ content }) => `<section>${content.html}</section>`,
           },
         ],
       }),

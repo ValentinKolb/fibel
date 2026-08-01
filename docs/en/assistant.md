@@ -155,7 +155,7 @@ assistantPlugin({
 
 For each request, the plugin adds the trusted overview and active agent-access context, current language and page, a bounded session history, and documentation retrieved by the tools. Hidden pages are excluded. Tool results are treated as untrusted reference text and cannot replace the system instructions.
 
-Custom pages need no additional tool or registry. Their `context` Markdown is available through the existing search and read tools, and opening the assistant on a custom route resolves that page as the current page automatically.
+Custom pages need no additional tool or registry. Their `content` Markdown is available through the existing search and read tools, and opening the assistant on a custom route resolves that page as the current page automatically.
 
 On collection pages, `search_docs` searches the current collection by default. The model can pass another collection ID or `all` when a question crosses collection boundaries. `read_doc` still requires one exact canonical href returned by search.
 

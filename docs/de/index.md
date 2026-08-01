@@ -42,7 +42,7 @@ des Nutzers.
 ## Funktionsumfang
 
 - Seiten aus `docs/<locale>/**/*.md`, mit Navigation, Sections und Pagination aus dem Frontmatter.
-- Eigene serverseitig gerenderte Seiten mit durchsuchbarem Markdown-Kontext und optionaler Solid-SSR-Brücke.
+- Eigene serverseitig gerenderte Seiten mit durchsuchbarem Markdown-Inhalt und optionaler Solid-SSR-Brücke.
 - Serverseitige Suche mit Spotlight-Dialog, zu öffnen mit `/` oder `Mod+K`.
 - Native Sprachrouten und ein Sprachumschalter, der die aktuelle Seite beibehält.
 - Light und Dark Mode serverseitig aufgelöst, der erste Frame stimmt damit bereits.

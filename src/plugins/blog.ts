@@ -24,7 +24,7 @@ export function blogPlugin(options: BlogOptions): FibelPlugin {
         path: "/",
         title: collection.label,
         description: collection.description,
-        context: `# ${collection.label}\n\n${collection.description}`,
+        content: `# ${collection.label}\n\n${collection.description}`,
         layout: "full",
         render: ({ page, fibel }) =>
           renderBlogIndex(page, fibel, options.collection),

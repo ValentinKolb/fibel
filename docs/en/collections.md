@@ -134,14 +134,14 @@ const panelHeaderPage = solidPage({
   path: "/panel-header",
   title: "PanelHeader",
   description: "A consistent heading and action area.",
-  context: panelHeaderMarkdown,
-  component: ({ context }) => (
-    <PanelHeaderShowcase documentation={context.html} />
+  content: panelHeaderMarkdown,
+  component: ({ content }) => (
+    <PanelHeaderShowcase documentation={content.html} />
   ),
 });
 ```
 
-With the earlier config, this page is available at `/docs/en/ui/panel-header`. Its `context` Markdown feeds the same search, raw Markdown, assistant, MCP, and `llms.txt` pipelines as collection Markdown files.
+With the earlier config, this page is available at `/docs/en/ui/panel-header`. Its `content` Markdown feeds the same search, raw Markdown, assistant, MCP, and `llms.txt` pipelines as collection Markdown files.
 
 ## Browse and search collections
 

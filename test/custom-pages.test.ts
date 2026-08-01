@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, spyOn, test } from "bun:test";
 import type {
   GenerateRequest,
   GenerateResult,
@@ -13,7 +13,7 @@ import {
 } from "../src";
 import { assistantPlugin, layoutPlugin } from "../src/plugins";
 
-const panelContext = {
+const panelContent = {
   default:
     "# Panel header\n\n## Usage\n\nThe panel-header-probe keeps a title and actions aligned.",
   de: "# Panel-Kopf\n\n## Verwendung\n\nDer panel-header-probe richtet Titel und Aktionen aus.",
@@ -85,7 +85,7 @@ function customPageProvider(requests: GenerateRequest[]): Provider {
 }
 
 describe("custom pages", () => {
-  test("renders, indexes, and publishes shared or localized Markdown context", async () => {
+  test("renders, indexes, and publishes shared or localized Markdown content", async () => {
     const app = await createFibelApp({
       ...config,
       pages: [
@@ -96,9 +96,9 @@ describe("custom pages", () => {
           section: "Components",
           order: 50,
           tags: ["ui"],
-          context: panelContext,
-          render: ({ context }) =>
-            `<section data-panel-showcase><div class="documentation">${context.html}</div><span data-markdown-size>${context.markdown.length}</span></section>`,
+          content: panelContent,
+          render: ({ content }) =>
+            `<section data-panel-showcase><div class="documentation">${content.html}</div><span data-markdown-size>${content.markdown.length}</span></section>`,
         },
       ],
     });
@@ -143,7 +143,7 @@ describe("custom pages", () => {
     expect(page).toMatchObject({
       kind: "custom",
       layout: "article",
-      body: panelContext.default,
+      body: panelContent.default,
     });
   });
 
@@ -168,7 +168,7 @@ describe("custom pages", () => {
     expect(html).not.toContain("data-copy-markdown");
   });
 
-  test("exposes custom page context through the existing assistant read tool", async () => {
+  test("exposes custom page content through the existing assistant read tool", async () => {
     const requests: GenerateRequest[] = [];
     const app = await createFibelApp({
       ...config,
@@ -177,8 +177,8 @@ describe("custom pages", () => {
           path: "/panel-header",
           title: "PanelHeader",
           description: "A heading and action area.",
-          context: panelContext,
-          render: ({ context }) => context.html,
+          content: panelContent,
+          render: ({ content }) => content.html,
         },
       ],
       plugins: [
@@ -208,6 +208,71 @@ describe("custom pages", () => {
     expect(events).toContain('"href":"/en/panel-header"');
     expect(JSON.stringify(requests)).toContain("panel-header-probe");
     expect(requests[0]?.systemPrompt).toContain("current_page=/en/panel-header");
+  });
+
+  test("keeps deprecated context aliases with once-per-page warnings", async () => {
+    const warn = spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      const app = await createFibelApp({
+        ...config,
+        pages: [
+          {
+            path: "/legacy-context",
+            title: "Legacy context",
+            description: "Legacy custom page.",
+            context: "# Legacy context\n\nLegacy custom-page-probe.",
+            render: ({ context }) => context.html,
+          },
+        ],
+      });
+
+      expect(warn).toHaveBeenCalledTimes(1);
+      expect(warn).toHaveBeenCalledWith(
+        '[fibel] Custom page "/legacy-context" uses deprecated "context"; rename it to "content".',
+      );
+
+      const first = await app.fetch(new Request("http://localhost/en/legacy-context"));
+      const second = await app.fetch(new Request("http://localhost/en/legacy-context"));
+      expect(await first.text()).toContain("Legacy custom-page-probe");
+      expect(second.status).toBe(200);
+      expect(warn).toHaveBeenCalledTimes(2);
+      expect(warn).toHaveBeenLastCalledWith(
+        '[fibel] Custom page "/en/legacy-context" renderer uses deprecated "context"; use "content" instead.',
+      );
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
+  test("prefers content when both definition keys are present", async () => {
+    const warn = spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      const app = await createFibelApp({
+        ...config,
+        pages: [
+          {
+            path: "/content-precedence",
+            title: "Content precedence",
+            description: "Canonical content wins.",
+            content: "# Current\n\ncurrent-content-probe",
+            context: "# Legacy\n\nlegacy-context-probe",
+            render: ({ content }) => content.html,
+          },
+        ],
+      });
+
+      const html = await (
+        await app.fetch(new Request("http://localhost/en/content-precedence"))
+      ).text();
+      expect(html).toContain("current-content-probe");
+      expect(html).not.toContain("legacy-context-probe");
+      expect(warn).toHaveBeenCalledTimes(1);
+      expect(warn).toHaveBeenCalledWith(
+        '[fibel] Custom page "/content-precedence" defines both "content" and deprecated "context"; "content" takes precedence.',
+      );
+    } finally {
+      warn.mockRestore();
+    }
   });
 
   test("rejects invalid and duplicate routes", async () => {
