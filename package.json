@@ -1,6 +1,6 @@
 {
   "name": "@k2b/fibel",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "description": "Config-first documentation runtime for Markdown collections, custom SSR pages, search, and AI-ready source routes.",
   "type": "module",
   "main": "src/index.ts",
