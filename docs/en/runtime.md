@@ -88,7 +88,7 @@ Tagged releases publish the image to GitHub Container Registry:
 
 ```sh
 docker run --rm -p 3000:3000 ghcr.io/k2b-dev/fibel:latest
-docker run --rm -p 3000:3000 ghcr.io/k2b-dev/fibel:v0.7.0
+docker run --rm -p 3000:3000 ghcr.io/k2b-dev/fibel:v0.7.1
 ```
 
 ## Mount in Hono
