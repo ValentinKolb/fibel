@@ -27,6 +27,7 @@ COPY --from=build --chown=bun:bun /app/package.json ./package.json
 COPY --from=build --chown=bun:bun /app/fibel.config.ts ./fibel.config.ts
 COPY --from=build --chown=bun:bun /app/src ./src
 COPY --from=build --chown=bun:bun /app/docs ./docs
+COPY --from=build --chown=bun:bun /app/blog ./blog
 COPY --from=build --chown=bun:bun /app/skills ./skills
 COPY --from=build --chown=bun:bun /app/assets ./assets
 COPY --from=build --chown=bun:bun /app/.fibel ./.fibel

@@ -91,3 +91,21 @@ jobs:
           push: true
           tags: ${{ steps.docker-meta.outputs.tags }}
           labels: ${{ steps.docker-meta.outputs.labels }}
+
+      - name: Smoke-test published container
+        env:
+          IMAGE: ghcr.io/k2b-dev/fibel:${{ github.ref_name }}
+        run: |
+          docker run --detach --name fibel-smoke --publish 127.0.0.1:3000:3000 "$IMAGE"
+          trap 'docker rm --force fibel-smoke >/dev/null 2>&1 || true' EXIT
+
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent --show-error http://127.0.0.1:3000/en/blog >/tmp/fibel-blog.html; then
+              break
+            fi
+            sleep 1
+          done
+
+          grep --fixed-strings 'href="/en/blog/documentation-interface"' /tmp/fibel-blog.html
+          curl --fail --silent --show-error http://127.0.0.1:3000/en/blog/documentation-interface \
+            | grep --fixed-strings 'Documentation is an interface'
