@@ -6,6 +6,7 @@ import type {
   StreamEvent,
 } from "@k2b/nessi/ai";
 import config from "./fixture-config";
+import siteConfig from "../fibel.config";
 import {
   createFibelApp,
   defaultPlugins,
@@ -85,6 +86,48 @@ function customPageProvider(requests: GenerateRequest[]): Provider {
 }
 
 describe("custom pages", () => {
+  test("ships the local counter demo as an indexed custom-page collection", async () => {
+    const app = await createFibelApp({
+      ...siteConfig,
+      plugins: defaultPlugins(),
+    });
+
+    const response = await app.fetch(
+      new Request("http://localhost/en/custom-demo"),
+    );
+    expect(response.status).toBe(200);
+    const html = await response.text();
+    expect(html).toContain("data-counter-demo");
+    expect(html).toContain('data-counter-action="increment"');
+    expect(html).toContain("Custom Demo");
+
+    const raw = await (
+      await app.fetch(new Request("http://localhost/en/custom-demo.md"))
+    ).text();
+    expect(raw).toContain("# Hello world counter");
+    expect(raw).toContain("custom-page-counter-demo");
+
+    const search = await (
+      await app.fetch(
+        new Request(
+          "http://localhost/_fibel/search?locale=en&collection=custom-demo&q=counter",
+        ),
+      )
+    ).json();
+    expect(search.results).toEqual([
+      expect.objectContaining({
+        title: "Hello world counter",
+        href: "/en/custom-demo",
+        collection: "custom-demo",
+      }),
+    ]);
+
+    expect(app.context.nav.get("en:custom-demo")?.[0]?.pages[0]).toMatchObject({
+      href: "/en/custom-demo",
+      kind: "custom",
+    });
+  });
+
   test("renders, indexes, and publishes shared or localized Markdown content", async () => {
     const app = await createFibelApp({
       ...config,

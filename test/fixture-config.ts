@@ -7,6 +7,7 @@ const config = {
   content: "docs",
   collections: undefined,
   defaultCollection: undefined,
+  pages: undefined,
   plugins: [...defaultPlugins(), agentSkillsPlugin({ directory: "skills" })],
 } satisfies FibelConfig;
 
