@@ -27,7 +27,6 @@
   "dependencies": {
     "@k2b/nessi": "^0.10.0",
     "@k2b/stdlib": "^0.17.0",
-    "@k2b/sync": "^5.7.0",
     "@modelcontextprotocol/sdk": "1.30.0",
     "bun-plugin-tailwind": "^0.1.2",
     "marked": "^16.4.1",

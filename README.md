@@ -475,7 +475,7 @@ The built-in plugin set includes Markdown rendering, theme handling, i18n checks
 
 ### Documentation assistant
 
-The optional assistant plugin uses `@k2b/nessi` to answer from visible documentation pages. Its default `@k2b/sync/browser` rate limiters and sessions live in the Fibel process, so a single-server deployment needs no Redis or database.
+The optional assistant plugin uses `@k2b/nessi` to answer from visible documentation pages. Its built-in rate limiters and sessions live in the Fibel process, so a single-server deployment needs no Redis or database.
 
 ```ts
 import { assistantPlugin, providerFromEnv } from "@k2b/fibel/plugins";
@@ -495,7 +495,7 @@ FIBEL_AI_MODEL=provider/model-name
 OPENROUTER_API_KEY=...
 ```
 
-The defaults limit each session to 5 requests per minute, the process to 100 requests per day, each response to 3 agent turns and 600 output tokens, and concurrent generations to 2. In-memory limits reset on restart and are separate per replica. Multiple replicas can inject Redis-backed limiters from `@k2b/sync` plus a shared Nessi session store. Configure a provider-account spending cap as the final financial limit.
+The defaults limit each session to 5 requests per minute, the process to 100 requests per day, each response to 3 agent turns and 600 output tokens, and concurrent generations to 2. In-memory limits reset on restart and are separate per replica. Multiple replicas can inject shared limiters implementing `RateLimiter` from `@k2b/fibel/plugins` plus a shared Nessi session store. Configure a provider-account spending cap as the final financial limit.
 
 ## Commands
 

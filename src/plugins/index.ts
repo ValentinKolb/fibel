@@ -29,6 +29,7 @@ export type { BlogOptions } from "./blog";
 export type { AssistantProviderEnv, AssistantProviderName } from "./assistant-provider";
 export type { ImprintOptions } from "./imprint";
 export type { LayoutOptions } from "./layout";
+export type { RateLimiter, RateLimitResult } from "./rate-limit";
 export type { McpOptions } from "./mcp";
 
 export function defaultPlugins(): FibelPlugin[] {

@@ -91,10 +91,10 @@ Each endpoint closes over its own Fibel context. Navigation, locales, visible pa
 
 The plugin implements no authentication and should expose only documentation intended for public access. It applies fixed request-size, document-size, concurrency, and per-process request limits. The default rate limiter is in memory and requires no infrastructure.
 
-Deployments with several replicas can inject an existing shared `@k2b/sync` rate limiter:
+Deployments with several replicas can inject an existing shared rate limiter:
 
 ```ts
-import type { RateLimiter } from "@k2b/sync";
+import type { RateLimiter } from "@k2b/fibel/plugins";
 import { mcpPlugin } from "@k2b/fibel/plugins";
 
 declare const sharedMcpRateLimiter: RateLimiter;
@@ -103,5 +103,7 @@ mcpPlugin({
   rateLimiter: sharedMcpRateLimiter,
 });
 ```
+
+`check(identifier)` must atomically count and evaluate requests across replicas and return `{ limited, resetIn }`, with `resetIn` in milliseconds. MCP uses the shared key `"public"`.
 
 The MCP endpoint performs no model calls, so these limits protect server work and response bandwidth rather than provider spend.

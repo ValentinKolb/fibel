@@ -1,13 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { ratelimit } from "@k2b/sync/browser";
+import { createMemoryRateLimiter } from "../src/plugins/rate-limit";
 import config from "./fixture-config";
 import { createFibelApp, defaultPlugins, type FibelConfig } from "../src";
 import {
   agentSkillsPlugin,
   mcpPlugin,
 } from "../src/plugins";
-
-let limiterId = 0;
 
 function mcpConfig(overrides: Partial<FibelConfig> = {}): FibelConfig {
   return {
@@ -21,13 +19,8 @@ function mcpConfig(overrides: Partial<FibelConfig> = {}): FibelConfig {
 }
 
 function testMcpPlugin() {
-  limiterId += 1;
   return mcpPlugin({
-    rateLimiter: ratelimit({
-      id: `fibel-mcp-test-${limiterId}`,
-      limit: 1_000,
-      windowSecs: 60,
-    }),
+    rateLimiter: createMemoryRateLimiter(1_000, 60_000),
   });
 }
 
@@ -482,11 +475,7 @@ describe("MCP plugin", () => {
       plugins: [
         ...defaultPlugins(),
         mcpPlugin({
-          rateLimiter: ratelimit({
-            id: `fibel-mcp-limited-test-${Date.now()}`,
-            limit: 1,
-            windowSecs: 60,
-          }),
+          rateLimiter: createMemoryRateLimiter(1, 60_000),
         }),
       ],
     });

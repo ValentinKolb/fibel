@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import type { GenerateRequest, GenerateResult, Provider, StreamEvent } from "@k2b/nessi/ai";
-import { ratelimit } from "@k2b/sync/browser";
+import { createMemoryRateLimiter } from "../src/plugins/rate-limit";
 import config from "./fixture-config";
 import { createFibelApp, defaultPlugins } from "../src";
 import {
@@ -562,7 +562,7 @@ describe("assistant plugin", () => {
     expect(html).toContain('<span class="hl-variable">$USER</span>');
   });
 
-  test("enforces injected Sync rate limiters before calling the provider", async () => {
+  test("enforces injected rate limiters before calling the provider", async () => {
     const requests: GenerateRequest[] = [];
     const app = await createFibelApp({
       ...config,
@@ -571,8 +571,8 @@ describe("assistant plugin", () => {
         assistantPlugin({
           provider: docsProvider(requests),
           rateLimiters: {
-            session: ratelimit({ id: "test-session-limit", limit: 1, windowSecs: 60 }),
-            global: ratelimit({ id: "test-global-limit", limit: 10, windowSecs: 60 }),
+            session: createMemoryRateLimiter(1, 60_000),
+            global: createMemoryRateLimiter(10, 60_000),
           },
         }),
       ],

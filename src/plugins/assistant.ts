@@ -8,7 +8,7 @@ import {
   type Usage,
 } from "@k2b/nessi";
 import { timing } from "@k2b/stdlib";
-import { ratelimit, type RateLimiter } from "@k2b/sync/browser";
+import { createMemoryRateLimiter, type RateLimiter } from "./rate-limit";
 import { z } from "zod";
 import type { FibelContext, FibelPage, FibelPlugin, SearchEntry } from "../types";
 import { escapeHtml, joinUrl, json } from "../utils";
@@ -129,18 +129,10 @@ export function assistantPlugin(options: AssistantOptions): FibelPlugin {
   const rateLimiters: AssistantRateLimiters = {
     session:
       options.rateLimiters?.session ??
-      ratelimit({
-        id: "fibel-assistant-session",
-        limit: limits.requestsPerMinute,
-        windowSecs: 60,
-      }),
+      createMemoryRateLimiter(limits.requestsPerMinute, 60_000),
     global:
       options.rateLimiters?.global ??
-      ratelimit({
-        id: "fibel-assistant-global",
-        limit: limits.requestsPerDay,
-        windowSecs: 24 * 60 * 60,
-      }),
+      createMemoryRateLimiter(limits.requestsPerDay, 24 * 60 * 60 * 1_000),
   };
 
   const sessions = new Map<string, SessionRecord>();

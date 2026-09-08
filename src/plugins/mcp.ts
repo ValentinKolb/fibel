@@ -1,6 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
-import { ratelimit, type RateLimiter } from "@k2b/sync/browser";
+import { createMemoryRateLimiter, type RateLimiter } from "./rate-limit";
 import { z } from "zod";
 import type { FibelContext, FibelPage, FibelPlugin } from "../types";
 import { joinUrl } from "../utils";
@@ -29,11 +29,7 @@ export function mcpPlugin(options: McpOptions = {}): FibelPlugin {
     setup(context) {
       const endpoint = mcpEndpoint(context);
       const script = joinUrl(context.config.routing.basePath, context.config.routing.internalPath, "mcp.js");
-      rateLimiter ??= ratelimit({
-        id: `fibel-mcp:${context.config.routing.basePath || "root"}`,
-        limit: requestsPerMinute,
-        windowSecs: 60,
-      });
+      rateLimiter ??= createMemoryRateLimiter(requestsPerMinute, 60_000);
 
       addAgentSetupUi(context, {
         mcp: {

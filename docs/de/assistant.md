@@ -74,7 +74,7 @@ Die Standardkonfiguration ist für einen Bun-Prozess ausgelegt und braucht weder
 - jede Antwort auf höchstens 3 Nessi-Turns und 600 Output-Tokens;
 - Session-History, Tool-Ergebnisse, Suchtreffer, Seitenauszüge, Session-Anzahl und Request-Dauer.
 
-Die Rate-Limiter stammen aus `@k2b/sync/browser` und liegen im Arbeitsspeicher. Ihre Zähler und Chat-Sessions werden bei einem Prozessneustart zurückgesetzt. Jede Replica besitzt eigene Zähler und Sessions.
+Fibels eingebaute Rate-Limiter liegen im Arbeitsspeicher. Ihre Zähler und Chat-Sessions werden bei einem Prozessneustart zurückgesetzt. Jede Replica besitzt eigene Zähler und Sessions.
 
 Im Provider-Konto sollte zusätzlich ein Ausgabenlimit als neustartfeste finanzielle Grenze gesetzt werden. Die Anwendungsgrenzen reduzieren versehentliche Nutzung, ersetzen aber kein Provider-Budget.
 
@@ -105,21 +105,24 @@ assistantPlugin({
 
 ## Limits zwischen Replicas teilen
 
-Bei mehreren Fibel-Replicas lassen sich serverseitige Limiter aus `@k2b/sync` injizieren. Das Plugin akzeptiert dasselbe `RateLimiter`-Interface wie der In-Memory-Standard:
+Bei mehreren Fibel-Replicas lassen sich gemeinsame Rate-Limiter mit bestehendem Speicher, etwa Redis, injizieren. Der Typ `RateLimiter` wird aus `@k2b/fibel/plugins` importiert. Seine Methode `check(identifier)` liefert ein Promise mit `{ limited: boolean, resetIn: number }`; `resetIn` bezeichnet die Zeit bis zum Ende des aktuellen Fensters in Millisekunden. Die Prüfung muss den Request über alle Replicas hinweg atomar zählen und das Limit auswerten:
 
 ```ts
-import { ratelimit } from "@k2b/sync";
+import type { RateLimiter } from "@k2b/fibel/plugins";
+
+declare const sharedSessionRateLimiter: RateLimiter;
+declare const sharedGlobalRateLimiter: RateLimiter;
 
 assistantPlugin({
   provider: providerFromEnv(),
   rateLimiters: {
-    session: ratelimit({ id: "fibel-assistant-session", limit: 5, windowSecs: 60 }),
-    global: ratelimit({ id: "fibel-assistant-global", limit: 100, windowSecs: 86_400 }),
+    session: sharedSessionRateLimiter,
+    global: sharedGlobalRateLimiter,
   },
 });
 ```
 
-Das Server-Paket nutzt Redis über Bun. `createSessionStore` ist außerdem erforderlich, wenn der Chatverlauf einer Session zwischen Replicas folgen muss. Ohne diesen Store werden nur die Rate-Limit-Zähler geteilt.
+Die gemeinsamen Limiter müssen getrennte Session- und globale Zähler verwenden. `createSessionStore` ist außerdem erforderlich, wenn der Chatverlauf einer Session zwischen Replicas folgen muss. Ohne diesen Store werden nur die Rate-Limit-Zähler geteilt.
 
 ## Kontext steuern
 

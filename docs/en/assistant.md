@@ -74,7 +74,7 @@ The default configuration is designed for one Bun process and needs no Redis, da
 - at most 3 Nessi turns and 600 output tokens per response;
 - bounded session history, tool results, search results, page excerpts, session count, and request duration.
 
-The rate limiters come from `@k2b/sync/browser` and live in memory. Their counters and chat sessions reset when the process restarts. Each replica has separate counters and sessions.
+Fibel’s built-in rate limiters live in memory. Their counters and chat sessions reset when the process restarts. Each replica has separate counters and sessions.
 
 Set a spending limit in the provider account as the restart-proof financial backstop. Application limits reduce accidental usage, but they do not replace a provider-side budget.
 
@@ -105,21 +105,24 @@ assistantPlugin({
 
 ## Share limits across replicas
 
-For multiple Fibel replicas, inject server-side `@k2b/sync` limiters. The plugin accepts the same `RateLimiter` interface used by the in-memory default:
+For multiple Fibel replicas, inject shared rate limiters backed by your existing storage, such as Redis. Import the `RateLimiter` type from `@k2b/fibel/plugins`. Its `check(identifier)` method returns a promise with `{ limited: boolean, resetIn: number }`, where `resetIn` is the time until the current window ends in milliseconds. Checking must atomically count the request and evaluate the limit across replicas:
 
 ```ts
-import { ratelimit } from "@k2b/sync";
+import type { RateLimiter } from "@k2b/fibel/plugins";
+
+declare const sharedSessionRateLimiter: RateLimiter;
+declare const sharedGlobalRateLimiter: RateLimiter;
 
 assistantPlugin({
   provider: providerFromEnv(),
   rateLimiters: {
-    session: ratelimit({ id: "fibel-assistant-session", limit: 5, windowSecs: 60 }),
-    global: ratelimit({ id: "fibel-assistant-global", limit: 100, windowSecs: 86_400 }),
+    session: sharedSessionRateLimiter,
+    global: sharedGlobalRateLimiter,
   },
 });
 ```
 
-The server package uses Redis through Bun. Also provide `createSessionStore` when chat history must follow a user between replicas. Without it, only the rate counters are shared.
+Configure separate session and global counters in your shared limiters. Also provide `createSessionStore` when chat history must follow a user between replicas. Without it, only the rate counters are shared.
 
 ## Control context
 

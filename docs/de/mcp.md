@@ -94,10 +94,10 @@ Jeder Endpunkt verwendet ausschließlich den Kontext seiner Fibel-Instanz. Navig
 
 Das Plugin implementiert keine Authentifizierung und sollte nur Dokumentation bereitstellen, die für öffentlichen Zugriff bestimmt ist. Feste Grenzen gelten für Request-Größe, Dokumentgröße, parallele Requests und die Request-Rate pro Prozess. Der standardmäßige Rate-Limiter liegt im Speicher und benötigt keine zusätzliche Infrastruktur.
 
-Deployments mit mehreren Replikas können einen bereits vorhandenen gemeinsamen `@k2b/sync`-Rate-Limiter übergeben:
+Deployments mit mehreren Replikas können einen bereits vorhandenen gemeinsamen Rate-Limiter übergeben:
 
 ```ts
-import type { RateLimiter } from "@k2b/sync";
+import type { RateLimiter } from "@k2b/fibel/plugins";
 import { mcpPlugin } from "@k2b/fibel/plugins";
 
 declare const sharedMcpRateLimiter: RateLimiter;
@@ -106,5 +106,7 @@ mcpPlugin({
   rateLimiter: sharedMcpRateLimiter,
 });
 ```
+
+`check(identifier)` muss Requests über alle Replikas hinweg atomar zählen und prüfen und `{ limited, resetIn }` zurückgeben, mit `resetIn` in Millisekunden. MCP verwendet den gemeinsamen Schlüssel `"public"`.
 
 Der MCP-Endpunkt führt keine Modellaufrufe aus. Die Grenzen schützen daher Serverarbeit und Antwortbandbreite und nicht das Budget eines KI-Providers.
